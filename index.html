@@ -2,177 +2,54 @@
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
-<title>Radio PRO</title>
-
-<link rel="manifest" href="manifest.json">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RADIO FIXED</title>
 
 <style>
-body{
-margin:0;
-background:#0b0b0b;
-color:white;
-font-family:Arial;
-}
-
-header{
-text-align:center;
-padding:12px;
-font-size:20px;
-color:#ff2a2a;
-font-weight:bold;
-}
-
-.grid{
-display:grid;
-grid-template-columns:repeat(2,1fr);
-gap:10px;
-padding:10px;
-padding-bottom:80px;
-}
-
-.card{
-background:#111;
-border:1px solid #222;
-border-radius:14px;
-padding:14px;
-text-align:center;
-cursor:pointer;
-transition:0.2s;
-user-select:none;
-}
-
-.card:active{
-transform:scale(0.96);
-border-color:#ff2a2a;
-}
-
-.logo{
-width:44px;
-height:44px;
-margin:0 auto 8px;
-background:#ff2a2a;
-border-radius:12px;
-display:flex;
-align-items:center;
-justify-content:center;
-font-size:11px;
-font-weight:bold;
-}
-
-#player{
-position:fixed;
-bottom:0;
-left:0;
-right:0;
-background:#111;
-padding:12px;
-display:flex;
-justify-content:center;
-gap:10px;
-border-top:1px solid #222;
-}
-
-button{
-background:black;
-color:white;
-border:1px solid #ff2a2a;
-padding:10px 14px;
-border-radius:10px;
-cursor:pointer;
-}
-
-button:active{
-transform:scale(0.95);
-}
+body{margin:0;background:#000;color:#fff;font-family:Arial;text-align:center;}
+button{padding:12px;margin:8px;border:1px solid red;background:#111;color:#fff;width:90%;}
+h2{color:red;}
 </style>
 </head>
 
 <body>
 
-<header>📻 RADIO PRO (GitHub PWA)</header>
+<h2>📻 WORKING RADIO ONLY</h2>
 
-<div class="grid" id="grid"></div>
+<button onclick="play('https://rs8-krk2-cyfronet.rmfstream.pl/RMFFM48.mp3')">RMF FM</button>
 
-<div id="player">
-<button onclick="stopRadio()">⏹ STOP</button>
-</div>
+<button onclick="play('https://zt01.cdn.eurozet.pl/ZET128.mp3')">Radio ZET</button>
 
-<audio id="audio"></audio>
+<button onclick="play('https://waw01-02.cdn.eurozet.pl/ESKA.mp3')">Radio Eska</button>
+
+<button onclick="play('https://radiostream.pl/tuba9-1.mp3')">TOK FM</button>
+
+<button onclick="stop()">STOP</button>
+
+<audio id="audio" controls style="width:100%;margin-top:20px;"></audio>
 
 <script>
 
 const audio = document.getElementById("audio");
 
-/* 🔥 TYLKO STABILNE DIRECT STREAMS */
-const stations = [
-{
-name:"RMF FM",
-url:"https://rs8-krk2-cyfronet.rmfstream.pl/RMFFM48.mp3"
-},
-{
-name:"Radio ZET",
-url:"https://zt01.cdn.eurozet.pl/ZET128.mp3"
-},
-{
-name:"Radio Eska",
-url:"https://waw01-02.cdn.eurozet.pl/ESKA.mp3"
-},
-{
-name:"TOK FM",
-url:"https://radiostream.pl/tuba9-1.mp3"
-},
-{
-name:"BBC Radio 1",
-url:"https://stream.live.vc.bbcmedia.co.uk/bbc_radio_one"
-},
-{
-name:"BBC 1Xtra",
-url:"https://stream.live.vc.bbcmedia.co.uk/bbc_1xtra"
-},
-{
-name:"Radio Wrocław",
-url:"https://stream4.nadaje.com:9001/radiowroclaw"
-}
-];
-
 function play(url){
 
-stopRadio();
+stop();
 
 audio.src = url;
 audio.load();
 
-audio.play().catch(err=>{
-alert("❌ STREAM BLOCKED / NOT SUPPORTED");
-console.log(err);
+audio.play().catch(e=>{
+alert("NIE DZIAŁA W TWOJEJ PRZEGLĄDARCE");
+console.log(e);
 });
 
 }
 
-function stopRadio(){
+function stop(){
 audio.pause();
-audio.src = "";
+audio.src="";
 }
-
-const grid = document.getElementById("grid");
-
-stations.forEach(s=>{
-
-const card = document.createElement("div");
-card.className = "card";
-
-card.innerHTML = `
-<div class="logo">${s.name.slice(0,3).toUpperCase()}</div>
-<div>${s.name}</div>
-`;
-
-card.onclick = ()=>play(s.url);
-
-grid.appendChild(card);
-
-});
 
 </script>
 
