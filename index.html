@@ -21,7 +21,7 @@ height:100vh;
 }
 
 #title{
-font-size:70px;
+font-size:80px;
 margin-top:40px;
 color:#ff2a2a;
 text-shadow:0 0 20px red;
@@ -81,20 +81,27 @@ cursor:pointer;
 
 const audio = document.getElementById("audio");
 
-/* 🔥 TYLKO REALNIE DZIAŁAJĄCE STREAMY */
 const stations = [
 
 { name:"Muzyczne Radio", url:"https://stream.rcs.revma.com/gzwc1xcq042vv" },
 
 { name:"RMF FM", url:"https://rs8-krk2-cyfronet.rmfstream.pl/RMFFM48.mp3" },
+{ name:"RMF MAXX", url:"https://rs8-krk2-cyfronet.rmfstream.pl/RMFMAXXX48.mp3" },
 
 { name:"Radio ZET", url:"https://zt01.cdn.eurozet.pl/ZET128.mp3" },
-
 { name:"Radio Eska", url:"https://waw01-02.cdn.eurozet.pl/ESKA.mp3" },
+
+{ name:"Eska ROCK", url:"https://waw01-02.cdn.eurozet.pl/ESKAROCK.mp3" },
 
 { name:"Radio Wrocław", url:"https://stream4.nadaje.com:9001/radiowroclaw" },
 
-{ name:"Radio 357", url:"https://stream.radio357.pl" }
+{ name:"Radio 357", url:"https://stream.radio357.pl" },
+
+{ name:"Radio Nowy Świat", url:"https://stream.nowyswiat.online" },
+
+{ name:"Radio Pogoda", url:"https://zt01.cdn.eurozet.pl/POGODA.mp3" },
+
+{ name:"Antyradio", url:"https://antyradio.cdn.eurozet.pl/antyradio.mp3" }
 
 ];
 
@@ -120,7 +127,7 @@ container.appendChild(div);
 /* controls */
 function play(){
 audio.src = current;
-audio.play().catch(()=>alert("Nie można odtworzyć"));
+audio.play().catch(()=>alert("STREAM ERROR"));
 }
 
 function stop(){
