@@ -1,46 +1,69 @@
 <!DOCTYPE html>
-<html>
+<html lang="pl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Radio PRO APK</title>
+<title>Stable Radio</title>
 
 <style>
-body{margin:0;background:#0b0b0b;color:#fff;font-family:Arial;}
-h1{text-align:center;color:red;font-size:18px;}
+body{
+margin:0;
+background:#0b0b0b;
+color:white;
+font-family:Arial;
+}
 
-.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:10px;}
+h1{
+text-align:center;
+color:#ff2a2a;
+font-size:18px;
+padding:10px;
+}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(2,1fr);
+gap:10px;
+padding:10px;
+}
 
 .card{
 background:#111;
-padding:14px;
-border-radius:12px;
-text-align:center;
 border:1px solid #222;
+border-radius:12px;
+padding:14px;
+text-align:center;
 cursor:pointer;
 }
 
-.card:active{transform:scale(0.97);border-color:red;}
-
-.logo{
-width:42px;height:42px;margin:auto;
-background:red;border-radius:10px;
-display:flex;align-items:center;justify-content:center;
-font-size:10px;
+.card:active{
+transform:scale(0.97);
+border-color:red;
 }
 
 #player{
-position:fixed;bottom:0;width:100%;
-background:#111;padding:10px;
+position:fixed;
+bottom:0;
+width:100%;
+background:#111;
+padding:10px;
 text-align:center;
+border-top:1px solid #222;
 }
-button{padding:10px;border:1px solid red;background:black;color:white;}
+
+button{
+padding:10px 14px;
+background:black;
+color:white;
+border:1px solid red;
+cursor:pointer;
+}
 </style>
 </head>
 
 <body>
 
-<h1>🔥 RADIO APK SYSTEM</h1>
+<h1>📻 STABLE RADIO (WORKING ONLY)</h1>
 
 <div class="grid" id="grid"></div>
 
@@ -52,30 +75,41 @@ button{padding:10px;border:1px solid red;background:black;color:white;}
 
 <script>
 
-const API = "https://TWOJ-BACKEND.onrender.com/api/";
-
-const stations = [
-{ id:"rmf", name:"RMF FM" },
-{ id:"zet", name:"Radio ZET" },
-{ id:"eska", name:"Radio Eska" },
-{ id:"jedynka", name:"PR Jedynka" },
-{ id:"trojka", name:"PR Trójka" }
-];
-
 const audio = document.getElementById("audio");
 
-async function play(id){
+/* 🔥 TYLKO PEWNE STREAMY (PUBLIC MP3/AAC) */
+const stations = [
+{
+name:"RMF FM",
+url:"https://rs8-krk2-cyfronet.rmfstream.pl/RMFFM48.mp3"
+},
+{
+name:"Radio ZET",
+url:"https://zt01.cdn.eurozet.pl/ZET128.mp3"
+},
+{
+name:"Radio Eska",
+url:"https://waw01-02.cdn.eurozet.pl/ESKA.mp3"
+},
+{
+name:"TOK FM",
+url:"https://radiostream.pl/tuba9-1.mp3"
+},
+{
+name:"BBC Radio 1",
+url:"https://stream.live.vc.bbcmedia.co.uk/bbc_radio_one"
+}
+];
+
+function play(url){
 
 stop();
 
-const r = await fetch(API + id);
-const data = await r.json();
-
-audio.src = data.stream;
+audio.src = url;
 audio.load();
 
 audio.play().catch(e=>{
-alert("PLAY ERROR");
+alert("PLAY ERROR: " + e.message);
 console.log(e);
 });
 
@@ -89,11 +123,13 @@ audio.src="";
 const grid = document.getElementById("grid");
 
 stations.forEach(s=>{
+
 let d=document.createElement("div");
 d.className="card";
-d.innerHTML=`<div class="logo">${s.name.slice(0,3)}</div><div>${s.name}</div>`;
-d.onclick=()=>play(s.id);
+d.innerHTML=`<div>${s.name}</div>`;
+d.onclick=()=>play(s.url);
 grid.appendChild(d);
+
 });
 
 </script>
