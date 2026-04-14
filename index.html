@@ -6,137 +6,73 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
-
 <style>
 body{
 margin:0;
 background:#000;
 color:#fff;
-font-family:'Orbitron',sans-serif;
-display:flex;
-flex-direction:column;
-align-items:center;
-height:100vh;
+font-family:Arial;
+text-align:center;
 }
 
 #title{
-font-size:80px;
-margin-top:40px;
-color:#ff2a2a;
-text-shadow:0 0 20px red;
-}
-
-#controls{
-display:flex;
-gap:10px;
+font-size:40px;
 margin-top:20px;
-flex-wrap:wrap;
-justify-content:center;
+color:#ff2a2a;
 }
 
 button{
-width:150px;
-height:45px;
-background:#111;
-color:#fff;
-border:2px solid red;
-font-family:'Orbitron';
-cursor:pointer;
-}
-
-#stations{
-margin-top:30px;
 width:90%;
-display:grid;
-grid-template-columns:repeat(2,1fr);
-gap:10px;
-}
-
-.station{
+margin:6px;
+padding:14px;
 background:#111;
-padding:12px;
-border-radius:10px;
-text-align:center;
-cursor:pointer;
+color:white;
+border:1px solid red;
+font-size:16px;
 }
 </style>
 </head>
 
 <body>
 
-<div id="title">Moje Radio</div>
+<div id="title">📻 Moje Radio</div>
 
-<div id="controls">
-<button onclick="play()">PLAY</button>
+<button onclick="play('https://stream.rcs.revma.com/gzwc1xcq042vv')">Muzyczne Radio</button>
+
+<button onclick="play('https://rs8-krk2-cyfronet.rmfstream.pl/RMFFM48.mp3')">RMF FM</button>
+
+<button onclick="play('https://rs8-krk2-cyfronet.rmfstream.pl/RMFMAXXX48.mp3')">RMF MAXX</button>
+
+<button onclick="play('https://zt01.cdn.eurozet.pl/ZET128.mp3')">Radio ZET</button>
+
+<button onclick="play('https://waw01-02.cdn.eurozet.pl/ESKA.mp3')">Radio Eska</button>
+
+<button onclick="play('https://waw01-02.cdn.eurozet.pl/ESKAROCK.mp3')">Eska ROCK</button>
+
+<button onclick="play('https://zt01.cdn.eurozet.pl/POGODA.mp3')">Radio Pogoda</button>
+
+<button onclick="play('https://antyradio.cdn.eurozet.pl/antyradio.mp3')">Antyradio</button>
+
+<button onclick="play('https://stream4.nadaje.com:9001/radiowroclaw')">Radio Wrocław</button>
+
 <button onclick="stop()">STOP</button>
-<button onclick="mute()">MUTE</button>
-</div>
 
-<div id="stations"></div>
-
-<audio id="audio" controls style="width:90%;margin-top:20px;"></audio>
+<audio id="audio" controls style="width:100%;margin-top:20px;"></audio>
 
 <script>
 
 const audio = document.getElementById("audio");
 
-const stations = [
-
-{ name:"Muzyczne Radio", url:"https://stream.rcs.revma.com/gzwc1xcq042vv" },
-
-{ name:"RMF FM", url:"https://rs8-krk2-cyfronet.rmfstream.pl/RMFFM48.mp3" },
-{ name:"RMF MAXX", url:"https://rs8-krk2-cyfronet.rmfstream.pl/RMFMAXXX48.mp3" },
-
-{ name:"Radio ZET", url:"https://zt01.cdn.eurozet.pl/ZET128.mp3" },
-{ name:"Radio Eska", url:"https://waw01-02.cdn.eurozet.pl/ESKA.mp3" },
-
-{ name:"Eska ROCK", url:"https://waw01-02.cdn.eurozet.pl/ESKAROCK.mp3" },
-
-{ name:"Radio Wrocław", url:"https://stream4.nadaje.com:9001/radiowroclaw" },
-
-{ name:"Radio 357", url:"https://stream.radio357.pl" },
-
-{ name:"Radio Nowy Świat", url:"https://stream.nowyswiat.online" },
-
-{ name:"Radio Pogoda", url:"https://zt01.cdn.eurozet.pl/POGODA.mp3" },
-
-{ name:"Antyradio", url:"https://antyradio.cdn.eurozet.pl/antyradio.mp3" }
-
-];
-
-let current = stations[0].url;
-
-/* UI */
-const container = document.getElementById("stations");
-
-stations.forEach(s=>{
-const div = document.createElement("div");
-div.className="station";
-div.innerText = s.name;
-
-div.onclick = ()=>{
-current = s.url;
-audio.src = current;
-audio.play();
-};
-
-container.appendChild(div);
+function play(url){
+audio.src = url;
+audio.play().catch(()=>{
+alert("Ta stacja nie może być odtworzona w tej przeglądarce");
 });
-
-/* controls */
-function play(){
-audio.src = current;
-audio.play().catch(()=>alert("STREAM ERROR"));
 }
 
 function stop(){
 audio.pause();
 audio.src="";
-}
-
-function mute(){
-audio.muted = !audio.muted;
 }
 
 </script>
