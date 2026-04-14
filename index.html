@@ -3,94 +3,95 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Radio App PRO</title>
+<title>Radio App</title>
 
 <style>
 body{
 margin:0;
-background:#0a0a0a;
-font-family:system-ui;
+background:#000;
 color:#fff;
+font-family:Arial;
 }
 
+/* SEKCJE */
 .section{
 width:95%;
-max-width:520px;
+max-width:500px;
 margin:20px auto;
 }
 
 h2{
 font-size:14px;
 color:#aaa;
-margin:10px 5px;
 }
 
+/* GRID */
 .grid{
 display:grid;
-grid-template-columns:repeat(3,1fr);
-gap:14px;
+grid-template-columns:repeat(4,1fr);
+gap:10px;
 }
 
+/* TILE */
 .tile{
-position:relative;
-aspect-ratio:1;
-border-radius:22px;
-background:linear-gradient(145deg,#111,#1a1a1a);
+background:#111;
+border-radius:12px;
 display:flex;
+flex-direction:column;
 align-items:center;
 justify-content:center;
+padding:10px;
 cursor:pointer;
-transition:0.2s;
-box-shadow:0 4px 20px rgba(0,0,0,0.5);
-}
-
-.tile img{
-width:70%;
-height:70%;
-object-fit:contain;
+border:1px solid #222;
 }
 
 .tile.active{
-transform:scale(1.05);
-box-shadow:0 0 25px #ff2a2a;
+border:1px solid red;
 }
 
+/* IKONA 1cm */
+.tile img{
+width:38px;
+height:38px;
+object-fit:contain;
+margin-bottom:5px;
+}
+
+/* TEXT fallback */
+.tile span{
+font-size:10px;
+text-align:center;
+}
+
+/* HEART */
 .heart{
-position:absolute;
-top:8px;
-right:8px;
-font-size:18px;
-opacity:0.6;
-cursor:pointer;
+font-size:12px;
+margin-top:4px;
+opacity:0.5;
 }
 
 .heart.active{
-color:#ff2a2a;
+color:red;
 opacity:1;
 }
 
+/* PLAYER */
 #player{
 position:fixed;
 bottom:0;
-left:50%;
-transform:translateX(-50%);
 width:100%;
-max-width:520px;
 background:#111;
-padding:12px;
 display:flex;
-justify-content:space-around;
-border-top:1px solid #222;
+justify-content:center;
+gap:10px;
+padding:10px;
 }
 
 button{
+padding:10px;
 background:#000;
-border:1px solid #ff2a2a;
 color:#fff;
-padding:12px 18px;
-border-radius:12px;
-font-size:14px;
-cursor:pointer;
+border:1px solid red;
 }
 </style>
 </head>
@@ -99,12 +100,12 @@ cursor:pointer;
 
 <div class="section">
 <h2>⭐ ULUBIONE</h2>
-<div id="favGrid" class="grid"></div>
+<div id="fav" class="grid"></div>
 </div>
 
 <div class="section">
 <h2>📻 STACJE</h2>
-<div id="allGrid" class="grid"></div>
+<div id="all" class="grid"></div>
 </div>
 
 <div id="player">
@@ -116,99 +117,100 @@ cursor:pointer;
 
 <script>
 
-/* 🔥 DZIAŁAJĄCE STACJE */
-const stations = [
+/* 🔥 TYLKO PEWNE STREAMY */
+const stations=[
 
-{ id:1, name:"PR1", stream:"https://stream.polskieradio.pl/pr1_mp3", logo:"https://myradioonline.pl/images/radio/polskie-radio-jedynka.png" },
-{ id:2, name:"PR2", stream:"https://stream.polskieradio.pl/pr2_mp3", logo:"https://myradioonline.pl/images/radio/polskie-radio-dwojka.png" },
-{ id:3, name:"PR3", stream:"https://stream.polskieradio.pl/pr3_mp3", logo:"https://myradioonline.pl/images/radio/polskie-radio-trojka.png" },
-{ id:4, name:"PR4", stream:"https://stream.polskieradio.pl/pr4_mp3", logo:"https://myradioonline.pl/images/radio/polskie-radio-czworka.png" },
-{ id:5, name:"Chopin", stream:"https://stream.polskieradio.pl/pr_chopin_mp3", logo:"https://myradioonline.pl/images/radio/polskie-radio-chopin.png" },
+{ id:1,name:"PR1",stream:"https://stream.polskieradio.pl/pr1_mp3" },
+{ id:2,name:"PR2",stream:"https://stream.polskieradio.pl/pr2_mp3" },
+{ id:3,name:"PR3",stream:"https://stream.polskieradio.pl/pr3_mp3" },
+{ id:4,name:"PR4",stream:"https://stream.polskieradio.pl/pr4_mp3" },
 
-{ id:6, name:"Wrocław", stream:"https://stream4.nadaje.com:9192/prw", logo:"https://myradioonline.pl/images/radio/radio-wroclaw.png" },
-{ id:7, name:"RDC", stream:"https://stream4.nadaje.com:8200/rdc", logo:"https://myradioonline.pl/images/radio/radio-dla-ciebie.png" },
+{ id:5,name:"BBC1",stream:"https://stream.live.vc.bbcmedia.co.uk/bbc_radio_one" },
+{ id:6,name:"BBC1X",stream:"https://stream.live.vc.bbcmedia.co.uk/bbc_1xtra" },
 
-{ id:8, name:"BBC1", stream:"http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one", logo:"https://myradioonline.pl/images/radio/bbc-radio-1.png" },
-{ id:9, name:"BBC1X", stream:"http://stream.live.vc.bbcmedia.co.uk/bbc_1xtra", logo:"https://myradioonline.pl/images/radio/bbc-radio-1xtra.png" },
+{ id:7,name:"SLAM",stream:"https://stream.slam.nl/slam_mp3" },
 
-{ id:10, name:"SLAM", stream:"https://stream.slam.nl/slam_mp3", logo:"https://myradioonline.pl/images/radio/slam.png" },
-{ id:11, name:"Ibiza", stream:"https://ibizaglobalradio.streaming-pro.com:8024/stream", logo:"https://myradioonline.pl/images/radio/ibiza-global-radio.png" },
-{ id:12, name:"Sonica", stream:"https://streaming.ibizasonica.com:8000/", logo:"https://myradioonline.pl/images/radio/ibiza-sonica.png" },
-
-{ id:13, name:"1FM Club", stream:"https://strm112.1.fm/club_mobile_mp3", logo:"https://myradioonline.pl/images/radio/1fm.png" },
-{ id:14, name:"Trance", stream:"https://strm112.1.fm/trance_mobile_mp3", logo:"https://myradioonline.pl/images/radio/1fm.png" }
+{ id:8,name:"1FM",stream:"https://strm112.1.fm/club_mobile_mp3" }
 
 ];
+
+/* IKONY LOKALNE (PEWNE) */
+function getIcon(name){
+return "data:image/svg+xml;utf8," + encodeURIComponent(`
+<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40'>
+<rect width='100%' height='100%' fill='black'/>
+<text x='50%' y='55%' font-size='10' fill='red' text-anchor='middle'>${name}</text>
+</svg>
+`);
+}
 
 /* SYSTEM */
 const audio=document.getElementById("audio");
 let current=null;
-let favorites = JSON.parse(localStorage.getItem("fav")) || [];
+let fav=JSON.parse(localStorage.getItem("fav"))||[];
 
 /* TILE */
-function createTile(s){
+function tile(s){
 
-let div=document.createElement("div");
-div.className="tile";
+let d=document.createElement("div");
+d.className="tile";
 
 let img=document.createElement("img");
-img.src=s.logo;
+img.src=getIcon(s.name);
+
+let txt=document.createElement("span");
+txt.textContent=s.name;
 
 let heart=document.createElement("div");
 heart.className="heart";
 heart.innerHTML="❤";
 
-if(favorites.includes(s.id)){
-heart.classList.add("active");
-}
+if(fav.includes(s.id)) heart.classList.add("active");
 
-div.onclick=()=>{
+/* PLAY */
+d.onclick=()=>{
 current=s;
 audio.src=s.stream;
-audio.play();
+audio.play().catch(e=>alert("Błąd audio"));
 
 document.querySelectorAll(".tile").forEach(t=>t.classList.remove("active"));
-div.classList.add("active");
+d.classList.add("active");
 };
 
+/* FAVORITE */
 heart.onclick=(e)=>{
 e.stopPropagation();
 
-if(favorites.includes(s.id)){
-favorites=favorites.filter(id=>id!==s.id);
+if(fav.includes(s.id)){
+fav=fav.filter(i=>i!==s.id);
 }else{
-if(favorites.length>=6){
-alert("Max 6 ulubionych");
-return;
-}
-favorites.push(s.id);
+if(fav.length>=6) return alert("Max 6");
+fav.push(s.id);
 }
 
-localStorage.setItem("fav",JSON.stringify(favorites));
+localStorage.setItem("fav",JSON.stringify(fav));
 render();
 };
 
-div.appendChild(img);
-div.appendChild(heart);
+d.appendChild(img);
+d.appendChild(txt);
+d.appendChild(heart);
 
-return div;
+return d;
 }
 
 /* RENDER */
 function render(){
 
-const favGrid=document.getElementById("favGrid");
-const allGrid=document.getElementById("allGrid");
+let favDiv=document.getElementById("fav");
+let allDiv=document.getElementById("all");
 
-favGrid.innerHTML="";
-allGrid.innerHTML="";
-
-stations.filter(s=>favorites.includes(s.id)).forEach(s=>{
-favGrid.appendChild(createTile(s));
-});
+favDiv.innerHTML="";
+allDiv.innerHTML="";
 
 stations.forEach(s=>{
-allGrid.appendChild(createTile(s));
+if(fav.includes(s.id)) favDiv.appendChild(tile(s));
+allDiv.appendChild(tile(s));
 });
 }
 
