@@ -2,9 +2,7 @@
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
-<title>Moje Radio</title>
-
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Moje Radio PRO</title>
 
 <style>
 body{
@@ -18,7 +16,7 @@ text-align:center;
 #title{
 font-size:40px;
 margin:20px;
-color:#ff2a2a;
+color:red;
 }
 
 button{
@@ -28,70 +26,51 @@ padding:14px;
 background:#111;
 color:white;
 border:1px solid red;
-font-size:16px;
 cursor:pointer;
-}
-
-#player{
-margin-top:15px;
-width:100%;
-}
-audio{
-width:100%;
 }
 </style>
 </head>
 
 <body>
 
-<div id="title">📻 Moje Radio</div>
+<div id="title">📻 Moje Radio PRO</div>
 
-<!-- 🔥 STACJE (TYLKO DZIAŁAJĄCE MP3/AAC) -->
+<div id="list"></div>
 
-<button onclick="play('https://stream.rcs.revma.com/gzwc1xcq042vv')">Muzyczne Radio</button>
-
-<button onclick="play('https://rs8-krk2-cyfronet.rmfstream.pl/RMFFM48.mp3')">RMF FM</button>
-
-<button onclick="play('https://rs8-krk2-cyfronet.rmfstream.pl/RMFMAXXX48.mp3')">RMF MAXX</button>
-
-<button onclick="play('https://zt01.cdn.eurozet.pl/ZET128.mp3')">Radio ZET</button>
-
-<button onclick="play('https://waw01-02.cdn.eurozet.pl/ESKA.mp3')">Radio ESKA</button>
-
-<button onclick="play('https://antyradio.cdn.eurozet.pl/antyradio.mp3')">Antyradio</button>
-
-<button onclick="play('https://zt01.cdn.eurozet.pl/POGODA.mp3')">Radio Pogoda</button>
-
-<button onclick="play('https://waw01-02.cdn.eurozet.pl/ESKAROCK.mp3')">Eska ROCK</button>
-
-<button onclick="play('https://stream4.nadaje.com:9001/radiowroclaw')">Radio Wrocław</button>
-
-<button onclick="play('https://www.voxfm.pl/radio/voxfm.pl.mp3')">VOX FM</button>
-
-<button onclick="stop()">STOP</button>
-
-<div id="player">
-<audio id="audio" controls></audio>
-</div>
+<audio id="audio" controls style="width:100%"></audio>
 
 <script>
 
+const API = "https://TWOJ-WORKER.workers.dev/stations";
+const PROXY = "https://TWOJ-WORKER.workers.dev?url=";
+
 const audio = document.getElementById("audio");
 
-/* 🔥 PLAY */
-function play(url){
-audio.src = url;
-audio.play().catch(err=>{
-alert("❌ STREAM NIE DZIAŁA w tej przeglądarce lub stacja blokuje dostęp");
-console.log(err);
-});
-}
+/* 🔥 LOAD STATIONS */
+fetch(API)
+.then(r=>r.json())
+.then(data=>{
 
-/* STOP */
-function stop(){
-audio.pause();
-audio.src="";
-}
+data.forEach(s=>{
+
+const btn = document.createElement("button");
+btn.innerText = s.name;
+
+btn.onclick = ()=>{
+
+audio.src = PROXY + encodeURIComponent(s.stream);
+audio.play().catch(e=>{
+alert("STREAM ERROR");
+console.log(e);
+});
+
+};
+
+document.getElementById("list").appendChild(btn);
+
+});
+
+});
 
 </script>
 
