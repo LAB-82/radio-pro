@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <title>Moje Radio</title>
-
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
@@ -17,18 +16,35 @@ text-align:center;
 
 #title{
 font-size:40px;
-margin-top:20px;
+margin:20px;
 color:#ff2a2a;
 }
 
+#stations{
+display:grid;
+grid-template-columns:repeat(2,1fr);
+gap:10px;
+padding:10px;
+}
+
 button{
-width:90%;
-margin:6px;
 padding:14px;
 background:#111;
 color:white;
 border:1px solid red;
 font-size:16px;
+cursor:pointer;
+}
+
+#player{
+margin-top:10px;
+height:200px;
+}
+
+iframe{
+width:100%;
+height:100%;
+border:none;
 }
 </style>
 </head>
@@ -37,44 +53,33 @@ font-size:16px;
 
 <div id="title">📻 Moje Radio</div>
 
-<!-- 🔥 STACJE Z MYRADIOONLINE (TYLKO DZIAŁAJĄCE) -->
+<div id="stations">
 
-<button onclick="play('https://stream.rcs.revma.com/gzwc1xcq042vv')">Muzyczne Radio</button>
+<button onclick="loadStation('https://www.muzyczneradio.pl/player')">Muzyczne Radio</button>
 
-<button onclick="play('https://rs8-krk2-cyfronet.rmfstream.pl/RMFFM48.mp3')">RMF FM</button>
+<button onclick="loadStation('https://www.rmf.fm/player')">RMF FM</button>
 
-<button onclick="play('https://rs8-krk2-cyfronet.rmfstream.pl/RMFMAXXX48.mp3')">RMF MAXX</button>
+<button onclick="loadStation('https://player.radiozet.pl/')">Radio ZET</button>
 
-<button onclick="play('https://zt01.cdn.eurozet.pl/ZET128.mp3')">Radio ZET</button>
+<button onclick="loadStation('https://www.eska.pl/player')">Radio ESKA</button>
 
-<button onclick="play('https://waw01-02.cdn.eurozet.pl/ESKA.mp3')">Radio ESKA</button>
+<button onclick="loadStation('https://www.antyradio.pl/player')">Antyradio</button>
 
-<button onclick="play('https://waw01-02.cdn.eurozet.pl/ESKAROCK.mp3')">ESKA ROCK</button>
+<button onclick="loadStation('https://www.radioplus.pl/player')">Radio Plus</button>
 
-<button onclick="play('https://zt01.cdn.eurozet.pl/POGODA.mp3')">Radio Pogoda</button>
+<button onclick="loadStation('https://www.radiowroclaw.pl/player')">Radio Wrocław</button>
 
-<button onclick="play('https://antyradio.cdn.eurozet.pl/antyradio.mp3')">Antyradio</button>
+<button onclick="loadStation('https://nowyswiat.online/player')">Nowy Świat</button>
 
-<button onclick="play('https://stream4.nadaje.com:9001/radiowroclaw')">Radio Wrocław</button>
+</div>
 
-<button onclick="stop()">STOP</button>
-
-<audio id="audio" controls style="width:100%;margin-top:20px;"></audio>
+<div id="player"></div>
 
 <script>
 
-const audio = document.getElementById("audio");
-
-function play(url){
-audio.src = url;
-audio.play().catch(()=>{
-alert("STREAM NIE DZIAŁA (blokada stacji)");
-});
-}
-
-function stop(){
-audio.pause();
-audio.src="";
+function loadStation(url){
+document.getElementById("player").innerHTML =
+`<iframe src="${url}"></iframe>`;
 }
 
 </script>
