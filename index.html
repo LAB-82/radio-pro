@@ -3,9 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Radio LIVE</title>
-
-<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+<title>Radio PRO SYSTEM</title>
 
 <style>
 body{
@@ -16,9 +14,8 @@ font-family:Arial;
 }
 
 .header{
-padding:14px;
 text-align:center;
-font-size:18px;
+padding:12px;
 color:#ff2a2a;
 font-weight:bold;
 }
@@ -30,56 +27,48 @@ gap:10px;
 padding:10px;
 }
 
-.station{
-background:#141414;
-border:1px solid #222;
+.card{
+background:#111;
 border-radius:14px;
-padding:12px;
+padding:10px;
 text-align:center;
 cursor:pointer;
-transition:0.2s;
+border:1px solid #222;
 }
 
-.station:active{
-transform:scale(0.96);
-border-color:#ff2a2a;
+.card:active{
+transform:scale(0.95);
+border-color:red;
 }
 
-.logo{
-width:48px;
-height:48px;
+.icon{
+width:50px;
+height:50px;
 border-radius:12px;
-margin:0 auto 6px;
+margin:auto;
 display:flex;
 align-items:center;
 justify-content:center;
-font-size:10px;
-font-weight:bold;
 background:linear-gradient(45deg,#ff2a2a,#111);
+font-weight:bold;
 }
 
-.name{
-font-size:11px;
-opacity:0.9;
-}
-
-#controls{
+#player{
 position:fixed;
 bottom:0;
 width:100%;
+background:#111;
 display:flex;
 justify-content:center;
-gap:10px;
 padding:10px;
-background:#111;
-border-top:1px solid #222;
+gap:10px;
 }
 
 button{
-padding:10px 16px;
-background:#000;
-border:1px solid #ff2a2a;
-color:#fff;
+padding:10px 14px;
+background:black;
+color:white;
+border:1px solid red;
 cursor:pointer;
 }
 </style>
@@ -87,101 +76,69 @@ cursor:pointer;
 
 <body>
 
-<div class="header">🔥 LIVE RADIO ENGINE</div>
+<div class="header">🔥 RADIO PRO SYSTEM</div>
 
 <div class="grid" id="grid"></div>
 
-<div id="controls">
-<button onclick="stopRadio()">STOP</button>
+<div id="player">
+<button onclick="stop()">STOP</button>
 </div>
 
 <audio id="audio" controls style="display:none;"></audio>
 
 <script>
 
-const audio = document.getElementById("audio");
-let hls = null;
+const API = "https://TWOJ-SERVER.onrender.com/stream/";
 
-/* 🔥 TYLKO STACJE KTÓRE REALNIE MAJĄ PUBLICZNE STREAMY */
 const stations = [
-
-/* 🇵🇱 POLSKA */
-{ name:"RMF FM", url:"https://rs8-krk2-cyfronet.rmfstream.pl/RMFFM48.mp3" },
-{ name:"Radio Zet", url:"https://zt01.cdn.eurozet.pl/ZET128.mp3" },
-{ name:"Eska", url:"https://waw01-02.cdn.eurozet.pl/ESKA.mp3" },
-
-{ name:"Polskie Radio 1", url:"https://stream.polskieradio.pl/pr1_mp3_128" },
-{ name:"Polskie Radio 3", url:"https://stream.polskieradio.pl/pr3_mp3_128" },
-
-{ name:"TOK FM", url:"https://radiostream.pl/tuba9-1.mp3" },
-
-/* 🌍 ZAGRANICA */
-{ name:"BBC Radio 1", url:"https://stream.live.vc.bbcmedia.co.uk/bbc_radio_one" },
-{ name:"BBC 1Xtra", url:"https://stream.live.vc.bbcmedia.co.uk/bbc_1xtra" },
-
-{ name:"SLAM FM", url:"https://stream.slam.nl/slam_mp3" },
-
-{ name:"1.FM Club", url:"https://strm112.1.fm/club_mobile_mp3" }
-
+{ id:"rmf", name:"RMF FM" },
+{ id:"zet", name:"Radio ZET" },
+{ id:"eska", name:"Radio Eska" },
+{ id:"tokfm", name:"TOK FM" },
+{ id:"bbc1", name:"BBC Radio 1" }
 ];
 
-/* 🔥 PLAY ENGINE (REAL FIXED VERSION) */
-function play(url){
+const audio = document.getElementById("audio");
 
-stopRadio();
+function play(id){
 
-setTimeout(()=>{
+fetch(API + id)
+.then(r=>r.json())
+.then(data=>{
 
-if(url.includes(".m3u8")){
-if(Hls.isSupported()){
-hls = new Hls();
-hls.loadSource(url);
-hls.attachMedia(audio);
-hls.on(Hls.Events.MANIFEST_PARSED, ()=>{
-audio.play();
-});
-}
-}else{
-audio.src = url;
+audio.pause();
+audio.src = data.stream;
 audio.load();
+
 audio.play().catch(e=>{
-alert("PLAY ERROR: "+e.message);
+alert("PLAY ERROR");
 console.log(e);
 });
+
+});
+
 }
 
-},200);
-
-}
-
-/* STOP */
-function stopRadio(){
-if(hls){
-hls.destroy();
-hls = null;
-}
+function stop(){
 audio.pause();
-audio.src = "";
+audio.src="";
 }
 
-/* UI */
 const grid = document.getElementById("grid");
 
 stations.forEach(s=>{
 
-let d=document.createElement("div");
-d.className="station";
+let div=document.createElement("div");
+div.className="card";
 
-d.innerHTML=`
-<div class="logo">${s.name.slice(0,3)}</div>
-<div class="name">${s.name}</div>
+div.innerHTML=`
+<div class="icon">${s.name.slice(0,3)}</div>
+<div>${s.name}</div>
 `;
 
-d.onclick=()=>{
-play(s.url);
-};
+div.onclick=()=>play(s.id);
 
-grid.appendChild(d);
+grid.appendChild(div);
 
 });
 
