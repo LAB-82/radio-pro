@@ -1,45 +1,178 @@
 <!DOCTYPE html>
-<html>
+<html lang="pl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RADIO FIX</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<title>Radio PRO</title>
+
+<link rel="manifest" href="manifest.json">
 
 <style>
-body{background:#000;color:#fff;font-family:Arial;text-align:center;}
-button{padding:14px;margin:10px;background:#111;color:#fff;border:1px solid red;}
+body{
+margin:0;
+background:#0b0b0b;
+color:white;
+font-family:Arial;
+}
+
+header{
+text-align:center;
+padding:12px;
+font-size:20px;
+color:#ff2a2a;
+font-weight:bold;
+}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(2,1fr);
+gap:10px;
+padding:10px;
+padding-bottom:80px;
+}
+
+.card{
+background:#111;
+border:1px solid #222;
+border-radius:14px;
+padding:14px;
+text-align:center;
+cursor:pointer;
+transition:0.2s;
+user-select:none;
+}
+
+.card:active{
+transform:scale(0.96);
+border-color:#ff2a2a;
+}
+
+.logo{
+width:44px;
+height:44px;
+margin:0 auto 8px;
+background:#ff2a2a;
+border-radius:12px;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:11px;
+font-weight:bold;
+}
+
+#player{
+position:fixed;
+bottom:0;
+left:0;
+right:0;
+background:#111;
+padding:12px;
+display:flex;
+justify-content:center;
+gap:10px;
+border-top:1px solid #222;
+}
+
+button{
+background:black;
+color:white;
+border:1px solid #ff2a2a;
+padding:10px 14px;
+border-radius:10px;
+cursor:pointer;
+}
+
+button:active{
+transform:scale(0.95);
+}
 </style>
 </head>
+
 <body>
 
-<h2>🔥 STABLE RADIO FIX</h2>
+<header>📻 RADIO PRO (GitHub PWA)</header>
 
-<button onclick="play('BBC Radio 1')">BBC RADIO 1</button>
-<button onclick="play('RMF FM')">RMF FM</button>
+<div class="grid" id="grid"></div>
+
+<div id="player">
+<button onclick="stopRadio()">⏹ STOP</button>
+</div>
 
 <audio id="audio"></audio>
 
 <script>
 
 const audio = document.getElementById("audio");
-const API = "https://TWOJ-SERWER.onrender.com/api/";
 
-async function play(name){
+/* 🔥 TYLKO STABILNE DIRECT STREAMS */
+const stations = [
+{
+name:"RMF FM",
+url:"https://rs8-krk2-cyfronet.rmfstream.pl/RMFFM48.mp3"
+},
+{
+name:"Radio ZET",
+url:"https://zt01.cdn.eurozet.pl/ZET128.mp3"
+},
+{
+name:"Radio Eska",
+url:"https://waw01-02.cdn.eurozet.pl/ESKA.mp3"
+},
+{
+name:"TOK FM",
+url:"https://radiostream.pl/tuba9-1.mp3"
+},
+{
+name:"BBC Radio 1",
+url:"https://stream.live.vc.bbcmedia.co.uk/bbc_radio_one"
+},
+{
+name:"BBC 1Xtra",
+url:"https://stream.live.vc.bbcmedia.co.uk/bbc_1xtra"
+},
+{
+name:"Radio Wrocław",
+url:"https://stream4.nadaje.com:9001/radiowroclaw"
+}
+];
 
-try{
+function play(url){
 
-const res = await fetch(API + encodeURIComponent(name));
-const data = await res.json();
+stopRadio();
 
-audio.src = data.stream;
-await audio.play();
+audio.src = url;
+audio.load();
 
-}catch(e){
-alert("STREAM ERROR");
-console.log(e);
+audio.play().catch(err=>{
+alert("❌ STREAM BLOCKED / NOT SUPPORTED");
+console.log(err);
+});
+
 }
 
+function stopRadio(){
+audio.pause();
+audio.src = "";
 }
+
+const grid = document.getElementById("grid");
+
+stations.forEach(s=>{
+
+const card = document.createElement("div");
+card.className = "card";
+
+card.innerHTML = `
+<div class="logo">${s.name.slice(0,3).toUpperCase()}</div>
+<div>${s.name}</div>
+`;
+
+card.onclick = ()=>play(s.url);
+
+grid.appendChild(card);
+
+});
 
 </script>
 
