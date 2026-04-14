@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Radio LIVE PRO</title>
+<title>Radio PRO LIVE</title>
 
 <style>
 body{
@@ -14,9 +14,8 @@ font-family:Arial;
 }
 
 .header{
-padding:12px;
 text-align:center;
-font-size:18px;
+padding:14px;
 color:#ff2a2a;
 font-weight:bold;
 }
@@ -35,7 +34,6 @@ padding:12px;
 cursor:pointer;
 border:1px solid #222;
 text-align:center;
-transition:0.2s;
 }
 
 .card:active{
@@ -56,24 +54,20 @@ font-weight:bold;
 font-size:10px;
 }
 
-.name{
-font-size:12px;
-margin-top:6px;
-}
-
 #player{
 position:fixed;
 bottom:0;
 width:100%;
 background:#111;
+padding:10px;
 display:flex;
 justify-content:center;
-padding:10px;
+gap:10px;
 border-top:1px solid #222;
 }
 
 button{
-padding:10px 16px;
+padding:10px 14px;
 background:black;
 color:white;
 border:1px solid red;
@@ -84,7 +78,7 @@ cursor:pointer;
 
 <body>
 
-<div class="header">🔥 POLSKIE RADIO LIVE</div>
+<div class="header">🔥 RADIO PRO SYSTEM</div>
 
 <div class="grid" id="grid"></div>
 
@@ -96,64 +90,46 @@ cursor:pointer;
 
 <script>
 
-/* 🔥 TWOJA LISTA */
+const API = "https://TWOJ-BACKEND.onrender.com/api/stream/";
+
 const stations = [
-"Muzyczne Radio",
-"Polskie Radio Jedynka",
-"Polskie Radio Dwójka",
-"Polskie Radio Trójka",
-"Polskie Radio Czwórka",
-"Polskie Radio Dzieciom",
-"Radio Wrocław",
-"Radio Wnet",
-"Radio dla Ciebie",
-"Polskie Radio Chopin"
+{ id:"rmf", name:"RMF FM" },
+{ id:"zet", name:"Radio ZET" },
+{ id:"eska", name:"Radio Eska" },
+{ id:"jedynka", name:"PR Jedynka" },
+{ id:"dwojka", name:"PR Dwójka" },
+{ id:"trojka", name:"PR Trójka" },
+{ id:"czworka", name:"PR Czwórka" },
+{ id:"wroclaw", name:"Radio Wrocław" },
+{ id:"wnet", name:"Radio Wnet" },
+{ id:"rdc", name:"Radio RDC" },
+{ id:"chopin", name:"PR Chopin" }
 ];
 
 const audio = document.getElementById("audio");
-let currentStream = null;
 
-/* 🔥 RADIO BROWSER API (STABILNE STREAMY) */
-async function getStream(name){
-
-const url = `https://de1.api.radio-browser.info/json/stations/byname/${encodeURIComponent(name)}`;
-
-const res = await fetch(url);
-const data = await res.json();
-
-/* bierzemy pierwszy działający stream */
-return data?.[0]?.url_resolved || null;
-}
-
-/* 🔥 PLAY */
-async function play(name){
+async function play(id){
 
 stop();
 
-const stream = await getStream(name);
+const res = await fetch(API + id);
+const data = await res.json();
 
-if(!stream){
-alert("Brak streamu: " + name);
-return;
-}
+audio.src = data.stream;
+audio.load();
 
-audio.src = stream;
 audio.play().catch(e=>{
-alert("PLAY ERROR");
+alert("PLAY ERROR: " + e.message);
 console.log(e);
 });
 
-currentStream = stream;
-
 }
 
-/* STOP */
 function stop(){
 audio.pause();
 audio.src="";
 }
 
-/* UI */
 const grid = document.getElementById("grid");
 
 stations.forEach(s=>{
@@ -162,11 +138,11 @@ let d=document.createElement("div");
 d.className="card";
 
 d.innerHTML=`
-<div class="logo">${s.slice(0,3).toUpperCase()}</div>
-<div class="name">${s}</div>
+<div class="logo">${s.name.slice(0,3)}</div>
+<div>${s.name}</div>
 `;
 
-d.onclick=()=>play(s);
+d.onclick=()=>play(s.id);
 
 grid.appendChild(d);
 
