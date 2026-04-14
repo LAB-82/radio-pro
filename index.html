@@ -3,21 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Radio STABLE</title>
+<title>Radio PRO V2</title>
 
 <style>
 body{
 margin:0;
 background:#0b0b0b;
-color:#fff;
+color:white;
 font-family:Arial;
 }
 
-h1{
+.header{
 text-align:center;
+padding:14px;
 color:#ff2a2a;
-font-size:18px;
-padding:10px;
+font-weight:bold;
 }
 
 .grid{
@@ -29,11 +29,12 @@ padding:10px;
 
 .card{
 background:#111;
+border-radius:14px;
 padding:12px;
-border-radius:12px;
 text-align:center;
 cursor:pointer;
 border:1px solid #222;
+transition:0.2s;
 }
 
 .card:active{
@@ -42,14 +43,15 @@ border-color:red;
 }
 
 .logo{
-width:40px;
-height:40px;
+width:44px;
+height:44px;
 margin:auto;
 border-radius:10px;
-background:#ff2a2a;
+background:linear-gradient(45deg,#ff2a2a,#111);
 display:flex;
 align-items:center;
 justify-content:center;
+font-weight:bold;
 font-size:10px;
 }
 
@@ -61,6 +63,8 @@ background:#111;
 padding:10px;
 display:flex;
 justify-content:center;
+gap:10px;
+border-top:1px solid #222;
 }
 
 button{
@@ -68,13 +72,14 @@ padding:10px 14px;
 background:black;
 color:white;
 border:1px solid red;
+cursor:pointer;
 }
 </style>
 </head>
 
 <body>
 
-<h1>RADIO STABLE (REAL STREAMS)</h1>
+<div class="header">🔥 RADIO PRO V2 (STABLE)</div>
 
 <div class="grid" id="grid"></div>
 
@@ -86,22 +91,33 @@ border:1px solid red;
 
 <script>
 
-const audio = document.getElementById("audio");
+const API = "https://TWOJ-BACKEND.onrender.com/api/";
 
-/* 🔥 TYLKO STREAMY KTÓRE SĄ REALNIE PUBLICZNE I STABILNE */
 const stations = [
-{ name:"RMF FM", url:"https://rs8-krk2-cyfronet.rmfstream.pl/RMFFM48.mp3" },
-{ name:"Radio ZET", url:"https://zt01.cdn.eurozet.pl/ZET128.mp3" },
-{ name:"Radio Eska", url:"https://waw01-02.cdn.eurozet.pl/ESKA.mp3" },
-{ name:"TOK FM", url:"https://radiostream.pl/tuba9-1.mp3" },
-{ name:"BBC Radio 1", url:"https://stream.live.vc.bbcmedia.co.uk/bbc_radio_one" }
+{ id:"rmf", name:"RMF FM" },
+{ id:"zet", name:"Radio ZET" },
+{ id:"eska", name:"Radio Eska" },
+{ id:"jedynka", name:"PR Jedynka" },
+{ id:"dwojka", name:"PR Dwójka" },
+{ id:"trojka", name:"PR Trójka" },
+{ id:"czworka", name:"PR Czwórka" },
+{ id:"dzieciom", name:"PR Dzieciom" },
+{ id:"wroclaw", name:"Radio Wrocław" },
+{ id:"wnet", name:"Radio Wnet" },
+{ id:"rdc", name:"Radio RDC" },
+{ id:"chopin", name:"PR Chopin" }
 ];
 
-function play(url){
+const audio = document.getElementById("audio");
+
+async function play(id){
 
 stop();
 
-audio.src = url;
+const res = await fetch(API + id);
+const data = await res.json();
+
+audio.src = data.stream;
 audio.load();
 
 audio.play().catch(e=>{
@@ -128,7 +144,7 @@ d.innerHTML=`
 <div>${s.name}</div>
 `;
 
-d.onclick=()=>play(s.url);
+d.onclick=()=>play(s.id);
 
 grid.appendChild(d);
 
