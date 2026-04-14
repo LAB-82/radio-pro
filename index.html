@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Radio PRO</title>
+<title>Radio PRO SYSTEM</title>
 
 <style>
 body{
@@ -16,9 +16,9 @@ font-family:Arial;
 header{
 text-align:center;
 padding:12px;
-color:#ff2a2a;
 font-size:20px;
 font-weight:bold;
+color:#ff2a2a;
 }
 
 .grid{
@@ -26,6 +26,7 @@ display:grid;
 grid-template-columns:repeat(2,1fr);
 gap:10px;
 padding:10px;
+padding-bottom:80px;
 }
 
 .card{
@@ -35,6 +36,7 @@ border-radius:12px;
 padding:14px;
 text-align:center;
 cursor:pointer;
+transition:0.2s;
 }
 
 .card:active{
@@ -51,7 +53,6 @@ background:#111;
 padding:10px;
 display:flex;
 justify-content:center;
-gap:10px;
 border-top:1px solid #222;
 }
 
@@ -61,13 +62,14 @@ color:white;
 border:1px solid red;
 padding:10px 14px;
 border-radius:8px;
+cursor:pointer;
 }
 </style>
 </head>
 
 <body>
 
-<header>📻 RADIO PRO (REAL SYSTEM A)</header>
+<header>📻 RADIO PRO SYSTEM (REAL)</header>
 
 <div class="grid" id="grid"></div>
 
@@ -79,37 +81,25 @@ border-radius:8px;
 
 <script>
 
-const PROXY = "https://YOUR-WORKER.workers.dev/?url=";
-
-const stations = [
-{
-name:"RMF FM",
-url:"https://rs8-krk2-cyfronet.rmfstream.pl/RMFFM48.mp3"
-},
-{
-name:"Radio ZET",
-url:"https://zt01.cdn.eurozet.pl/ZET128.mp3"
-},
-{
-name:"Radio Eska",
-url:"https://waw01-02.cdn.eurozet.pl/ESKA.mp3"
-},
-{
-name:"TOK FM",
-url:"https://radiostream.pl/tuba9-1.mp3"
-},
-{
-name:"BBC Radio 1",
-url:"https://stream.live.vc.bbcmedia.co.uk/bbc_radio_one"
-}
-];
+/* 🔥 PODMIEŃ NA SWÓJ WORKER */
+const PROXY = "https://TWOJ-WORKER.workers.dev/?url=";
 
 const audio = document.getElementById("audio");
+
+/* 🔥 STACJE (tylko przykładowe stabilne linki) */
+const stations = [
+{ name:"RMF FM", url:"https://rs8-krk2-cyfronet.rmfstream.pl/RMFFM48.mp3" },
+{ name:"Radio ZET", url:"https://zt01.cdn.eurozet.pl/ZET128.mp3" },
+{ name:"Radio Eska", url:"https://waw01-02.cdn.eurozet.pl/ESKA.mp3" },
+{ name:"TOK FM", url:"https://radiostream.pl/tuba9-1.mp3" },
+{ name:"BBC Radio 1", url:"https://stream.live.vc.bbcmedia.co.uk/bbc_radio_one" }
+];
 
 function play(url){
 
 stopRadio();
 
+/* 🔥 PROXY CALL */
 fetch(PROXY + encodeURIComponent(url))
 .then(r => r.text())
 .then(stream => {
@@ -120,6 +110,10 @@ alert("PLAY ERROR");
 console.log(e);
 });
 
+})
+.catch(e=>{
+alert("PROXY ERROR");
+console.log(e);
 });
 
 }
@@ -132,18 +126,55 @@ audio.src = "";
 const grid = document.getElementById("grid");
 
 stations.forEach(s=>{
-
 const div = document.createElement("div");
 div.className = "card";
 div.innerHTML = s.name;
-
 div.onclick = ()=>play(s.url);
-
 grid.appendChild(div);
-
 });
 
 </script>
 
 </body>
 </html>
+
+<!-- ========================================================= -->
+<!-- 🔥 CLOUDFARE WORKER (DEPLOY SEPARATNIE) -->
+<!-- ========================================================= -->
+
+<script type="text/plain">
+
+export default {
+async fetch(request) {
+
+const url = new URL(request.url);
+const target = url.searchParams.get("url");
+
+if (!target) {
+return new Response("missing url");
+}
+
+try {
+
+const res = await fetch(target, {
+headers: {
+"User-Agent": "Mozilla/5.0"
+}
+});
+
+/* 🔥 KLUCZ: zwracamy FINAL URL */
+return new Response(res.url, {
+headers: {
+"Access-Control-Allow-Origin": "*",
+"Content-Type": "text/plain"
+}
+});
+
+} catch (e) {
+return new Response("error");
+}
+
+}
+};
+
+</script>
