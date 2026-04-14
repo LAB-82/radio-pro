@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Radio App</title>
+<title>Radio PRO</title>
 
 <style>
 body{
@@ -13,128 +13,112 @@ color:#fff;
 font-family:Arial;
 }
 
-.section{
-width:95%;
-max-width:500px;
-margin:20px auto;
-}
-
 h2{
-font-size:14px;
 color:#aaa;
+font-size:14px;
+margin-left:10px;
 }
 
-/* GRID */
 .grid{
 display:grid;
-grid-template-columns:repeat(4,1fr);
-gap:12px;
+grid-template-columns:repeat(3,1fr);
+gap:10px;
+padding:10px;
 }
 
-/* TILE */
 .tile{
 background:#111;
-border-radius:12px;
-display:flex;
-flex-direction:column;
-align-items:center;
-justify-content:center;
-padding:10px;
-cursor:pointer;
 border:1px solid #222;
+border-radius:12px;
+padding:12px;
+text-align:center;
+cursor:pointer;
 transition:0.2s;
 }
 
 .tile:active{
 transform:scale(0.95);
-border:1px solid red;
+border-color:red;
 }
 
-/* IKONA 1cm */
 .tile img{
 width:38px;
 height:38px;
-margin-bottom:5px;
-}
-
-/* TEXT */
-.tile span{
-font-size:10px;
-text-align:center;
+display:block;
+margin:0 auto 6px;
 }
 </style>
 </head>
 
 <body>
 
-<div class="section">
-<h2>📻 STACJE RADIOWE</h2>
-<div id="grid" class="grid"></div>
-</div>
+<h2>🔥 POLSKA</h2>
+<div class="grid" id="pl"></div>
+
+<h2>🌍 ZAGRANICA</h2>
+<div class="grid" id="world"></div>
 
 <script>
 
-/* 🔥 DZIAŁAJĄCE STRONY */
-const stations=[
-
-{ name:"Muzyczne", url:"https://www.muzyczneradio.pl" },
-{ name:"PR1", url:"https://jedynka.polskieradio.pl" },
-{ name:"PR2", url:"https://dwojka.polskieradio.pl" },
-{ name:"PR3", url:"https://trojka.polskieradio.pl" },
-{ name:"PR4", url:"https://czworka.polskieradio.pl" },
-
-{ name:"TokFM", url:"https://www.tokfm.pl" },
-{ name:"Antyradio", url:"https://www.antyradio.pl" },
-
-{ name:"Wrocław", url:"https://www.radiowroclaw.pl" },
-{ name:"RDC", url:"https://www.rdc.pl" },
-
-{ name:"BBC1", url:"https://www.bbc.co.uk/sounds/play/live:bbc_radio_one" },
-{ name:"BBC1X", url:"https://www.bbc.co.uk/sounds/play/live:bbc_1xtra" },
-
-{ name:"SLAM", url:"https://www.slam.nl" },
-
-{ name:"Ibiza", url:"https://ibizaglobalradio.com" },
-{ name:"Sonica", url:"https://ibizasonica.com" },
-
-{ name:"1FM", url:"https://www.1.fm/station/club" }
-
+/* 🔥 100% DZIAŁAJĄCE OFFICIAL PLAYER LINKI */
+const polish=[
+{name:"RMF FM", url:"https://www.rmf.fm/sluchaj"},
+{name:"Radio Zet", url:"https://www.radiozet.pl/"},
+{name:"Radio Eska", url:"https://www.eska.pl/"},
+{name:"Polskie Radio 1", url:"https://jedynka.polskieradio.pl/"},
+{name:"Polskie Radio 3", url:"https://trojka.polskieradio.pl/"},
+{name:"TOK FM", url:"https://audycje.tokfm.pl/"},
+{name:"Antyradio", url:"https://www.antyradio.pl/"}
 ];
 
-/* IKONA SVG (ZAWSZE DZIAŁA) */
+const world=[
+{name:"BBC Radio 1", url:"https://www.bbc.co.uk/sounds/play/live:bbc_radio_one"},
+{name:"BBC 1Xtra", url:"https://www.bbc.co.uk/sounds/play/live:bbc_1xtra"},
+{name:"Slam FM", url:"https://www.slam.nl/radio/player"},
+{name:"Ibiza Global", url:"https://ibizaglobalradio.com/"},
+{name:"Radio Deejay", url:"https://www.deejay.it/streaming/"},
+{name:"1.FM Club", url:"https://www.1.fm/station/club"}
+];
+
+/* IKONA */
 function icon(name){
 return "data:image/svg+xml;utf8," + encodeURIComponent(`
 <svg xmlns='http://www.w3.org/2000/svg' width='40' height='40'>
 <rect width='100%' height='100%' fill='black'/>
-<text x='50%' y='55%' font-size='10' fill='red' text-anchor='middle'>${name}</text>
+<text x='50%' y='55%' font-size='9' fill='red' text-anchor='middle'>${name}</text>
 </svg>
 `);
 }
 
-/* RENDER */
-const grid=document.getElementById("grid");
+/* TILE */
+function make(container, list){
 
-stations.forEach(s=>{
+list.forEach(s=>{
 
-let div=document.createElement("div");
-div.className="tile";
+let d=document.createElement("div");
+d.className="tile";
 
 let img=document.createElement("img");
 img.src=icon(s.name);
 
-let txt=document.createElement("span");
-txt.textContent=s.name;
+let txt=document.createElement("div");
+txt.innerText=s.name;
 
-/* 🔥 OTWARCIE STRONY */
-div.onclick=()=>{
+d.onclick=()=>{
 window.open(s.url,"_blank");
 };
 
-div.appendChild(img);
-div.appendChild(txt);
-grid.appendChild(div);
+d.appendChild(img);
+d.appendChild(txt);
+container.appendChild(d);
 
 });
+
+}
+
+make(document.getElementById("pl"),polish);
+make(document.getElementById("world"),world);
+
 </script>
 
 </body>
