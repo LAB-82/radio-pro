@@ -1,66 +1,44 @@
 <!DOCTYPE html>
-<html lang="pl">
+<html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RADIO DEBUG</title>
+<title>RADIO FIX</title>
+
 <style>
-body{background:#000;color:#fff;font-family:Arial;text-align:center;padding:20px;}
-button{padding:15px;margin:10px;border:1px solid red;background:#111;color:#fff;}
-#log{margin-top:20px;font-size:14px;color:#0f0;white-space:pre-wrap;}
+body{background:#000;color:#fff;font-family:Arial;text-align:center;}
+button{padding:14px;margin:10px;background:#111;color:#fff;border:1px solid red;}
 </style>
 </head>
 <body>
 
-<h2>RADIO DEBUG TEST</h2>
+<h2>🔥 STABLE RADIO FIX</h2>
 
-<button onclick="testPlay()">PLAY TEST</button>
-<button onclick="stop()">STOP</button>
+<button onclick="play('BBC Radio 1')">BBC RADIO 1</button>
+<button onclick="play('RMF FM')">RMF FM</button>
 
-<audio id="audio" controls></audio>
-
-<div id="log"></div>
+<audio id="audio"></audio>
 
 <script>
 
 const audio = document.getElementById("audio");
-const log = document.getElementById("log");
+const API = "https://TWOJ-SERWER.onrender.com/api/";
 
-/* 🔥 NAJPROSTSZY PEWNY STREAM */
-const STREAM = "https://stream.live.vc.bbcmedia.co.uk/bbc_radio_one";
-
-function write(msg){
-log.textContent += msg + "\n";
-}
-
-async function testPlay(){
-
-write("▶ klik PLAY");
+async function play(name){
 
 try{
 
-audio.src = STREAM;
-audio.load();
+const res = await fetch(API + encodeURIComponent(name));
+const data = await res.json();
 
+audio.src = data.stream;
 await audio.play();
 
-write("✅ PLAY OK");
-
 }catch(e){
-
-write("❌ ERROR:");
-write(e.message);
-
+alert("STREAM ERROR");
 console.log(e);
-
 }
 
-}
-
-function stop(){
-audio.pause();
-audio.src="";
-write("⏹ STOP");
 }
 
 </script>
