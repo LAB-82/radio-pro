@@ -3,95 +3,83 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Radio PRO APP</title>
+<title>Radio LIVE</title>
 
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 
 <style>
 body{
 margin:0;
-background:#0a0a0a;
+background:#0b0b0b;
 color:#fff;
 font-family:Arial;
 }
 
 .header{
-padding:15px;
-font-size:18px;
-font-weight:bold;
-color:#ff2a2a;
+padding:14px;
 text-align:center;
+font-size:18px;
+color:#ff2a2a;
+font-weight:bold;
 }
 
 .grid{
 display:grid;
 grid-template-columns:repeat(3,1fr);
-gap:12px;
-padding:12px;
+gap:10px;
+padding:10px;
 }
 
-/* 🔥 REAL APP TILE */
-.tile{
-background:#111;
-border-radius:16px;
-padding:12px;
-cursor:pointer;
-display:flex;
-flex-direction:column;
-align-items:center;
-justify-content:center;
+.station{
+background:#141414;
 border:1px solid #222;
+border-radius:14px;
+padding:12px;
+text-align:center;
+cursor:pointer;
 transition:0.2s;
 }
 
-.tile:active{
+.station:active{
 transform:scale(0.96);
 border-color:#ff2a2a;
 }
 
-/* 🔥 REAL LOGO STYLE (NIE KWADRATY) */
 .logo{
-width:52px;
-height:52px;
-border-radius:14px;
+width:48px;
+height:48px;
+border-radius:12px;
+margin:0 auto 6px;
 display:flex;
 align-items:center;
 justify-content:center;
+font-size:10px;
 font-weight:bold;
-font-size:12px;
-color:white;
+background:linear-gradient(45deg,#ff2a2a,#111);
 }
-
-.rm1{background:linear-gradient(45deg,#ff0000,#ff6600);}
-.rm2{background:linear-gradient(45deg,#0066ff,#00ccff);}
-.rm3{background:linear-gradient(45deg,#00aa00,#66ff66);}
-.rm4{background:linear-gradient(45deg,#aa00ff,#ff00cc);}
-.rm5{background:linear-gradient(45deg,#ffcc00,#ff3300);}
 
 .name{
 font-size:11px;
-margin-top:6px;
-text-align:center;
 opacity:0.9;
 }
 
-#player{
+#controls{
 position:fixed;
 bottom:0;
 width:100%;
-background:#111;
 display:flex;
 justify-content:center;
 gap:10px;
 padding:10px;
+background:#111;
 border-top:1px solid #222;
 }
 
 button{
 padding:10px 16px;
 background:#000;
-color:#fff;
 border:1px solid #ff2a2a;
+color:#fff;
 cursor:pointer;
 }
 </style>
@@ -99,12 +87,12 @@ cursor:pointer;
 
 <body>
 
-<div class="header">🔥 RADIO PRO PLAYER</div>
+<div class="header">🔥 LIVE RADIO ENGINE</div>
 
 <div class="grid" id="grid"></div>
 
-<div id="player">
-<button onclick="stop()">STOP</button>
+<div id="controls">
+<button onclick="stopRadio()">STOP</button>
 </div>
 
 <audio id="audio" controls style="display:none;"></audio>
@@ -113,63 +101,61 @@ cursor:pointer;
 
 const audio = document.getElementById("audio");
 let hls = null;
-let current = null;
 
-/* 🔥 REAL STACJE (MP3 + HLS MIX) */
-const stations=[
-{ name:"Muzyczne Radio", url:"https://stream.rcs.revma.com/gzwc1xcq042vv", cls:"rm1" },
-{ name:"PR1", url:"https://stream.polskieradio.pl/pr1_mp3", cls:"rm2" },
-{ name:"PR3", url:"https://stream.polskieradio.pl/pr3_mp3", cls:"rm3" },
+/* 🔥 TYLKO STACJE KTÓRE REALNIE MAJĄ PUBLICZNE STREAMY */
+const stations = [
 
-{ name:"BBC Radio 1", url:"https://stream.live.vc.bbcmedia.co.uk/bbc_radio_one", cls:"rm4" },
-{ name:"BBC 1Xtra", url:"https://stream.live.vc.bbcmedia.co.uk/bbc_1xtra", cls:"rm5" },
+/* 🇵🇱 POLSKA */
+{ name:"RMF FM", url:"https://rs8-krk2-cyfronet.rmfstream.pl/RMFFM48.mp3" },
+{ name:"Radio Zet", url:"https://zt01.cdn.eurozet.pl/ZET128.mp3" },
+{ name:"Eska", url:"https://waw01-02.cdn.eurozet.pl/ESKA.mp3" },
 
-{ name:"SLAM FM", url:"https://stream.slam.nl/slam_mp3", cls:"rm2" },
-{ name:"1.FM Club", url:"https://strm112.1.fm/club_mobile_mp3", cls:"rm3" },
+{ name:"Polskie Radio 1", url:"https://stream.polskieradio.pl/pr1_mp3_128" },
+{ name:"Polskie Radio 3", url:"https://stream.polskieradio.pl/pr3_mp3_128" },
 
-{ name:"Ibiza Global", url:"https://ibizaglobalradio.streamingmedia.it/play", cls:"rm4" }
+{ name:"TOK FM", url:"https://radiostream.pl/tuba9-1.mp3" },
+
+/* 🌍 ZAGRANICA */
+{ name:"BBC Radio 1", url:"https://stream.live.vc.bbcmedia.co.uk/bbc_radio_one" },
+{ name:"BBC 1Xtra", url:"https://stream.live.vc.bbcmedia.co.uk/bbc_1xtra" },
+
+{ name:"SLAM FM", url:"https://stream.slam.nl/slam_mp3" },
+
+{ name:"1.FM Club", url:"https://strm112.1.fm/club_mobile_mp3" }
+
 ];
 
-/* 🔥 LOGO (REAL APP STYLE SVG) */
-function logo(name, cls){
-return `
-<svg xmlns='http://www.w3.org/2000/svg' width='52' height='52'>
-<rect width='100%' height='100%' fill='url(#g)'/>
-<defs>
-<linearGradient id='g' x1='0' y1='0' x2='1' y2='1'>
-<stop offset='0%' stop-color='#ff2a2a'/>
-<stop offset='100%' stop-color='#111'/>
-</linearGradient>
-</defs>
-<text x='50%' y='55%' text-anchor='middle' fill='white' font-size='10'>${name.slice(0,4)}</text>
-</svg>`;
-}
+/* 🔥 PLAY ENGINE (REAL FIXED VERSION) */
+function play(url){
 
-/* 🔥 PLAY ENGINE (REAL APP STYLE) */
-function playStream(url){
+stopRadio();
 
-stop();
+setTimeout(()=>{
 
 if(url.includes(".m3u8")){
 if(Hls.isSupported()){
 hls = new Hls();
 hls.loadSource(url);
 hls.attachMedia(audio);
-hls.on(Hls.Events.MANIFEST_PARSED,function(){
+hls.on(Hls.Events.MANIFEST_PARSED, ()=>{
 audio.play();
 });
-}else{
-alert("HLS not supported");
 }
 }else{
 audio.src = url;
+audio.load();
 audio.play().catch(e=>{
 alert("PLAY ERROR: "+e.message);
+console.log(e);
 });
 }
+
+},200);
+
 }
 
-function stop(){
+/* STOP */
+function stopRadio(){
 if(hls){
 hls.destroy();
 hls = null;
@@ -178,23 +164,21 @@ audio.pause();
 audio.src = "";
 }
 
-/* 🔥 UI */
+/* UI */
 const grid = document.getElementById("grid");
 
 stations.forEach(s=>{
 
 let d=document.createElement("div");
-d.className="tile";
+d.className="station";
 
 d.innerHTML=`
-<div class="logo ${s.cls}">
-${s.name.slice(0,3).toUpperCase()}
-</div>
+<div class="logo">${s.name.slice(0,3)}</div>
 <div class="name">${s.name}</div>
 `;
 
 d.onclick=()=>{
-playStream(s.url);
+play(s.url);
 };
 
 grid.appendChild(d);
