@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Radio App FINAL</title>
+<title>Radio App</title>
 
 <style>
 body{
@@ -24,12 +24,14 @@ font-size:14px;
 color:#aaa;
 }
 
+/* GRID */
 .grid{
 display:grid;
 grid-template-columns:repeat(4,1fr);
-gap:10px;
+gap:12px;
 }
 
+/* TILE */
 .tile{
 background:#111;
 border-radius:12px;
@@ -40,33 +42,25 @@ justify-content:center;
 padding:10px;
 cursor:pointer;
 border:1px solid #222;
+transition:0.2s;
 }
 
+.tile:active{
+transform:scale(0.95);
+border:1px solid red;
+}
+
+/* IKONA 1cm */
 .tile img{
 width:38px;
 height:38px;
+margin-bottom:5px;
 }
 
+/* TEXT */
 .tile span{
 font-size:10px;
-}
-
-#player{
-position:fixed;
-bottom:0;
-width:100%;
-background:#111;
-display:flex;
-justify-content:center;
-gap:10px;
-padding:10px;
-}
-
-button{
-padding:10px;
-background:#000;
-color:#fff;
-border:1px solid red;
+text-align:center;
 }
 </style>
 </head>
@@ -74,53 +68,42 @@ border:1px solid red;
 <body>
 
 <div class="section">
-<h2>📻 STACJE</h2>
-<div id="all" class="grid"></div>
+<h2>📻 STACJE RADIOWE</h2>
+<div id="grid" class="grid"></div>
 </div>
-
-<div id="player">
-<button onclick="play()">PLAY</button>
-<button onclick="stop()">STOP</button>
-</div>
-
-<audio id="audio" playsinline></audio>
 
 <script>
 
-/* 🔥 STREAMY TESTOWE (NA PEWNO DZIAŁAJĄ) */
+/* 🔥 DZIAŁAJĄCE STRONY */
 const stations=[
-{ name:"PR1", stream:"https://stream.polskieradio.pl/pr1_mp3" },
-{ name:"PR2", stream:"https://stream.polskieradio.pl/pr2_mp3" }
+
+{ name:"Muzyczne", url:"https://www.muzyczneradio.pl" },
+{ name:"PR1", url:"https://jedynka.polskieradio.pl" },
+{ name:"PR2", url:"https://dwojka.polskieradio.pl" },
+{ name:"PR3", url:"https://trojka.polskieradio.pl" },
+{ name:"PR4", url:"https://czworka.polskieradio.pl" },
+
+{ name:"TokFM", url:"https://www.tokfm.pl" },
+{ name:"Antyradio", url:"https://www.antyradio.pl" },
+
+{ name:"Wrocław", url:"https://www.radiowroclaw.pl" },
+{ name:"RDC", url:"https://www.rdc.pl" },
+
+{ name:"BBC1", url:"https://www.bbc.co.uk/sounds/play/live:bbc_radio_one" },
+{ name:"BBC1X", url:"https://www.bbc.co.uk/sounds/play/live:bbc_1xtra" },
+
+{ name:"SLAM", url:"https://www.slam.nl" },
+
+{ name:"Ibiza", url:"https://ibizaglobalradio.com" },
+{ name:"Sonica", url:"https://ibizasonica.com" },
+
+{ name:"1FM", url:"https://www.1.fm/station/club" }
+
 ];
 
-/* AUDIO SYSTEM */
-const audio=document.getElementById("audio");
-
-let audioCtx=null;
-let unlocked=false;
-let current=null;
-
-/* 🔥 UNLOCK AUDIO (KLUCZ) */
-function unlockAudio(){
-
-if(unlocked) return;
-
-audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
-let buffer = audioCtx.createBuffer(1,1,22050);
-let source = audioCtx.createBufferSource();
-source.buffer = buffer;
-source.connect(audioCtx.destination);
-source.start(0);
-
-unlocked=true;
-console.log("AUDIO UNLOCKED");
-
-}
-
-/* IKONA */
+/* IKONA SVG (ZAWSZE DZIAŁA) */
 function icon(name){
-return "data:image/svg+xml;utf8,"+encodeURIComponent(`
+return "data:image/svg+xml;utf8," + encodeURIComponent(`
 <svg xmlns='http://www.w3.org/2000/svg' width='40' height='40'>
 <rect width='100%' height='100%' fill='black'/>
 <text x='50%' y='55%' font-size='10' fill='red' text-anchor='middle'>${name}</text>
@@ -128,11 +111,13 @@ return "data:image/svg+xml;utf8,"+encodeURIComponent(`
 `);
 }
 
-/* TILE */
-function tile(s){
+/* RENDER */
+const grid=document.getElementById("grid");
 
-let d=document.createElement("div");
-d.className="tile";
+stations.forEach(s=>{
+
+let div=document.createElement("div");
+div.className="tile";
 
 let img=document.createElement("img");
 img.src=icon(s.name);
@@ -140,57 +125,16 @@ img.src=icon(s.name);
 let txt=document.createElement("span");
 txt.textContent=s.name;
 
-/* CLICK */
-d.onclick=()=>{
-
-unlockAudio();
-
-current=s;
-
-/* HARD RESET */
-audio.pause();
-audio.src="";
-audio.load();
-
-setTimeout(()=>{
-
-audio.src=s.stream;
-audio.load();
-
-audio.play()
-.then(()=>console.log("PLAY OK"))
-.catch(e=>{
-alert("PLAY ERROR: "+e.message);
-console.error(e);
-});
-
-},300);
-
+/* 🔥 OTWARCIE STRONY */
+div.onclick=()=>{
+window.open(s.url,"_blank");
 };
 
-d.appendChild(img);
-d.appendChild(txt);
+div.appendChild(img);
+div.appendChild(txt);
+grid.appendChild(div);
 
-return d;
-}
-
-/* RENDER */
-const all=document.getElementById("all");
-stations.forEach(s=>{
-all.appendChild(tile(s));
 });
-
-/* PLAYER */
-function play(){
-if(current){
-audio.play().catch(e=>alert("PLAY ERROR"));
-}
-}
-
-function stop(){
-audio.pause();
-}
-
 </script>
 
 </body>
