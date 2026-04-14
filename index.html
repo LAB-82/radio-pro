@@ -49,7 +49,7 @@ border:1px solid #222;
 border:1px solid red;
 }
 
-/* IKONA 1cm */
+/* IKONA ~1cm */
 .tile img{
 width:38px;
 height:38px;
@@ -57,7 +57,7 @@ object-fit:contain;
 margin-bottom:5px;
 }
 
-/* TEXT fallback */
+/* TEXT */
 .tile span{
 font-size:10px;
 text-align:center;
@@ -92,6 +92,7 @@ padding:10px;
 background:#000;
 color:#fff;
 border:1px solid red;
+cursor:pointer;
 }
 </style>
 </head>
@@ -117,7 +118,7 @@ border:1px solid red;
 
 <script>
 
-/* 🔥 TYLKO PEWNE STREAMY */
+/* 🔥 PEWNE STREAMY */
 const stations=[
 
 { id:1,name:"PR1",stream:"https://stream.polskieradio.pl/pr1_mp3" },
@@ -134,7 +135,7 @@ const stations=[
 
 ];
 
-/* IKONY LOKALNE (PEWNE) */
+/* SVG IKONA (fallback zawsze działa) */
 function getIcon(name){
 return "data:image/svg+xml;utf8," + encodeURIComponent(`
 <svg xmlns='http://www.w3.org/2000/svg' width='40' height='40'>
@@ -167,14 +168,37 @@ heart.innerHTML="❤";
 
 if(fav.includes(s.id)) heart.classList.add("active");
 
-/* PLAY */
+/* 🔥 STABILNE PLAY */
 d.onclick=()=>{
-current=s;
-audio.src=s.stream;
-audio.play().catch(e=>alert("Błąd audio"));
 
-document.querySelectorAll(".tile").forEach(t=>t.classList.remove("active"));
-d.classList.add("active");
+current=s;
+
+try{
+
+audio.pause();
+audio.currentTime=0;
+audio.src="";
+audio.load();
+
+setTimeout(()=>{
+
+audio.src=s.stream;
+audio.load();
+
+let p=audio.play();
+
+if(p!==undefined){
+p.catch(e=>{
+alert("PLAY ERROR: "+e.message);
+});
+}
+
+},200);
+
+}catch(e){
+alert("AUDIO ERROR");
+}
+
 };
 
 /* FAVORITE */
@@ -217,8 +241,15 @@ allDiv.appendChild(tile(s));
 render();
 
 /* PLAYER */
-function play(){ if(current) audio.play(); }
-function stop(){ audio.pause(); }
+function play(){
+if(current){
+audio.play().catch(e=>alert("PLAY ERROR"));
+}
+}
+
+function stop(){
+audio.pause();
+}
 
 </script>
 
