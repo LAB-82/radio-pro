@@ -3,134 +3,65 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Stable Radio</title>
-
+<title>RADIO DEBUG</title>
 <style>
-body{
-margin:0;
-background:#0b0b0b;
-color:white;
-font-family:Arial;
-}
-
-h1{
-text-align:center;
-color:#ff2a2a;
-font-size:18px;
-padding:10px;
-}
-
-.grid{
-display:grid;
-grid-template-columns:repeat(2,1fr);
-gap:10px;
-padding:10px;
-}
-
-.card{
-background:#111;
-border:1px solid #222;
-border-radius:12px;
-padding:14px;
-text-align:center;
-cursor:pointer;
-}
-
-.card:active{
-transform:scale(0.97);
-border-color:red;
-}
-
-#player{
-position:fixed;
-bottom:0;
-width:100%;
-background:#111;
-padding:10px;
-text-align:center;
-border-top:1px solid #222;
-}
-
-button{
-padding:10px 14px;
-background:black;
-color:white;
-border:1px solid red;
-cursor:pointer;
-}
+body{background:#000;color:#fff;font-family:Arial;text-align:center;padding:20px;}
+button{padding:15px;margin:10px;border:1px solid red;background:#111;color:#fff;}
+#log{margin-top:20px;font-size:14px;color:#0f0;white-space:pre-wrap;}
 </style>
 </head>
-
 <body>
 
-<h1>📻 STABLE RADIO (WORKING ONLY)</h1>
+<h2>RADIO DEBUG TEST</h2>
 
-<div class="grid" id="grid"></div>
-
-<div id="player">
+<button onclick="testPlay()">PLAY TEST</button>
 <button onclick="stop()">STOP</button>
-</div>
 
-<audio id="audio"></audio>
+<audio id="audio" controls></audio>
+
+<div id="log"></div>
 
 <script>
 
 const audio = document.getElementById("audio");
+const log = document.getElementById("log");
 
-/* 🔥 TYLKO PEWNE STREAMY (PUBLIC MP3/AAC) */
-const stations = [
-{
-name:"Muzyczne Radio",
-url:"https://onlineradio.pl/akademickie-wroclaw/"
-},
-{
-name:"Radio ZET",
-url:"https://onlineradio.pl/zet/"
-},
-{
-name:"Radio Wrocław",
-url:"https://www.radiowroclaw.pl/rds/play/posluchaj-radia"
-},
-{
-name:"TOK FM",
-url:"https://radiostream.pl/tuba9-1.mp3"
-},
-{
-name:"Polskie Radio 4",
-url:"https://onlineradio.pl/czworka/"
+/* 🔥 NAJPROSTSZY PEWNY STREAM */
+const STREAM = "https://stream.live.vc.bbcmedia.co.uk/bbc_radio_one";
+
+function write(msg){
+log.textContent += msg + "\n";
 }
-];
 
-function play(url){
+async function testPlay(){
 
-stop();
+write("▶ klik PLAY");
 
-audio.src = url;
+try{
+
+audio.src = STREAM;
 audio.load();
 
-audio.play().catch(e=>{
-alert("PLAY ERROR: " + e.message);
+await audio.play();
+
+write("✅ PLAY OK");
+
+}catch(e){
+
+write("❌ ERROR:");
+write(e.message);
+
 console.log(e);
-});
+
+}
 
 }
 
 function stop(){
 audio.pause();
 audio.src="";
+write("⏹ STOP");
 }
-
-const grid = document.getElementById("grid");
-
-stations.forEach(s=>{
-
-let d=document.createElement("div");
-d.className="card";
-d.innerHTML=`<div>${s.name}</div>`;
-d.onclick=()=>play(s.url);
-grid.appendChild(d);
-
-});
 
 </script>
 
