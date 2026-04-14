@@ -2,179 +2,77 @@
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Radio PRO SYSTEM</title>
+<title>Muzyczne Radio PRO+</title>
 
 <style>
 body{
 margin:0;
-background:#0b0b0b;
+background:#000;
 color:#fff;
 font-family:Arial;
+text-align:center;
 }
 
-header{
-text-align:center;
-padding:12px;
-font-size:20px;
-font-weight:bold;
+#title{
+font-size:40px;
+padding:20px;
 color:#ff2a2a;
 }
 
-.grid{
-display:grid;
-grid-template-columns:repeat(2,1fr);
-gap:10px;
-padding:10px;
-padding-bottom:80px;
-}
-
-.card{
-background:#111;
-border:1px solid #222;
-border-radius:12px;
-padding:14px;
-text-align:center;
-cursor:pointer;
-transition:0.2s;
-}
-
-.card:active{
-transform:scale(0.96);
-border-color:#ff2a2a;
-}
-
-#player{
-position:fixed;
-bottom:0;
-left:0;
-right:0;
-background:#111;
-padding:10px;
-display:flex;
-justify-content:center;
-border-top:1px solid #222;
-}
-
 button{
-background:black;
+width:90%;
+margin:6px;
+padding:14px;
+background:#111;
 color:white;
 border:1px solid red;
-padding:10px 14px;
-border-radius:8px;
-cursor:pointer;
+font-size:16px;
 }
 </style>
 </head>
 
 <body>
 
-<header>📻 RADIO PRO SYSTEM (REAL)</header>
+<div id="title">📻 MUZYCZNE RADIO PRO+</div>
 
-<div class="grid" id="grid"></div>
+<button onclick="play('https://stream.rcs.revma.com/gzwc1xcq042vv')">Muzyczne Radio</button>
 
-<div id="player">
-<button onclick="stopRadio()">STOP</button>
-</div>
+<button onclick="play('https://stream3.polskieradio.pl/PR1')">Polskie Radio Jedynka</button>
 
-<audio id="audio" controls style="width:100%;position:fixed;bottom:60px;left:0;"></audio>
+<button onclick="play('https://stream3.polskieradio.pl/PR2')">Polskie Radio Dwójka</button>
+
+<button onclick="play('https://stream3.polskieradio.pl/PR3')">Polskie Radio Trójka</button>
+
+<button onclick="play('https://stream3.polskieradio.pl/PR4')">Polskie Radio Czwórka</button>
+
+<button onclick="play('https://stream3.polskieradio.pl/PRD')">Polskie Radio Dzieciom</button>
+
+<button onclick="play('https://stream3.polskieradio.pl/PRW')">Radio Wrocław</button>
+
+<button onclick="play('https://stream3.polskieradio.pl/PRWnet')">Radio Wnet</button>
+
+<button onclick="stop()">STOP</button>
+
+<audio id="audio" controls style="width:100%;margin-top:20px;"></audio>
 
 <script>
 
-/* 🔥 PODMIEŃ NA SWÓJ WORKER */
-const PROXY = "https://TWOJ-WORKER.workers.dev/?url=";
-
 const audio = document.getElementById("audio");
 
-/* 🔥 STACJE (tylko przykładowe stabilne linki) */
-const stations = [
-{ name:"RMF FM", url:"https://rs8-krk2-cyfronet.rmfstream.pl/RMFFM48.mp3" },
-{ name:"Radio ZET", url:"https://zt01.cdn.eurozet.pl/ZET128.mp3" },
-{ name:"Radio Eska", url:"https://waw01-02.cdn.eurozet.pl/ESKA.mp3" },
-{ name:"TOK FM", url:"https://radiostream.pl/tuba9-1.mp3" },
-{ name:"BBC Radio 1", url:"https://stream.live.vc.bbcmedia.co.uk/bbc_radio_one" }
-];
-
 function play(url){
-
-stopRadio();
-
-/* 🔥 PROXY CALL */
-fetch(PROXY + encodeURIComponent(url))
-.then(r => r.text())
-.then(stream => {
-
-audio.src = stream;
+audio.src = url;
 audio.play().catch(e=>{
-alert("PLAY ERROR");
+alert("STREAM ERROR");
 console.log(e);
 });
-
-})
-.catch(e=>{
-alert("PROXY ERROR");
-console.log(e);
-});
-
 }
 
-function stopRadio(){
+function stop(){
 audio.pause();
 audio.src = "";
 }
-
-const grid = document.getElementById("grid");
-
-stations.forEach(s=>{
-const div = document.createElement("div");
-div.className = "card";
-div.innerHTML = s.name;
-div.onclick = ()=>play(s.url);
-grid.appendChild(div);
-});
 
 </script>
 
 </body>
 </html>
-
-<!-- ========================================================= -->
-<!-- 🔥 CLOUDFARE WORKER (DEPLOY SEPARATNIE) -->
-<!-- ========================================================= -->
-
-<script type="text/plain">
-
-export default {
-async fetch(request) {
-
-const url = new URL(request.url);
-const target = url.searchParams.get("url");
-
-if (!target) {
-return new Response("missing url");
-}
-
-try {
-
-const res = await fetch(target, {
-headers: {
-"User-Agent": "Mozilla/5.0"
-}
-});
-
-/* 🔥 KLUCZ: zwracamy FINAL URL */
-return new Response(res.url, {
-headers: {
-"Access-Control-Allow-Origin": "*",
-"Content-Type": "text/plain"
-}
-});
-
-} catch (e) {
-return new Response("error");
-}
-
-}
-};
-
-</script>
