@@ -3,37 +3,49 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Radio PRO SYSTEM</title>
+<title>Radio PRO</title>
+
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 
 <style>
 body{
 margin:0;
-background:#0b0b0b;
-color:#fff;
+background:#0a0a0a;
+color:white;
 font-family:Arial;
 }
 
 .header{
+padding:15px;
 text-align:center;
-padding:12px;
-color:#ff2a2a;
+font-size:18px;
 font-weight:bold;
+color:#ff2a2a;
 }
 
-.grid{
+/* 🔥 TOP 6 GRID (APP STYLE) */
+.top{
 display:grid;
 grid-template-columns:repeat(3,1fr);
 gap:10px;
 padding:10px;
 }
 
+.grid{
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:10px;
+padding:10px;
+}
+
 .card{
 background:#111;
-border-radius:14px;
+border-radius:16px;
 padding:10px;
 text-align:center;
 cursor:pointer;
 border:1px solid #222;
+transition:0.2s;
 }
 
 .card:active{
@@ -41,18 +53,26 @@ transform:scale(0.95);
 border-color:red;
 }
 
-.icon{
-width:50px;
-height:50px;
-border-radius:12px;
+/* 🔥 REAL APP ICON */
+.logo{
+width:52px;
+height:52px;
+border-radius:14px;
 margin:auto;
 display:flex;
 align-items:center;
 justify-content:center;
-background:linear-gradient(45deg,#ff2a2a,#111);
 font-weight:bold;
+background:linear-gradient(45deg,#ff2a2a,#111);
 }
 
+.name{
+font-size:11px;
+margin-top:6px;
+opacity:0.9;
+}
+
+/* PLAYER BAR */
 #player{
 position:fixed;
 bottom:0;
@@ -60,15 +80,16 @@ width:100%;
 background:#111;
 display:flex;
 justify-content:center;
-padding:10px;
 gap:10px;
+padding:10px;
+border-top:1px solid #222;
 }
 
 button{
 padding:10px 14px;
-background:black;
+background:#000;
+border:1px solid #ff2a2a;
 color:white;
-border:1px solid red;
 cursor:pointer;
 }
 </style>
@@ -76,71 +97,148 @@ cursor:pointer;
 
 <body>
 
-<div class="header">🔥 RADIO PRO SYSTEM</div>
+<div class="header">🔥 RADIO PRO APP</div>
 
+<h3 style="padding-left:10px;color:#aaa">⭐ ULUBIONE (TOP 6)</h3>
+<div class="top" id="top"></div>
+
+<h3 style="padding-left:10px;color:#aaa">📻 STACJE</h3>
 <div class="grid" id="grid"></div>
 
 <div id="player">
 <button onclick="stop()">STOP</button>
 </div>
 
-<audio id="audio" controls style="display:none;"></audio>
+<audio id="audio"></audio>
 
 <script>
 
-const API = "https://TWOJ-SERVER.onrender.com/stream/";
+const API = "https://TWOJ-SERVER.onrender.com/api/";
+
+let current = null;
+let hls = null;
 
 const stations = [
+
 { id:"rmf", name:"RMF FM" },
 { id:"zet", name:"Radio ZET" },
 { id:"eska", name:"Radio Eska" },
 { id:"tokfm", name:"TOK FM" },
-{ id:"bbc1", name:"BBC Radio 1" }
+
+{ id:"bbc1", name:"BBC Radio 1" },
+{ id:"bbc1x", name:"BBC 1Xtra" },
+
+{ id:"slam", name:"SLAM FM" },
+{ id:"oneworld", name:"One World Radio" }
+
 ];
 
-const audio = document.getElementById("audio");
-
+/* 🔥 PLAYER ENGINE */
 function play(id){
 
 fetch(API + id)
 .then(r=>r.json())
 .then(data=>{
 
-audio.pause();
-audio.src = data.stream;
-audio.load();
+stop();
 
-audio.play().catch(e=>{
-alert("PLAY ERROR");
-console.log(e);
+const audio = document.getElementById("audio");
+
+if(data.stream.includes(".m3u8")){
+if(Hls.isSupported()){
+hls = new Hls();
+hls.loadSource(data.stream);
+hls.attachMedia(audio);
+hls.on(Hls.Events.MANIFEST_PARSED, ()=>{
+audio.play();
 });
+}
+}else{
+audio.src = data.stream;
+audio.play().catch(()=>alert("PLAY ERROR"));
+}
+
+current = id;
+
+saveFav(id);
 
 });
 
 }
 
 function stop(){
+const audio = document.getElementById("audio");
+
+if(hls){
+hls.destroy();
+hls = null;
+}
+
 audio.pause();
 audio.src="";
 }
 
-const grid = document.getElementById("grid");
+/* 🔥 ULUBIONE */
+function saveFav(id){
+
+let fav = JSON.parse(localStorage.getItem("fav") || "[]");
+
+fav = fav.filter(f=>f!==id);
+fav.unshift(id);
+fav = fav.slice(0,6);
+
+localStorage.setItem("fav",JSON.stringify(fav));
+
+renderFav();
+
+}
+
+/* TOP 6 */
+function renderFav(){
+
+const fav = JSON.parse(localStorage.getItem("fav") || "[]");
+
+const box = document.getElementById("top");
+box.innerHTML="";
+
+fav.forEach(id=>{
+const s = stations.find(x=>x.id===id);
+if(s){
+const d=document.createElement("div");
+d.className="card";
+d.innerHTML=`<div class="logo">${s.name.slice(0,3)}</div><div class="name">${s.name}</div>`;
+d.onclick=()=>play(s.id);
+box.appendChild(d);
+}
+});
+
+}
+
+/* GRID */
+function render(){
+
+const grid=document.getElementById("grid");
 
 stations.forEach(s=>{
 
-let div=document.createElement("div");
-div.className="card";
+let d=document.createElement("div");
+d.className="card";
 
-div.innerHTML=`
-<div class="icon">${s.name.slice(0,3)}</div>
-<div>${s.name}</div>
+d.innerHTML=`
+<div class="logo">${s.name.slice(0,3)}</div>
+<div class="name">${s.name}</div>
 `;
 
-div.onclick=()=>play(s.id);
+d.onclick=()=>play(s.id);
 
-grid.appendChild(div);
+grid.appendChild(d);
 
 });
+
+}
+
+render();
+renderFav();
 
 </script>
 
