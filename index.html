@@ -37,6 +37,8 @@ font-size:16px;
 
 <div id="title">📻 Moje Radio</div>
 
+<!-- 🔥 STACJE Z MYRADIOONLINE (TYLKO DZIAŁAJĄCE) -->
+
 <button onclick="play('https://stream.rcs.revma.com/gzwc1xcq042vv')">Muzyczne Radio</button>
 
 <button onclick="play('https://rs8-krk2-cyfronet.rmfstream.pl/RMFFM48.mp3')">RMF FM</button>
@@ -45,9 +47,9 @@ font-size:16px;
 
 <button onclick="play('https://zt01.cdn.eurozet.pl/ZET128.mp3')">Radio ZET</button>
 
-<button onclick="play('https://waw01-02.cdn.eurozet.pl/ESKA.mp3')">Radio Eska</button>
+<button onclick="play('https://waw01-02.cdn.eurozet.pl/ESKA.mp3')">Radio ESKA</button>
 
-<button onclick="play('https://waw01-02.cdn.eurozet.pl/ESKAROCK.mp3')">Eska ROCK</button>
+<button onclick="play('https://waw01-02.cdn.eurozet.pl/ESKAROCK.mp3')">ESKA ROCK</button>
 
 <button onclick="play('https://zt01.cdn.eurozet.pl/POGODA.mp3')">Radio Pogoda</button>
 
@@ -66,7 +68,7 @@ const audio = document.getElementById("audio");
 function play(url){
 audio.src = url;
 audio.play().catch(()=>{
-alert("Ta stacja nie może być odtworzona w tej przeglądarce");
+alert("STREAM NIE DZIAŁA (blokada stacji)");
 });
 }
 
