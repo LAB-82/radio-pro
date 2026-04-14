@@ -2,207 +2,195 @@
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
+<title>Muzyczne Radio PRO</title>
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Radio PRO STABLE</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
 
 <style>
+
 body{
 margin:0;
 background:#000;
 color:#fff;
-font-family:Arial;
+font-family:'Orbitron',sans-serif;
+display:flex;
+flex-direction:column;
+align-items:center;
+height:100vh;
+transition:0.4s;
 }
 
-header{
+body.day{
+background:#eaeaea;
+color:#000;
+}
+
+#title{
+font-size:88px;
+margin-top:50px;
 text-align:center;
-padding:14px;
-font-size:22px;
 color:#ff2a2a;
-font-weight:bold;
+text-shadow:0 0 5px #ff2a2a,0 0 15px #ff0000,0 0 30px #ff0000,0 0 60px #ff0000;
 }
 
-.grid{
-display:grid;
-grid-template-columns:repeat(2,1fr);
-gap:10px;
-padding:10px;
+#proEqualizer{
+display:block;
+margin:0 auto;
+margin-top:30px;
+margin-bottom:30px;
+border-radius:8px;
+overflow:hidden;
 }
 
-.card{
-background:#111;
-border:1px solid #222;
-border-radius:12px;
-padding:14px;
-cursor:pointer;
-text-align:center;
+canvas{
+display:block;
+height:260px;
+border-radius:8px;
 }
 
-.card:active{
-transform:scale(0.97);
-border-color:#ff2a2a;
+#controls{
+display:flex;
+gap:8px;
+margin-top:20px;
+margin-bottom:20px;
+align-items:center;
+justify-content:space-between;
+flex-wrap:wrap;
 }
 
-.logo{
-width:40px;
-height:40px;
-margin:0 auto 8px;
-border-radius:10px;
-background:#ff2a2a;
+.volumeWrapper{
+width:160px;
+height:45px;
 display:flex;
 align-items:center;
 justify-content:center;
-font-size:11px;
-font-weight:bold;
+background:#111;
+border:2px solid #ff2a2a;
+box-shadow:0 0 10px #ff2a2a;
 }
 
-#player{
-position:fixed;
-bottom:0;
-left:0;
-right:0;
-background:#111;
-padding:10px;
-display:flex;
-justify-content:center;
-border-top:1px solid #222;
+body.day .volumeWrapper{
+background:#d6d6d6;
+box-shadow:0 0 40px #ff2a2a,0 0 80px #ff0000;
 }
 
 button{
-background:black;
+width:160px;
+height:45px;
+background:#111;
 color:white;
-border:1px solid red;
-padding:10px 14px;
-border-radius:8px;
 cursor:pointer;
+font-family:'Orbitron';
+transition:0.2s;
+border:2px solid #ff2a2a;
+box-shadow:0 0 10px #ff2a2a;
 }
+
+body.day button{
+background:#d6d6d6;
+color:#000;
+box-shadow:0 0 40px #ff2a2a,0 0 80px #ff0000;
+}
+
+#stations{
+width:90%;
+max-width:900px;
+margin-top:20px;
+display:grid;
+grid-template-columns:repeat(2,1fr);
+gap:10px;
+}
+
+.station{
+background:#111;
+border:1px solid #222;
+padding:12px;
+border-radius:10px;
+cursor:pointer;
+text-align:center;
+transition:0.2s;
+}
+
+.station:active{
+transform:scale(0.96);
+border-color:#ff2a2a;
+}
+
 </style>
 </head>
 
 <body>
 
-<header>📻 RADIO PRO STABLE</header>
+<div id="title">Muzyczne Radio</div>
 
-<div class="grid" id="grid"></div>
+<canvas id="proEqualizer"></canvas>
 
-<div id="player">
-<button onclick="stopRadio()">STOP</button>
+<div id="controls">
+
+<button id="playBtn" onclick="playRadio()">PLAY</button>
+<button id="stopBtn" onclick="stopRadio()">STOP</button>
+<button id="muteBtn" onclick="muteRadio()">MUTE 🔊</button>
+
+<div class="volumeWrapper">
+<input id="volume" type="range" min="0" max="1" step="0.01" value="0.5">
 </div>
 
-<audio id="audio" controls style="width:100%;position:fixed;bottom:60px;"></audio>
+<button id="modeBtn" onclick="toggleMode()">🌙</button>
+
+</div>
+
+<!-- 🔥 STACJE -->
+<div id="stations"></div>
+
+<audio id="audio" crossorigin="anonymous"></audio>
 
 <script>
 
 const audio = document.getElementById("audio");
 
-/* 🔥 TYLKO PEWNE STREAMY (BEZ ZMYŚLANIA) */
+/* 🔥 STABILNE POLSKIE STREAMY (REALNE MP3 / HLS) */
 const stations = [
 
-/* ================= POLSKA ================= */
+{ name:"Muzyczne Radio", url:"https://stream.rcs.revma.com/gzwc1xcq042vv" },
 
-{
-name:"Muzyczne Radio",
-url:"https://stream.rcs.revma.com/gzwc1xcq042vv"
-},
+{ name:"Polskie Radio Jedynka", url:"https://stream2.polskieradio.pl/pr1_pr1-128.mp3" },
 
-{
-name:"Polskie Radio Jedynka",
-url:"https://stream3.polskieradio.pl/PR1"
-},
+{ name:"Polskie Radio Dwójka", url:"https://stream2.polskieradio.pl/pr2_pr2-128.mp3" },
 
-{
-name:"Polskie Radio Dwójka",
-url:"https://stream3.polskieradio.pl/PR2"
-},
+{ name:"Polskie Radio Trójka", url:"https://stream2.polskieradio.pl/pr3_pr3-128.mp3" },
 
-{
-name:"Polskie Radio Trójka",
-url:"https://stream3.polskieradio.pl/PR3"
-},
+{ name:"Polskie Radio Czwórka", url:"https://stream2.polskieradio.pl/pr4_pr4-128.mp3" },
 
-{
-name:"Polskie Radio Czwórka",
-url:"https://stream3.polskieradio.pl/PR4"
-},
+{ name:"Polskie Radio Dzieciom", url:"https://stream2.polskieradio.pl/prd_prd-128.mp3" },
 
-{
-name:"Polskie Radio Dzieciom",
-url:"https://stream3.polskieradio.pl/PRD"
-},
+{ name:"Radio Wrocław", url:"https://stream4.nadaje.com:9001/radiowroclaw" },
 
-{
-name:"Radio Wrocław",
-url:"https://stream4.nadaje.com:9001/radiowroclaw"
-},
+{ name:"Radio Wnet", url:"https://stream.rcs.revma.com/wnet" },
 
-{
-name:"Radio Wnet",
-url:"https://stream.rcs.revma.com/wnet"
-},
+{ name:"Radio dla Ciebie", url:"https://stream.rdc.pl/stream" },
 
-{
-name:"Radio dla Ciebie",
-url:"https://stream.rdc.pl/stream"
-},
-
-{
-name:"Polskie Radio Chopin",
-url:"https://stream3.polskieradio.pl/chopin"
-},
-
-/* ================= ZAGRANICA ================= */
-
-{
-name:"BBC Radio 1",
-url:"https://stream.live.vc.bbcmedia.co.uk/bbc_radio_one"
-},
-
-{
-name:"BBC 1Xtra",
-url:"https://stream.live.vc.bbcmedia.co.uk/bbc_1xtra"
-},
-
-{
-name:"Radio Deejay",
-url:"https://radiodeejay-lh.akamaihd.net/i/RadioDeejay_Live_1@119907/index_128_a-p.m3u8"
-},
-
-{
-name:"RTL 102.5",
-url:"https://streamingv2.shoutcast.com/rtl-1025"
-},
-
-{
-name:"KISS FM",
-url:"https://icecast.kissfmuk.com/kiss.mp3"
-},
-
-{
-name:"SLAM!",
-url:"https://stream.slam.nl/slam"
-},
-
-{
-name:"One World Radio",
-url:"https://icecast.omroep.nl/radio1-bb-mp3"
-},
-
-{
-name:"Ibiza Global Radio",
-url:"https://ibizaglobalradio.streaming-pro.com/live"
-},
-
-{
-name:"Psyndora Psytrance",
-url:"https://stream.psytrance.org/psytrance"
-},
-
-{
-name:"Radio Schizoid",
-url:"https://schizoid.in/stream"
-}
+{ name:"Polskie Radio Chopin", url:"https://stream2.polskieradio.pl/chopin-128.mp3" }
 
 ];
 
+/* UI RENDER */
+const container = document.getElementById("stations");
+
+stations.forEach(s=>{
+
+const div = document.createElement("div");
+div.className="station";
+div.innerText = s.name;
+
+div.onclick = ()=>play(s.url);
+
+container.appendChild(div);
+
+});
+
+/* PLAYER */
 function play(url){
 
 stopRadio();
@@ -210,7 +198,7 @@ stopRadio();
 audio.src = url;
 
 audio.play().catch(e=>{
-alert("STREAM ERROR (nie wspierany lub offline)");
+alert("STREAM ERROR");
 console.log(e);
 });
 
@@ -221,24 +209,25 @@ audio.pause();
 audio.src="";
 }
 
-/* UI */
-const grid = document.getElementById("grid");
+/* reszta Twojego UI zostaje */
+const volume = document.getElementById("volume");
+const muteBtn = document.getElementById("muteBtn");
+const modeBtn = document.getElementById("modeBtn");
 
-stations.forEach(s=>{
+function muteRadio(){
+audio.muted = !audio.muted;
+}
 
-const div = document.createElement("div");
-div.className="card";
+function toggleMode(){
+document.body.classList.toggle("day");
+modeBtn.innerText=document.body.classList.contains("day")?"☀️":"🌙";
+}
 
-div.innerHTML = `
-<div class="logo">${s.name.slice(0,3).toUpperCase()}</div>
-<div>${s.name}</div>
-`;
-
-div.onclick = ()=>play(s.url);
-
-grid.appendChild(div);
-
+volume.addEventListener("input",()=>{
+audio.volume = volume.value;
 });
+
+audio.volume = 0.5;
 
 </script>
 
