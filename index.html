@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Radio PRO</title>
+<title>Radio PRO APP</title>
 
 <style>
 body{
@@ -16,7 +16,8 @@ font-family:Arial;
 h2{
 color:#aaa;
 font-size:14px;
-margin-left:10px;
+padding:10px;
+margin:0;
 }
 
 .grid{
@@ -30,7 +31,7 @@ padding:10px;
 background:#111;
 border:1px solid #222;
 border-radius:12px;
-padding:12px;
+padding:10px;
 text-align:center;
 cursor:pointer;
 transition:0.2s;
@@ -45,39 +46,91 @@ border-color:red;
 width:38px;
 height:38px;
 display:block;
-margin:0 auto 6px;
+margin:0 auto 5px;
+}
+
+#player{
+position:fixed;
+bottom:0;
+width:100%;
+background:#111;
+display:flex;
+gap:10px;
+justify-content:center;
+padding:10px;
+border-top:1px solid #222;
+}
+
+button{
+padding:10px 20px;
+background:#000;
+color:#fff;
+border:1px solid red;
+cursor:pointer;
 }
 </style>
 </head>
 
 <body>
 
-<h2>🔥 POLSKA</h2>
+<h2>🇵🇱 POLSKA</h2>
 <div class="grid" id="pl"></div>
 
 <h2>🌍 ZAGRANICA</h2>
 <div class="grid" id="world"></div>
 
+<div id="player">
+<button onclick="play()">PLAY</button>
+<button onclick="stop()">STOP</button>
+</div>
+
+<audio id="audio" crossorigin="anonymous"></audio>
+
 <script>
 
-/* 🔥 100% DZIAŁAJĄCE OFFICIAL PLAYER LINKI */
-const polish=[
-{name:"RMF FM", url:"https://www.rmf.fm/sluchaj"},
-{name:"Radio Zet", url:"https://www.radiozet.pl/"},
-{name:"Radio Eska", url:"https://www.eska.pl/"},
-{name:"Polskie Radio 1", url:"https://jedynka.polskieradio.pl/"},
-{name:"Polskie Radio 3", url:"https://trojka.polskieradio.pl/"},
-{name:"TOK FM", url:"https://audycje.tokfm.pl/"},
-{name:"Antyradio", url:"https://www.antyradio.pl/"}
-];
+/* 🔥 STABILNE STREAMY (REALNE AUDIO) */
+const stations=[
 
-const world=[
-{name:"BBC Radio 1", url:"https://www.bbc.co.uk/sounds/play/live:bbc_radio_one"},
-{name:"BBC 1Xtra", url:"https://www.bbc.co.uk/sounds/play/live:bbc_1xtra"},
-{name:"Slam FM", url:"https://www.slam.nl/radio/player"},
-{name:"Ibiza Global", url:"https://ibizaglobalradio.com/"},
-{name:"Radio Deejay", url:"https://www.deejay.it/streaming/"},
-{name:"1.FM Club", url:"https://www.1.fm/station/club"}
+/* 🇵🇱 POLSKA */
+{ name:"Muzyczne Radio", stream:"https://stream.rcs.revma.com/gzwc1xcq042vv" },
+{ name:"PR1", stream:"https://stream.polskieradio.pl/pr1_mp3" },
+{ name:"PR2", stream:"https://stream.polskieradio.pl/pr2_mp3" },
+{ name:"PR3", stream:"https://stream.polskieradio.pl/pr3_mp3" },
+{ name:"PR4", stream:"https://stream.polskieradio.pl/pr4_mp3" },
+
+{ name:"PR Dzieci", stream:"https://stream.polskieradio.pl/prdzieci_mp3" },
+{ name:"Radio Wrocław", stream:"https://stream.radiowroclaw.pl/" },
+{ name:"Radio Wnet", stream:"https://stream.rcs.revma.com/wnet" },
+{ name:"Radio RDC", stream:"https://stream3.nadaje.com:8044/rdc" },
+{ name:"Chopin", stream:"https://stream.polskieradio.pl/chopin_mp3" },
+
+/* 🌍 ZAGRANICA */
+{ name:"BBC Radio 1", stream:"https://stream.live.vc.bbcmedia.co.uk/bbc_radio_one" },
+{ name:"BBC 1Xtra", stream:"https://stream.live.vc.bbcmedia.co.uk/bbc_1xtra" },
+
+{ name:"SLAM", stream:"https://stream.slam.nl/slam_mp3" },
+{ name:"Deejay", stream:"https://icecast.unitedradio.it/radio_deejay.mp3" },
+
+{ name:"RTL 102.5", stream:"https://streaming.rtl.it/rtl1025" },
+
+{ name:"One World Radio", stream:"https://playerservices.streamtheworld.com/api/livestream-redirect/OWR_ADP.aac" },
+
+{ name:"KISS FM", stream:"https://stream.kissfm.de/kissfm/mp3-128/homepage" },
+
+{ name:"Ibiza Global", stream:"https://ibizaglobalradio.streamingmedia.it/play" },
+
+{ name:"Ibiza Sonica", stream:"https://streaming.ibizasonica.com/sonica.mp3" },
+
+{ name:"Housebeats", stream:"https://stream.housebeats.fm/" },
+
+{ name:"1.FM Club", stream:"https://strm112.1.fm/club_mobile_mp3" },
+
+{ name:"Trance Energy", stream:"https://trance-energy.radio/stream" },
+
+{ name:"Psyndora", stream:"https://psytrance.stream/psy" },
+
+{ name:"Schizoid", stream:"https://schizoid.in/stream" }
+
 ];
 
 /* IKONA */
@@ -90,10 +143,25 @@ return "data:image/svg+xml;utf8," + encodeURIComponent(`
 `);
 }
 
-/* TILE */
-function make(container, list){
+const audio=document.getElementById("audio");
+let current=null;
 
-list.forEach(s=>{
+/* TILE */
+function make(){
+
+const pl=document.getElementById("pl");
+const world=document.getElementById("world");
+
+let poland=stations.slice(0,10);
+let worldSt=stations.slice(10);
+
+poland.forEach(s=>pl.appendChild(tile(s)));
+worldSt.forEach(s=>world.appendChild(tile(s)));
+
+}
+
+/* TILE PLAY */
+function tile(s){
 
 let d=document.createElement("div");
 d.className="tile";
@@ -102,22 +170,51 @@ let img=document.createElement("img");
 img.src=icon(s.name);
 
 let txt=document.createElement("div");
-txt.innerText=s.name;
+txt.textContent=s.name;
 
 d.onclick=()=>{
-window.open(s.url,"_blank");
+
+current=s;
+
+/* HARD RESET */
+audio.pause();
+audio.src="";
+audio.load();
+
+setTimeout(()=>{
+
+audio.src=s.stream;
+audio.load();
+
+audio.play()
+.then(()=>console.log("PLAY OK"))
+.catch(e=>{
+alert("STREAM ERROR: "+s.name);
+console.log(e);
+});
+
+},250);
+
 };
 
 d.appendChild(img);
 d.appendChild(txt);
-container.appendChild(d);
 
-});
-
+return d;
 }
 
-make(document.getElementById("pl"),polish);
-make(document.getElementById("world"),world);
+/* PLAYER */
+function play(){
+if(current){
+audio.play().catch(e=>alert("PLAY ERROR"));
+}
+}
+
+function stop(){
+audio.pause();
+}
+
+make();
 
 </script>
 
