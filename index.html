@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Radio PRO APP</title>
+<title>Radio PRO</title>
 
 <style>
 body{
@@ -14,10 +14,9 @@ font-family:Arial;
 }
 
 h2{
-color:#aaa;
+margin:10px;
 font-size:14px;
-padding:10px;
-margin:0;
+color:#aaa;
 }
 
 .grid{
@@ -29,11 +28,11 @@ padding:10px;
 
 .tile{
 background:#111;
-border:1px solid #222;
-border-radius:12px;
-padding:10px;
+border-radius:14px;
+padding:12px;
 text-align:center;
 cursor:pointer;
+border:1px solid #222;
 transition:0.2s;
 }
 
@@ -42,12 +41,26 @@ transform:scale(0.95);
 border-color:red;
 }
 
-.tile img{
-width:38px;
-height:38px;
-display:block;
-margin:0 auto 5px;
+/* 🔥 REALNE IKONY (kolor + gradient) */
+.icon{
+width:40px;
+height:40px;
+margin:0 auto 6px;
+border-radius:10px;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:10px;
+font-weight:bold;
+color:#fff;
 }
+
+/* różne kolory */
+.c1{background:linear-gradient(45deg,#ff0000,#ff6600);}
+.c2{background:linear-gradient(45deg,#0066ff,#00ccff);}
+.c3{background:linear-gradient(45deg,#00aa00,#66ff66);}
+.c4{background:linear-gradient(45deg,#aa00ff,#ff00cc);}
+.c5{background:linear-gradient(45deg,#ffcc00,#ff6600);}
 
 #player{
 position:fixed;
@@ -62,7 +75,7 @@ border-top:1px solid #222;
 }
 
 button{
-padding:10px 20px;
+padding:10px 18px;
 background:#000;
 color:#fff;
 border:1px solid red;
@@ -88,86 +101,44 @@ cursor:pointer;
 
 <script>
 
-/* 🔥 STABILNE STREAMY (REALNE AUDIO) */
+/* 🔥 TYLKO DZIAŁAJĄCE STREAMY */
 const stations=[
 
 /* 🇵🇱 POLSKA */
-{ name:"Muzyczne Radio", stream:"https://stream.rcs.revma.com/gzwc1xcq042vv" },
-{ name:"PR1", stream:"https://stream.polskieradio.pl/pr1_mp3" },
-{ name:"PR2", stream:"https://stream.polskieradio.pl/pr2_mp3" },
-{ name:"PR3", stream:"https://stream.polskieradio.pl/pr3_mp3" },
-{ name:"PR4", stream:"https://stream.polskieradio.pl/pr4_mp3" },
+{ name:"Muzyczne Radio", stream:"https://stream.rcs.revma.com/gzwc1xcq042vv", cls:"c1" },
+{ name:"PR1", stream:"https://stream.polskieradio.pl/pr1_mp3", cls:"c2" },
+{ name:"PR2", stream:"https://stream.polskieradio.pl/pr2_mp3", cls:"c3" },
+{ name:"PR3", stream:"https://stream.polskieradio.pl/pr3_mp3", cls:"c4" },
+{ name:"PR4", stream:"https://stream.polskieradio.pl/pr4_mp3", cls:"c5" },
 
-{ name:"PR Dzieci", stream:"https://stream.polskieradio.pl/prdzieci_mp3" },
-{ name:"Radio Wrocław", stream:"https://stream.radiowroclaw.pl/" },
-{ name:"Radio Wnet", stream:"https://stream.rcs.revma.com/wnet" },
-{ name:"Radio RDC", stream:"https://stream3.nadaje.com:8044/rdc" },
-{ name:"Chopin", stream:"https://stream.polskieradio.pl/chopin_mp3" },
+/* 🔥 PEWNY ICECAST */
+{ name:"Radio Wrocław", stream:"https://stream4.nadaje.com:9210/radiowroclaw", cls:"c1" },
+{ name:"TOK FM", stream:"https://stream.rcs.revma.com/tokfm", cls:"c2" },
+{ name:"Antyradio", stream:"https://stream.antyradio.pl/stream", cls:"c3" },
 
-/* 🌍 ZAGRANICA */
-{ name:"BBC Radio 1", stream:"https://stream.live.vc.bbcmedia.co.uk/bbc_radio_one" },
-{ name:"BBC 1Xtra", stream:"https://stream.live.vc.bbcmedia.co.uk/bbc_1xtra" },
+/* 🌍 ZAGRANICA (STABILNE) */
+{ name:"BBC Radio 1", stream:"https://stream.live.vc.bbcmedia.co.uk/bbc_radio_one", cls:"c4" },
+{ name:"BBC 1Xtra", stream:"https://stream.live.vc.bbcmedia.co.uk/bbc_1xtra", cls:"c5" },
 
-{ name:"SLAM", stream:"https://stream.slam.nl/slam_mp3" },
-{ name:"Deejay", stream:"https://icecast.unitedradio.it/radio_deejay.mp3" },
+{ name:"SLAM FM", stream:"https://stream.slam.nl/slam_mp3", cls:"c1" },
+{ name:"1.FM Club", stream:"https://strm112.1.fm/club_mobile_mp3", cls:"c2" },
 
-{ name:"RTL 102.5", stream:"https://streaming.rtl.it/rtl1025" },
-
-{ name:"One World Radio", stream:"https://playerservices.streamtheworld.com/api/livestream-redirect/OWR_ADP.aac" },
-
-{ name:"KISS FM", stream:"https://stream.kissfm.de/kissfm/mp3-128/homepage" },
-
-{ name:"Ibiza Global", stream:"https://ibizaglobalradio.streamingmedia.it/play" },
-
-{ name:"Ibiza Sonica", stream:"https://streaming.ibizasonica.com/sonica.mp3" },
-
-{ name:"Housebeats", stream:"https://stream.housebeats.fm/" },
-
-{ name:"1.FM Club", stream:"https://strm112.1.fm/club_mobile_mp3" },
-
-{ name:"Trance Energy", stream:"https://trance-energy.radio/stream" },
-
-{ name:"Psyndora", stream:"https://psytrance.stream/psy" },
-
-{ name:"Schizoid", stream:"https://schizoid.in/stream" }
+{ name:"Ibiza Global", stream:"https://ibizaglobalradio.streamingmedia.it/play", cls:"c3" }
 
 ];
-
-/* IKONA */
-function icon(name){
-return "data:image/svg+xml;utf8," + encodeURIComponent(`
-<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40'>
-<rect width='100%' height='100%' fill='black'/>
-<text x='50%' y='55%' font-size='9' fill='red' text-anchor='middle'>${name}</text>
-</svg>
-`);
-}
 
 const audio=document.getElementById("audio");
 let current=null;
 
-/* TILE */
-function make(){
-
-const pl=document.getElementById("pl");
-const world=document.getElementById("world");
-
-let poland=stations.slice(0,10);
-let worldSt=stations.slice(10);
-
-poland.forEach(s=>pl.appendChild(tile(s)));
-worldSt.forEach(s=>world.appendChild(tile(s)));
-
-}
-
-/* TILE PLAY */
+/* 🔥 TILE */
 function tile(s){
 
 let d=document.createElement("div");
 d.className="tile";
 
-let img=document.createElement("img");
-img.src=icon(s.name);
+let icon=document.createElement("div");
+icon.className="icon "+s.cls;
+icon.textContent=s.name.slice(0,3).toUpperCase();
 
 let txt=document.createElement("div");
 txt.textContent=s.name;
@@ -176,7 +147,7 @@ d.onclick=()=>{
 
 current=s;
 
-/* HARD RESET */
+/* HARD RESET (KLUCZ DO STABILNOŚCI) */
 audio.pause();
 audio.src="";
 audio.load();
@@ -187,7 +158,7 @@ audio.src=s.stream;
 audio.load();
 
 audio.play()
-.then(()=>console.log("PLAY OK"))
+.then(()=>console.log("PLAY OK:",s.name))
 .catch(e=>{
 alert("STREAM ERROR: "+s.name);
 console.log(e);
@@ -197,11 +168,24 @@ console.log(e);
 
 };
 
-d.appendChild(img);
+d.appendChild(icon);
 d.appendChild(txt);
 
 return d;
 }
+
+/* RENDER */
+function make(){
+
+const pl=document.getElementById("pl");
+const world=document.getElementById("world");
+
+stations.slice(0,6).forEach(s=>pl.appendChild(tile(s)));
+stations.slice(6).forEach(s=>world.appendChild(tile(s)));
+
+}
+
+make();
 
 /* PLAYER */
 function play(){
@@ -213,8 +197,6 @@ audio.play().catch(e=>alert("PLAY ERROR"));
 function stop(){
 audio.pause();
 }
-
-make();
 
 </script>
 
