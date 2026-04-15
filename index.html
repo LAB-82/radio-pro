@@ -22,57 +22,81 @@ font-family:"Orbitron",sans-serif;
 color:#ff2a2a;
 }
 
-/* ================= ARASAKA GRID (KLUCZ DO STYLU) ================= */
+/* ================= ARASAKA GRID (CIENKI TECHNICZNY) ================= */
 body{
 background:
-linear-gradient(90deg, rgba(255,0,0,0.03) 1px, transparent 1px),
-linear-gradient(0deg, rgba(255,0,0,0.03) 1px, transparent 1px);
-background-size:40px 40px;
+linear-gradient(rgba(255,0,0,0.06) 1px, transparent 1px),
+linear-gradient(90deg, rgba(255,0,0,0.06) 1px, transparent 1px);
+background-size:50px 50px;
 }
 
-/* ================= TITLE (PRECYZYJNY HUD STYLE) ================= */
+/* ================= TITLE ================= */
 #title{
-font-size:72px;
+font-size:70px;
 margin-top:30px;
 text-align:center;
-letter-spacing:12px;
+letter-spacing:10px;
 text-transform:uppercase;
 
 color:#ff2a2a;
 
 text-shadow:
-0 0 8px #ff0000,
-0 0 25px rgba(255,0,0,0.6);
+0 0 5px #ff0000,
+0 0 15px rgba(255,0,0,0.6);
 }
 
-/* ================= FIXED HUD FRAME (BRAK ROZJEŻDŻANIA) ================= */
+/* ================= HUD PANEL ================= */
 #proEqualizer{
 display:block;
 margin:20px auto;
 
-/* 🔥 KLUCZ: stała ramka jak HUD */
 width:900px;
 max-width:95vw;
 height:260px;
 
-border:1px solid rgba(255,0,0,0.35);
-border-radius:6px;
-
 background:rgba(0,0,0,0.35);
 
+/* cienkie ramki jak na obrazku */
+border:1px solid rgba(255,0,0,0.6);
+
 box-shadow:
-inset 0 0 30px rgba(255,0,0,0.2),
-0 0 20px #ff0000;
+inset 0 0 20px rgba(255,0,0,0.2),
+0 0 10px rgba(255,0,0,0.5);
+
+/* 🔥 segmenty HUD */
+position:relative;
 }
 
-/* ================= CANVAS LOCK ================= */
+/* 🔥 linie poziome HUD */
+#proEqualizer::before{
+content:"";
+position:absolute;
+left:0;
+top:50%;
+width:100%;
+height:1px;
+background:rgba(255,0,0,0.3);
+}
+
+/* 🔥 linie pionowe HUD */
+#proEqualizer::after{
+content:"";
+position:absolute;
+top:0;
+left:33%;
+width:1px;
+height:100%;
+background:rgba(255,0,0,0.25);
+}
+
+/* ================= CANVAS ================= */
 canvas{
 display:block;
 width:900px !important;
 height:260px !important;
 }
 
-/* ================= CONTROLS (ARASAKA ALIGN GRID) ================= */
+/* ================= CONTROLS ================= */
 #controls{
 display:flex;
 justify-content:center;
@@ -82,23 +106,22 @@ margin-top:10px;
 flex-wrap:wrap;
 }
 
-/* ================= BUTTONS (HUD PRECYZJA) ================= */
+/* ================= BUTTONS ================= */
 button{
 width:150px;
 height:44px;
 
-background:#050000;
+background:#020000;
 color:#ff2a2a;
 
-border:1px solid rgba(255,0,0,0.6);
+border:1px solid rgba(255,0,0,0.8);
 
 font-family:"Orbitron",sans-serif;
 letter-spacing:2px;
-text-transform:uppercase;
 
 box-shadow:
-0 0 10px rgba(255,0,0,0.5),
-inset 0 0 10px rgba(255,0,0,0.2);
+0 0 6px rgba(255,0,0,0.5),
+inset 0 0 6px rgba(255,0,0,0.2);
 
 cursor:pointer;
 transition:0.15s;
@@ -106,12 +129,10 @@ transition:0.15s;
 
 button:hover{
 box-shadow:
-0 0 25px #ff0000,
-0 0 60px rgba(255,0,0,0.4);
-transform:translateY(-1px);
+0 0 15px #ff0000;
 }
 
-/* ================= VOLUME (HUD BAR) ================= */
+/* ================= VOLUME ================= */
 .volumeWrapper{
 width:150px;
 height:44px;
@@ -120,30 +141,36 @@ display:flex;
 align-items:center;
 justify-content:center;
 
-background:#050000;
-border:1px solid rgba(255,0,0,0.6);
+background:#020000;
+border:1px solid rgba(255,0,0,0.8);
 
-box-shadow:0 0 12px rgba(255,0,0,0.5);
+box-shadow:0 0 8px rgba(255,0,0,0.5);
 }
 
 #volume{
 width:120px;
-height:5px;
+height:4px;
 appearance:none;
 background:#000;
 border:1px solid #ff2a2a;
 }
 
+/* 🔥 AKTYWNY TRACK */
+#volume.active{
+box-shadow:0 0 10px #ff0000;
+}
+
+/* 🔥 THUMB */
 #volume::-webkit-slider-thumb{
 -webkit-appearance:none;
-width:12px;
-height:12px;
+width:10px;
+height:10px;
 background:#ff2a2a;
-box-shadow:0 0 10px #ff0000;
+box-shadow:0 0 12px #ff0000;
 cursor:pointer;
 }
 
-/* ================= LINK (WRÓCONY, STABILNY) ================= */
+/* ================= LINK ================= */
 #bottomLink{
 position:absolute;
 bottom:15px;
@@ -156,10 +183,10 @@ color:#ff2a2a;
 text-decoration:none;
 font-size:16px;
 letter-spacing:2px;
-opacity:0.8;
+opacity:0.9;
 }
 
-/* ================= MOBILE FIX ================= */
+/* ================= MOBILE ================= */
 @media (max-width:768px){
 
 #title{
@@ -199,8 +226,10 @@ height:40px;
 <button id="muteBtn" onclick="muteRadio()">MUTE</button>
 
 <div class="volumeWrapper">
-<input id="volume" type="range">
+<input id="volume" type="range" min="0" max="1" step="0.01" value="0.5">
 </div>
+
+<button id="modeBtn">🌙</button>
 
 </div>
 
@@ -221,6 +250,8 @@ let ctx=canvas.getContext("2d");
 
 let audioCtx, analyser, source, dataArray;
 let animationStarted=false;
+
+audio.volume=volume.value;
 
 function setupAudio(){
 if(audioCtx) return;
@@ -253,14 +284,25 @@ function muteRadio(){
 audio.muted=!audio.muted;
 }
 
-/* ================= FIX: ARASAKA STABLE EQ ================= */
+/* 🔥 ACTIVE VOLUME */
+volume.addEventListener("input",()=>{
+audio.volume=parseFloat(volume.value);
+
+if(Math.abs(volume.value-0.5)>0.02){
+volume.classList.add("active");
+}else{
+volume.classList.remove("active");
+}
+});
+
+/* ================= EQ (CIENKI HUD STYLE) ================= */
 function draw(){
 requestAnimationFrame(draw);
+
 if(!analyser||!dataArray)return;
 
 analyser.getByteFrequencyData(dataArray);
 
-/* 🔥 KLUCZ: STAŁA RAMA = brak rozjazdu */
 let w=900;
 let h=260;
 
@@ -269,7 +311,7 @@ canvas.height=h;
 
 ctx.clearRect(0,0,w,h);
 
-let bars=60;
+let bars=90;
 let barW=w/bars;
 
 for(let i=0;i<bars;i++){
@@ -277,7 +319,9 @@ let v=dataArray[i]||0;
 let bh=(v/255)*h;
 
 ctx.fillStyle="#ff2a2a";
-ctx.fillRect(i*barW,h-bh,barW*0.7,bh);
+
+/* cienkie linie jak HUD */
+ctx.fillRect(i*barW,h-bh,barW*0.4,bh);
 }
 }
 
