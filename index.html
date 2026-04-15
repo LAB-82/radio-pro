@@ -15,6 +15,7 @@ body {
     height: 100vh;
 }
 
+/* LEWA LISTA */
 #sidebar {
     width: 300px;
     background: #141414;
@@ -34,12 +35,19 @@ body {
     background: #222;
 }
 
+.station.active {
+    background: #2a2a2a;
+    font-weight: bold;
+}
+
+/* PRAWA STRONA */
 #main {
     flex: 1;
     display: flex;
     flex-direction: column;
 }
 
+/* HEADER */
 #header {
     padding: 12px;
     background: #1a1a1a;
@@ -47,6 +55,7 @@ body {
     font-weight: bold;
 }
 
+/* META */
 #meta {
     display: flex;
     align-items: center;
@@ -57,16 +66,17 @@ body {
     font-size: 13px;
 }
 
+/* PLAYER AREA */
 #playerBox {
     flex: 1;
     display: flex;
     justify-content: center;
     align-items: center;
     background: #000;
-    position: relative;
 }
 
-#radioPlayer{
+/* PLAYER */
+#radioPlayer {
     width: 90%;
     height: 90%;
     background: #111;
@@ -75,24 +85,25 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    position: relative;
-    box-shadow: 0 0 25px rgba(0,0,0,0.7);
 }
 
-#logoBox img{
+/* LOGO */
+#logoBox img {
     width: 220px;
     height: auto;
     border-radius: 8px;
     margin-bottom: 20px;
 }
 
-#bigPlay{
+/* BIG PLAY */
+#bigPlay {
     font-size: 70px;
     cursor: pointer;
     user-select: none;
 }
 
-#bottomBar{
+/* BOTTOM BAR */
+#bottomBar {
     position: absolute;
     bottom: 12px;
     left: 50%;
@@ -106,6 +117,7 @@ body {
     cursor: pointer;
 }
 
+/* CONTROLS */
 #controls {
     height: 70px;
     background: #111;
@@ -122,11 +134,9 @@ body {
     user-select: none;
 }
 
-.active {
-    background:#2a2a2a !important;
+audio {
+    display: none;
 }
-
-audio { display:none; }
 </style>
 </head>
 
@@ -206,10 +216,8 @@ const stations = [
 "Radio Jasna Góra"
 ];
 
-// ⚠️ brak realnych streamów = jeden testowy
-const streams = stations.map(() =>
-    "https://stream.live.vc.bbcmedia.co.uk/bbc_radio_fourlw"
-);
+// ⚠️ jeden działający stream testowy (ważne!)
+const streamURL = "https://stream.live.vc.bbcmedia.co.uk/bbc_radio_fourlw";
 
 let index = 0;
 let playing = false;
@@ -218,7 +226,7 @@ const sidebar = document.getElementById("sidebar");
 const audio = document.getElementById("audio");
 const logo = document.getElementById("stationLogo");
 
-function renderActive(){
+function setActive(){
     document.querySelectorAll(".station").forEach((el,i)=>{
         el.classList.toggle("active", i === index);
     });
@@ -227,11 +235,13 @@ function renderActive(){
 function load(i){
     index = i;
 
-    renderActive();
+    setActive();
 
     logo.src = "https://via.placeholder.com/220x120?text=" + encodeURIComponent(stations[i]);
 
-    audio.src = streams[i];
+    audio.pause();
+    audio.src = streamURL;
+    audio.load();
 
     if(playing){
         audio.play().catch(()=>{});
@@ -243,9 +253,9 @@ function load(i){
 
 stations.forEach((s,i)=>{
     const div = document.createElement("div");
-    div.className="station";
-    div.innerText=s;
-    div.onclick=()=>load(i);
+    div.className = "station";
+    div.innerText = s;
+    div.onclick = () => load(i);
     sidebar.appendChild(div);
 });
 
