@@ -2,23 +2,12 @@
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
-<title>Muzyczne Radio PRO</title>
+<title>Muzyczne Radio - NIGHT CITY UI</title>
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#000000">
 
-<link rel="manifest" href="manifest.json">
-
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
-<link rel="apple-touch-icon" href="icon-192.png">
-
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
-<!-- 🌌 METAVERSE FONTS -->
-<link href="https://fonts.googleapis.com/css2?family=Tilt+Neon&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Audiowide&display=swap" rel="stylesheet">
+<!-- 🌐 CYBERPUNK FONT -->
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
 
 <style>
 
@@ -30,42 +19,36 @@ height:100%;
 overflow:hidden;
 }
 
-/* 🌐 METAVERSE BACKGROUND */
+/* 🌆 NIGHT CITY BACKGROUND */
 body{
 background:
 radial-gradient(circle at center, #0a0000 0%, #000 60%, #000 100%),
 repeating-linear-gradient(
-45deg,
-rgba(255,0,0,0.06),
-rgba(255,0,0,0.06) 2px,
-transparent 2px,
-transparent 8px
+0deg,
+rgba(255,0,0,0.05),
+rgba(255,0,0,0.05) 1px,
+transparent 1px,
+transparent 4px
 );
 
+font-family:"Orbitron",sans-serif;
 color:#ff2a2a;
-
-/* 🌌 METAVERSE FONT */
-font-family:"Tilt Neon","Audiowide",sans-serif;
 
 display:flex;
 flex-direction:column;
 align-items:center;
 height:100vh;
-transition:0.4s;
 
-/* glow ambience */
-box-shadow: inset 0 0 120px rgba(255,0,0,0.2);
+/* cyber glow */
+box-shadow: inset 0 0 150px rgba(255,0,0,0.2);
 }
 
-/* 🌌 TITLE = NEON HOLOGRAM */
+/* 🌆 GLITCH TITLE */
 #title{
-font-size:92px;
-margin-top:50px;
-text-align:center;
-
+font-size:90px;
+margin-top:40px;
 text-transform:uppercase;
-letter-spacing:10px;
-font-weight:800;
+letter-spacing:12px;
 
 color:#ff2a2a;
 
@@ -74,27 +57,25 @@ text-shadow:
 0 0 30px #ff0000,
 0 0 60px #8b0000;
 
-animation: flicker 2.8s infinite alternate;
+position:relative;
+animation: glitch 2.5s infinite;
 }
 
-/* flicker */
-@keyframes flicker{
-0%{opacity:1;}
-45%{opacity:0.85;}
-50%{opacity:1;}
-70%{opacity:0.7;}
-100%{opacity:1;}
+/* glitch effect */
+@keyframes glitch{
+0%{transform:translate(0);}
+20%{transform:translate(-2px,2px);}
+40%{transform:translate(2px,-1px);}
+60%{transform:translate(-1px,1px);}
+80%{transform:translate(1px,-2px);}
+100%{transform:translate(0);}
 }
 
-/* 🌌 VISUALIZER */
+/* 🌆 VISUALIZER */
 #proEqualizer{
-display:block;
-margin:0 auto;
 margin-top:30px;
 margin-bottom:30px;
-border-radius:12px;
-overflow:hidden;
-
+border-radius:10px;
 box-shadow:
 0 0 25px #ff0000,
 0 0 80px rgba(255,0,0,0.4);
@@ -103,52 +84,48 @@ box-shadow:
 canvas{
 display:block;
 height:260px;
-border-radius:12px;
 }
 
-/* 🌌 CONTROLS */
+/* 🌆 CONTROL PANEL */
 #controls{
 display:flex;
 gap:10px;
-margin-top:20px;
-margin-bottom:20px;
-align-items:center;
-justify-content:space-between;
 flex-wrap:wrap;
+justify-content:center;
+margin-top:20px;
 }
 
-/* 🔥 BUTTONS */
+/* 🔴 CYBER BUTTONS */
 button{
 width:160px;
 height:45px;
 
-background: rgba(10,0,0,0.85);
-
+background: rgba(10,0,0,0.8);
 color:#ff2a2a;
 
-font-family:"Tilt Neon","Audiowide",sans-serif;
-
-cursor:pointer;
-transition:0.2s;
+font-family:"Orbitron",sans-serif;
 
 border:1px solid #ff2a2a;
 
 box-shadow:
 0 0 15px #ff0000,
-inset 0 0 15px rgba(255,0,0,0.25);
+inset 0 0 10px rgba(255,0,0,0.2);
 
-letter-spacing:3px;
+cursor:pointer;
+transition:0.2s;
+
 text-transform:uppercase;
+letter-spacing:2px;
 }
 
 button:hover{
 transform:scale(1.08);
 box-shadow:
-0 0 30px #ff2a2a,
-0 0 80px #ff0000;
+0 0 30px #ff0000,
+0 0 80px #ff2a2a;
 }
 
-/* 🌌 VOLUME (FIXED METAVERSE SLIDER) */
+/* 🌆 VOLUME SLIDER */
 .volumeWrapper{
 width:160px;
 height:45px;
@@ -156,25 +133,18 @@ display:flex;
 align-items:center;
 justify-content:center;
 
-background: rgba(0,0,0,0.6);
-border:2px solid #ff2a2a;
-
-box-shadow:
-0 0 20px #ff0000,
-inset 0 0 10px rgba(255,0,0,0.2);
-
-backdrop-filter: blur(8px);
+background: rgba(0,0,0,0.7);
+border:1px solid #ff2a2a;
+box-shadow:0 0 20px #ff0000;
 }
 
 #volume{
 width:120px;
-height:6px;
 appearance:none;
-
+height:6px;
 background:#000;
 border:1px solid #ff2a2a;
-box-shadow:0 0 12px #ff0000;
-border-radius:10px;
+box-shadow:0 0 10px #ff0000;
 }
 
 #volume::-webkit-slider-thumb{
@@ -182,73 +152,46 @@ border-radius:10px;
 width:14px;
 height:14px;
 background:#ff2a2a;
-box-shadow:0 0 20px #ff0000;
-border-radius:3px;
+box-shadow:0 0 15px #ff0000;
 cursor:pointer;
 }
 
-/* 🌌 MODE */
-#modeBtn{
-font-size:22px;
-width:66px;
-height:49px;
-background:#000;
-border:1px solid #ff2a2a;
-box-shadow:0 0 20px #ff0000;
-color:#ff2a2a;
-font-family:"Tilt Neon","Audiowide",sans-serif;
-}
-
-/* 🌌 STATUS */
-.playActive{ text-shadow:0 0 25px #ff0000; }
-.stopActive{ text-shadow:0 0 25px #aa0000; }
-
-.muteActive{
-color:#ff8800;
-text-shadow:0 0 25px orange;
-animation:pulseMute 0.8s infinite alternate;
-}
-
-@keyframes pulseMute{
-from{transform:scale(1);}
-to{transform:scale(1.1);}
-}
-
-/* 🌌 MOBILE */
-@media (max-width: 768px){
-
-#title{
-font-size:44px;
-letter-spacing:5px;
-}
-
-canvas{
-width:95vw;
-height:200px;
-}
-
-#controls{
-justify-content:center;
-gap:8px;
-}
-
-button, .volumeWrapper{
-width:140px;
-height:44px;
-}
-}
-
-#bottomLink{
-margin-top:10px;
-text-align:center;
-width:100%;
-}
-
+/* 🌆 HUD LABEL */
 #bottomLink a{
 color:#ff2a2a;
-text-shadow:0 0 20px #ff0000;
+text-shadow:0 0 15px #ff0000;
 text-decoration:none;
-font-size:18px;
+font-size:16px;
+}
+
+/* 🌆 SCANLINES */
+body::before{
+content:"";
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:
+repeating-linear-gradient(
+0deg,
+rgba(255,0,0,0.05),
+rgba(0,0,0,0.0) 2px,
+transparent 4px
+);
+pointer-events:none;
+mix-blend-mode:overlay;
+}
+
+/* 🌆 FLICKER */
+@keyframes flicker{
+0%{opacity:1;}
+50%{opacity:0.8;}
+100%{opacity:1;}
+}
+
+#title{
+animation:glitch 2s infinite, flicker 3s infinite;
 }
 
 </style>
@@ -256,26 +199,24 @@ font-size:18px;
 
 <body>
 
-<div id="title">Muzyczne Radio</div>
+<div id="title">MUZYCZNE RADIO</div>
 
 <canvas id="proEqualizer"></canvas>
 
 <div id="controls">
 
-<button id="playBtn" onclick="playRadio()">PLAY</button>
-<button id="stopBtn" onclick="stopRadio()">STOP</button>
-<button id="muteBtn" onclick="muteRadio()">MUTE 🔊</button>
+<button onclick="playRadio()">PLAY</button>
+<button onclick="stopRadio()">STOP</button>
+<button onclick="muteRadio()">MUTE</button>
 
 <div class="volumeWrapper">
 <input id="volume" type="range" min="0" max="1" step="0.01" value="0.5">
 </div>
 
-<button id="modeBtn" onclick="toggleMode()">🌙</button>
-
 </div>
 
 <div id="bottomLink">
-<a href="https://www.muzyczneradio.pl" target="_blank">www.muzyczneradio.pl</a>
+<a href="#">www.muzyczneradio.pl</a>
 </div>
 
 <audio id="audio" crossorigin="anonymous"></audio>
@@ -283,22 +224,14 @@ font-size:18px;
 <script>
 const STREAM_URL="https://stream.rcs.revma.com/gzwc1xcq042vv";
 
-/* JS BEZ ZMIAN */
 let audio=document.getElementById("audio");
 let volume=document.getElementById("volume");
-let playBtn=document.getElementById("playBtn");
-let stopBtn=document.getElementById("stopBtn");
-let muteBtn=document.getElementById("muteBtn");
-let modeBtn=document.getElementById("modeBtn");
-let title=document.getElementById("title");
-let controls=document.getElementById("controls");
 let canvas=document.getElementById("proEqualizer");
 let ctx=canvas.getContext("2d");
 
-audio.volume=parseFloat(volume.value);
+audio.volume=volume.value;
 
 let audioCtx, analyser, source, dataArray;
-let peaks=[];
 let animationStarted=false;
 
 function setupAudio(){
@@ -310,7 +243,6 @@ analyser.fftSize=512;
 source.connect(analyser);
 analyser.connect(audioCtx.destination);
 dataArray=new Uint8Array(analyser.frequencyBinCount);
-for(let i=0;i<300;i++) peaks[i]=0;
 }
 
 function playRadio(){
@@ -318,61 +250,37 @@ setupAudio();
 if(audioCtx.state==="suspended") audioCtx.resume();
 audio.src=STREAM_URL;
 audio.play();
-playBtn.classList.add("playActive");
-stopBtn.classList.remove("stopActive");
 if(!animationStarted){animationStarted=true;draw();}
 }
 
 function stopRadio(){
 audio.pause();
-stopBtn.classList.add("stopActive");
-playBtn.classList.remove("playActive");
-setTimeout(()=>stopBtn.classList.remove("stopActive"),1000);
-for(let i=0;i<peaks.length;i++) peaks[i]=0;
 }
 
 function muteRadio(){
 audio.muted=!audio.muted;
-muteBtn.classList.toggle("muteActive");
-}
-
-function toggleMode(){
-document.body.classList.toggle("day");
-modeBtn.innerText=document.body.classList.contains("day")?"☀️":"🌙";
 }
 
 volume.addEventListener("input",()=>{
-audio.volume=parseFloat(volume.value);
+audio.volume=volume.value;
 });
-
-function resizeCanvas(){
-let dpr=window.devicePixelRatio||1;
-let width=title.offsetWidth;
-canvas.width=width*dpr;
-canvas.height=260*dpr;
-canvas.style.width=width+"px";
-canvas.style.height="260px";
-ctx.setTransform(1,0,0,1,0,0);
-ctx.scale(dpr,dpr);
-controls.style.width=width+"px";
-}
-
-window.addEventListener("load",resizeCanvas);
-window.addEventListener("resize",resizeCanvas);
 
 function draw(){
 requestAnimationFrame(draw);
 if(!analyser||!dataArray)return;
 analyser.getByteFrequencyData(dataArray);
-let w=canvas.width/window.devicePixelRatio;
-let h=canvas.height/window.devicePixelRatio;
+
+let w=canvas.width=window.innerWidth;
+let h=canvas.height=260;
+
 ctx.clearRect(0,0,w,h);
-let bars=Math.floor(w/8);
-for(let i=0;i<bars;i++){
+
+for(let i=0;i<100;i++){
 let v=dataArray[i]||0;
 let bh=(v/255)*h;
+
 ctx.fillStyle="#ff2a2a";
-ctx.fillRect(i*8,h-bh,6,bh);
+ctx.fillRect(i*10,h-bh,6,bh);
 }
 }
 </script>
