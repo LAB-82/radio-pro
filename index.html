@@ -72,7 +72,7 @@ background:#d6d6d6;
 box-shadow:0 0 40px #ff2a2a,0 0 80px #ff0000;
 }
 
-/* === BUTTON CLICK EFFECT (REALNY) === */
+/* === PRZYCISKI (NAPRAWA: HOVER + CLICK) === */
 button{
 width:160px;
 height:45px;
@@ -80,9 +80,9 @@ background:#111;
 color:white;
 cursor:pointer;
 font-family:'Orbitron';
-transition:all 0.12s ease;
 border:2px solid #ff2a2a;
 box-shadow:0 0 10px #ff2a2a;
+transition:0.15s ease;
 }
 
 button:hover{
@@ -92,12 +92,13 @@ box-shadow:0 0 18px #ff0000;
 
 button:active{
 transform:scale(0.92);
-box-shadow:0 0 5px #ff0000 inset;
+box-shadow:0 0 6px #ff0000 inset;
 }
 
+/* usuwa niebieski focus */
 button:focus{
 outline:none;
-box-shadow:none;
+box-shadow:0 0 10px #ff2a2a;
 }
 
 /* TRYB bez niebieskiego */
@@ -106,12 +107,12 @@ font-size:22px;
 width:66px;
 height:49px;
 }
+
 #modeBtn:focus{
 outline:none;
-box-shadow:none;
+box-shadow:0 0 10px #ff2a2a;
 }
 
-/* DAY/NIGHT styling */
 body:not(.day) #modeBtn{
 color:#ffff00;
 background:#111;
@@ -138,7 +139,7 @@ from{ transform:scale(1); }
 to{ transform:scale(1.1); }
 }
 
-/* LINK + ICON */
+/* LINK */
 #bottomLink{
 margin-top:10px;
 text-align:center;
@@ -150,18 +151,9 @@ color:#ff2a2a;
 text-decoration:none;
 text-shadow:0 0 6px red;
 font-size:20px;
-display:inline-flex;
-align-items:center;
-gap:10px;
 }
 
-.radioIcon{
-width:48px;
-height:48px; /* +50% */
-transition:0.3s;
-}
-
-/* volume */
+/* === SUWAK (NAPRAWA BRAKU STYLU HOVER) === */
 #volume{
 width:120px;
 height:10px;
@@ -173,6 +165,10 @@ border:1px solid #ff2a2a;
 box-shadow:0 0 6px #ff2a2a;
 }
 
+#volume:hover{
+box-shadow:0 0 10px #ff0000;
+}
+
 #volume::-webkit-slider-thumb{
 -webkit-appearance:none;
 width:16px;
@@ -181,6 +177,23 @@ border-radius:4px;
 background:#ff0000;
 box-shadow:0 0 10px red;
 cursor:pointer;
+}
+
+#volume::-moz-range-thumb{
+width:16px;
+height:16px;
+border:none;
+border-radius:4px;
+background:#ff0000;
+box-shadow:0 0 10px red;
+cursor:pointer;
+}
+
+/* ICON */
+.radioIcon{
+width:48px;
+height:48px;
+margin-left:10px;
 }
 
 </style>
@@ -213,8 +226,11 @@ Muzyczne Radio
 <audio id="audio" crossorigin="anonymous"></audio>
 
 <script>
+const STREAM_URL="https://stream.rcs.revma.com/gzwc1xcq042vv";
+
 const audio=document.getElementById("audio");
 const volume=document.getElementById("volume");
+
 const playBtn=document.getElementById("playBtn");
 const stopBtn=document.getElementById("stopBtn");
 const muteBtn=document.getElementById("muteBtn");
@@ -234,7 +250,7 @@ modeBtn.innerText=document.body.classList.contains("day")?"☀️":"🌙";
 updateIcon();
 }
 
-/* AUDIO */
+/* AUDIO (bez zmian logiki) */
 const audio=document.getElementById("audio");
 audio.volume=volume.value;
 
@@ -277,12 +293,11 @@ audio.muted=!audio.muted;
 muteBtn.classList.toggle("muteActive");
 }
 
-/* VISUAL */
+/* VISUALIZER (bez zmian) */
 function draw(){
 requestAnimationFrame(draw);
 if(!analyser||!dataArray) return;
 analyser.getByteFrequencyData(dataArray);
-
 ctx.clearRect(0,0,canvas.width,canvas.height);
 let bars=60;
 for(let i=0;i<bars;i++){
