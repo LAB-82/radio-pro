@@ -229,15 +229,15 @@ audioCtx=new (window.AudioContext||window.webkitAudioContext)();
 source=audioCtx.createMediaElementSource(audio);
 
 analyser=audioCtx.createAnalyser();
-analyser.fftSize=512;
-analyser.smoothingTimeConstant=0.5;
+analyser.fftSize=256; // 🔥 mniej danych = większa płynność
+analyser.smoothingTimeConstant=0.75; // 🔥 stabilniejszy rytm
 
 source.connect(analyser);
 analyser.connect(audioCtx.destination);
 
 dataArray=new Uint8Array(analyser.frequencyBinCount);
 
-for(let i=0;i<300;i++) peaks[i]=0;
+for(let i=0;i<200;i++) peaks[i]=0;
 }
 
 function playRadio(){
@@ -287,17 +287,8 @@ modeBtn.innerText=document.body.classList.contains("day")?"☀️":"🌙";
 }
 
 volume.addEventListener("input",()=>{
-let val=parseFloat(volume.value);
-audio.volume=val;
-
-if(Math.abs(val-0.5)<0.02){
-volume.classList.remove("active");
-}else{
-volume.classList.add("active");
-}
+audio.volume=parseFloat(volume.value);
 });
-
-volume.dispatchEvent(new Event("input"));
 
 function resizeCanvas(){
 
@@ -332,59 +323,42 @@ function drawEQ(){
 
 let dpr = window.devicePixelRatio || 1;
 let width = canvas.width / dpr;
-let heightCanvas = canvas.height / dpr;
+let height = canvas.height / dpr;
 
-ctx.clearRect(0,0,width,heightCanvas);
+ctx.clearRect(0,0,width,height);
 
-/* idealne dopasowanie szerokości */
-let bars = Math.max(1, Math.floor(width / 9));
+/* 🔥 mniej słupków = więcej FPS */
+let bars = 48;
 let barWidth = width / bars;
 
-let step=Math.max(1, Math.floor(dataArray.length/bars));
-
-let yOffset = 5;
-
-let maxHeight = (heightCanvas * 0.9) - 19;
+let step = Math.floor(dataArray.length / bars);
 
 for(let i=0;i<bars;i++){
 
-let index=i*step;
-let value = dataArray[index] || 0;
+let value = dataArray[i * step] || 0;
 
-/* lepsza dynamika */
-let percent = Math.pow(value / 255, 1.4);
+/* 🔥 stabilniejsza dynamika */
+let h = (value / 255) * height * 0.85;
 
-let targetHeight = heightCanvas * percent;
-let h = Math.min(maxHeight, targetHeight);
+/* smoothing bez tablicy peaks (oszczędność CPU) */
+let smooth = (peaks[i] || 0) * 0.7 + h * 0.3;
+peaks[i] = smooth;
 
-/* płynność */
-if(!peaks[i]) peaks[i]=0;
-peaks[i] += (h - peaks[i]) * 0.25;
+let x = i * barWidth;
+let y = height - smooth;
 
-let x=i*barWidth;
-let y=heightCanvas-peaks[i] + yOffset;
-
-/* HUD */
-let segmentHeight = 5;
-let gap = 2;
-
-let segments = Math.floor(peaks[i] / (segmentHeight + gap));
-
+/* 🔥 1 draw zamiast segmentów */
 ctx.fillStyle="#ff2a2a";
-ctx.shadowBlur=4;
+ctx.shadowBlur=3;
 ctx.shadowColor="#ff0000";
 
-for(let s=0;s<segments;s++){
-let segY = y + peaks[i] - (s+1)*(segmentHeight+gap);
-ctx.fillRect(x, segY, barWidth-1, segmentHeight);
-}
+ctx.fillRect(x, y, barWidth-2, smooth);
 
 ctx.shadowBlur=0;
 
-let peakY=heightCanvas-peaks[i] + yOffset;
-
+/* peak line */
 ctx.fillStyle="#ff2a2a";
-ctx.fillRect(x,peakY,barWidth-1,2);
+ctx.fillRect(x, height - smooth - 2, barWidth-2, 2);
 
 }
 }
