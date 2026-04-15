@@ -1,4 +1,4 @@
-<!DOCTYPE html>  
+<!DOCTYPE html> 
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
@@ -29,7 +29,7 @@ font-size:88px;
 margin-top:50px;
 text-align:center;
 color:#ff2a2a;
-text-shadow:0 0 6px #ff2a2a,0 0 12px #ff0000;
+text-shadow:0 0 5px #ff2a2a,0 0 15px #ff0000,0 0 30px #ff0000,0 0 60px #ff0000;
 }
 
 #proEqualizer{
@@ -64,12 +64,12 @@ align-items:center;
 justify-content:center;
 background:#111;
 border:2px solid #ff2a2a;
-box-shadow:0 0 6px #ff2a2a;
+box-shadow:0 0 10px #ff2a2a;
 }
 
 body.day .volumeWrapper{
 background:#d6d6d6;
-box-shadow:0 0 10px #ff2a2a;
+box-shadow:0 0 40px #ff2a2a,0 0 80px #ff0000;
 }
 
 button{
@@ -81,13 +81,13 @@ cursor:pointer;
 font-family:'Orbitron';
 transition:0.2s;
 border:2px solid #ff2a2a;
-box-shadow:0 0 6px #ff2a2a;
+box-shadow:0 0 10px #ff2a2a;
 }
 
 body.day button{
 background:#d6d6d6;
 color:#000;
-box-shadow:0 0 10px #ff2a2a;
+box-shadow:0 0 40px #ff2a2a,0 0 80px #ff0000;
 }
 
 #volume{
@@ -98,11 +98,11 @@ border-radius:10px;
 outline:none;
 background:#000;
 border:1px solid #ff2a2a;
-box-shadow:0 0 4px #ff2a2a;
+box-shadow:0 0 6px #ff2a2a;
 }
 
 #volume.active{
-box-shadow:0 0 8px #ff0000;
+box-shadow:0 0 10px #ff0000;
 border:1px solid #ff0000;
 }
 
@@ -112,7 +112,7 @@ width:16px;
 height:16px;
 border-radius:4px;
 background:#ff0000;
-box-shadow:0 0 8px #ff0000;
+box-shadow:0 0 10px red,0 0 20px red;
 cursor:pointer;
 }
 
@@ -122,22 +122,22 @@ height:16px;
 border:none;
 border-radius:4px;
 background:#ff0000;
-box-shadow:0 0 8px #ff0000;
+box-shadow:0 0 10px red,0 0 20px red;
 cursor:pointer;
 }
 
-.playActive{ color:#ff2a2a; text-shadow:0 0 8px #ff0000; }
-.stopActive{ color:#ff2a2a; text-shadow:0 0 8px #ff0000; }
+.playActive{ color:#00ff00; text-shadow:0 0 10px #00ff00; }
+.stopActive{ color:#ff4444; text-shadow:0 0 10px red; }
 
 .muteActive{
-color:#ff2a2a;
-text-shadow:0 0 8px #ff0000;
+color:#ffaa00;
+text-shadow:0 0 10px orange;
 animation:pulseMute 0.8s infinite alternate;
 }
 
 @keyframes pulseMute{
 from{ transform:scale(1); }
-to{ transform:scale(1.05); }
+to{ transform:scale(1.1); }
 }
 
 #modeBtn{
@@ -147,17 +147,16 @@ height:49px;
 }
 
 body:not(.day) #modeBtn{
-color:#ff2a2a;
-text-shadow:0 0 6px #ff0000;
+color:#ffff00;
+text-shadow:0 0 8px #ffff00,0 0 16px #ffff66;
 background:#111;
-box-shadow:0 0 6px #ff0000;
 }
 
 body.day #modeBtn{
-color:#ff2a2a;
-text-shadow:0 0 6px #ff0000;
-background:#d6d6d6;
-box-shadow:0 0 6px #ff0000;
+color:#ffff00;
+text-shadow:0 0 8px #ffff00,0 0 16px #ffff66;
+background:#00ccff;
+box-shadow:0 0 12px #00ccff,0 0 24px #00aaff;
 }
 
 #bottomLink{
@@ -169,7 +168,7 @@ width:100%;
 #bottomLink a{
 color:#ff2a2a;
 text-decoration:none;
-text-shadow:0 0 4px #ff0000;
+text-shadow:0 0 6px red;
 font-size:20px;
 }
 </style>
@@ -203,11 +202,22 @@ const STREAM_URL="https://stream.rcs.revma.com/gzwc1xcq042vv";
 
 const audio=document.getElementById("audio");
 const volume=document.getElementById("volume");
+
+const playBtn=document.getElementById("playBtn");
+const stopBtn=document.getElementById("stopBtn");
+const muteBtn=document.getElementById("muteBtn");
+const modeBtn=document.getElementById("modeBtn");
+
+const title=document.getElementById("title");
+const controls=document.getElementById("controls");
+
 const canvas=document.getElementById("proEqualizer");
 const ctx=canvas.getContext("2d");
 
+audio.volume=parseFloat(volume.value);
+
 let audioCtx, analyser, source, dataArray;
-let eqSmooth=[];
+let animationStarted=false;
 
 function setupAudio(){
 if(audioCtx) return;
@@ -217,42 +227,61 @@ audioCtx=new (window.AudioContext||window.webkitAudioContext)();
 source=audioCtx.createMediaElementSource(audio);
 
 analyser=audioCtx.createAnalyser();
-analyser.fftSize=1024;
-analyser.smoothingTimeConstant=0.85;
+analyser.fftSize=512;
+analyser.smoothingTimeConstant=0.7;
 
 source.connect(analyser);
 analyser.connect(audioCtx.destination);
 
-dataArray=new Uint8Array(analyser.frequencyCount);
+dataArray=new Uint8Array(analyser.frequencyBinCount);
 }
 
 function playRadio(){
 setupAudio();
-if(audioCtx.state==="suspended") audioCtx.resume();
-audio.src=STREAM_URL;
-audio.play();
-draw();
+
+if(audioCtx.state === "suspended"){
+audioCtx.resume();
 }
 
-function stopRadio(){ audio.pause(); }
-function muteRadio(){ audio.muted=!audio.muted; }
+audio.src=STREAM_URL;
+audio.play();
 
-volume.addEventListener("input",()=>audio.volume=parseFloat(volume.value));
+if(!animationStarted){
+animationStarted=true;
+draw();
+}
+}
+
+function stopRadio(){
+audio.pause();
+}
+
+function muteRadio(){
+audio.muted=!audio.muted;
+muteBtn.classList.toggle("muteActive");
+}
+
+function toggleMode(){
+document.body.classList.toggle("day");
+modeBtn.innerText=document.body.classList.contains("day")?"☀️":"🌙";
+}
+
+volume.addEventListener("input",()=>{
+audio.volume=parseFloat(volume.value);
+});
 
 function resizeCanvas(){
-let dpr=window.devicePixelRatio||1;
-let w=document.getElementById("title").offsetWidth;
+let dpr = window.devicePixelRatio || 1;
+let width = title.offsetWidth;
 
-canvas.width=w*dpr;
-canvas.height=260*dpr;
+canvas.width = width * dpr;
+canvas.height = 260 * dpr;
 
-canvas.style.width=w+"px";
-canvas.style.height="260px";
+canvas.style.width = width + "px";
+canvas.style.height = "260px";
 
-ctx.setTransform(1,0,0,1,0,0);
 ctx.scale(dpr,dpr);
-
-eqSmooth = new Array(100).fill(0);
+controls.style.width = width + "px";
 }
 
 window.addEventListener("load",resizeCanvas);
@@ -263,48 +292,45 @@ requestAnimationFrame(draw);
 if(!analyser) return;
 
 analyser.getByteFrequencyData(dataArray);
-
-let w=canvas.width/window.devicePixelRatio;
-let h=canvas.height/window.devicePixelRatio;
-
-ctx.clearRect(0,0,w,h);
-
-/* ===== VECTEEZY STRUCTURE MAP ===== */
-
-let bars=100;
-let mid=h*0.5;
-let barW=w/bars;
-let step=dataArray.length/bars;
-
-/* flat spectrum gradient (no glow, no effects) */
-let grad=ctx.createLinearGradient(0,0,w,0);
-grad.addColorStop(0,"#ff0000");
-grad.addColorStop(0.2,"#ff7a00");
-grad.addColorStop(0.4,"#ffee00");
-grad.addColorStop(0.6,"#00ff66");
-grad.addColorStop(0.8,"#00aaff");
-grad.addColorStop(1,"#ff00ff");
-
-ctx.fillStyle=grad;
-
-for(let i=0;i<bars;i++){
-
-let v=dataArray[Math.floor(i*step)]||0;
-
-/* visual model (not audio realism, like vector image) */
-let target=(v/255)*(h*0.4);
-eqSmooth[i]=eqSmooth[i]*0.7 + target*0.3;
-
-let amp=eqSmooth[i];
-
-let x=i*barW;
-
-/* TOP */
-ctx.fillRect(x,mid-amp,barW-1,amp);
-
-/* BOTTOM MIRROR */
-ctx.fillRect(x,mid,barW-1,amp);
+drawEQ();
 }
+
+/* =======================
+   NOWY EQUALIZER (VECTOR STYLE)
+======================= */
+function drawEQ(){
+
+let dpr = window.devicePixelRatio || 1;
+let width = canvas.width / dpr;
+let height = canvas.height / dpr;
+
+ctx.clearRect(0,0,width,height);
+
+let step = Math.floor(dataArray.length / 200);
+
+ctx.lineWidth = 3;
+ctx.shadowBlur = 20;
+
+ctx.beginPath();
+
+for(let i=0;i<200;i++){
+
+let v = dataArray[i*step] || 0;
+let x = (i/200)*width;
+let y = height - (v/255)*height*0.9;
+
+let hue = 0 + (i*2);
+ctx.strokeStyle = `hsl(${hue},100%,60%)`;
+ctx.shadowColor = `hsl(${hue},100%,50%)`;
+
+if(i===0){
+ctx.moveTo(x,y);
+}else{
+ctx.lineTo(x,y);
+}
+}
+
+ctx.stroke();
 }
 </script>
 
