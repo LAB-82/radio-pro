@@ -36,7 +36,6 @@ display:flex;
 flex-direction:column;
 align-items:center;
 height:100vh;
-transition:0.4s;
 }
 
 body.day{
@@ -49,7 +48,6 @@ font-size:88px;
 margin-top:50px;
 text-align:center;
 color:#ff2a2a;
-text-shadow:0 0 5px #ff2a2a,0 0 15px #ff0000,0 0 30px #ff0000,0 0 60px #ff0000;
 }
 
 #proEqualizer{
@@ -58,13 +56,11 @@ margin:0 auto;
 margin-top:30px;
 margin-bottom:30px;
 border-radius:8px;
-overflow:hidden;
 }
 
 canvas{
 display:block;
 height:260px;
-border-radius:8px;
 }
 
 #controls{
@@ -73,8 +69,9 @@ gap:8px;
 margin-top:20px;
 margin-bottom:20px;
 align-items:center;
-justify-content:space-between;
+justify-content:center;
 flex-wrap:wrap;
+width:100%;
 }
 
 button{
@@ -110,14 +107,6 @@ background:#000;
 border:1px solid #ff2a2a;
 }
 
-#volume::-webkit-slider-thumb{
--webkit-appearance:none;
-width:16px;
-height:16px;
-background:#ff2a2a;
-cursor:pointer;
-}
-
 #modeBtn{
 font-size:22px;
 width:66px;
@@ -138,6 +127,19 @@ width:100%;
 color:#ff2a2a;
 text-decoration:none;
 font-size:20px;
+}
+
+/* ================= MOBILE ONLY MINIMUM FIX ================= */
+@media (max-width: 768px){
+#title{
+font-size:42px;
+margin-top:20px;
+}
+
+canvas{
+width:95vw;
+height:200px;
+}
 }
 
 </style>
@@ -177,34 +179,24 @@ const volume=document.getElementById("volume");
 const canvas=document.getElementById("proEqualizer");
 const ctx=canvas.getContext("2d");
 const controls=document.getElementById("controls");
-const title=document.getElementById("title");
 
 audio.volume=parseFloat(volume.value);
 
 let audioCtx, analyser, source, dataArray;
 let animationStarted=false;
 
-/* ================= HARD PWA FIX ================= */
+/* ================= PWA FIX (BEZ DOTYKANIA UI) ================= */
 if('serviceWorker' in navigator){
-
 window.addEventListener('load', async () => {
-
 try {
-
-// USUŃ WSZYSTKIE STARE SW
 const regs = await navigator.serviceWorker.getRegistrations();
 for(let reg of regs){
 await reg.unregister();
 }
 
-// NOWA REJESTRACJA Z WERSJĄ (BYPASS CACHE)
-const reg = await navigator.serviceWorker.register('sw.js?v=final-' + Date.now());
-await reg.update();
+await navigator.serviceWorker.register('sw.js?v=' + Date.now());
 
-} catch(e){
-console.log("SW error", e);
-}
-
+} catch(e){}
 });
 }
 
@@ -259,25 +251,24 @@ volume.addEventListener("input",()=>{
 audio.volume=parseFloat(volume.value);
 });
 
+/* STABILNY CANVAS (NIE DYNAMIC WIDTH — TO ROZJEŻDŻAŁO UI) */
 function resizeCanvas(){
 let dpr=window.devicePixelRatio||1;
-let width=title.offsetWidth;
 
-canvas.width=width*dpr;
+canvas.width=800*dpr;
 canvas.height=260*dpr;
 
-canvas.style.width=width+"px";
+canvas.style.width="800px";
 canvas.style.height="260px";
 
 ctx.setTransform(1,0,0,1,0,0);
 ctx.scale(dpr,dpr);
-
-controls.style.width=width+"px";
 }
 
 window.addEventListener("load",resizeCanvas);
 window.addEventListener("resize",resizeCanvas);
 
+/* EQ */
 function draw(){
 requestAnimationFrame(draw);
 
@@ -287,10 +278,10 @@ analyser.getByteFrequencyData(dataArray);
 
 ctx.clearRect(0,0,canvas.width,canvas.height);
 
-let width=canvas.width/window.devicePixelRatio;
-let height=canvas.height/window.devicePixelRatio;
+let width=800;
+let height=260;
 
-let bars=Math.max(1,Math.floor(width/8));
+let bars=80;
 let barWidth=width/bars;
 let step=Math.floor(dataArray.length/bars);
 
@@ -300,34 +291,9 @@ for(let i=0;i<bars;i++){
 let value=dataArray[i*step]||0;
 let h=(value/255)*height;
 
-ctx.fillRect(i*barWidth,height-h,barWidth-1,h);
+ctx.fillRect(i*barWidth,height-h,barWidth-2,h);
 }
 }
-</script>
-
-<!-- ================= MINIMAL SW FILE (EMBED INFO ONLY) ================= -->
-<script>
-/*
-⚠️ WAŻNE:
-TEN SW MUSI BYĆ W OSOBNYM PLIKU: sw.js
-
-ZAWARTOŚĆ sw.js:
-
-const CACHE_NAME = "radio-pro-clean-" + Date.now();
-
-self.addEventListener("install", e => self.skipWaiting());
-
-self.addEventListener("activate", e => {
-e.waitUntil(
-caches.keys().then(keys => Promise.all(keys.map(k => caches.delete(k))))
-);
-self.clients.claim();
-});
-
-self.addEventListener("fetch", e => {
-e.respondWith(fetch(e.request));
-});
-*/
 </script>
 
 </body>
