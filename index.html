@@ -146,7 +146,6 @@ width:66px;
 height:49px;
 }
 
-/* 🔥 USUNIĘTE NIEBIESKIE PODŚWIETLENIE */
 body:not(.day) #modeBtn{
 color:#ff2a2a;
 text-shadow:0 0 6px #ff0000;
@@ -337,13 +336,18 @@ let heightCanvas = canvas.height / dpr;
 
 ctx.clearRect(0,0,width,heightCanvas);
 
-let bars = Math.max(1, Math.floor(width / 8));
-let barWidth = width / bars;
+/* przycięcie do środka suwaka */
+let maxWidth = width * 0.72;
+
+let bars = Math.max(1, Math.floor(maxWidth / 8));
+let barWidth = maxWidth / bars;
 
 let step=Math.max(1, Math.floor(dataArray.length/bars));
 
 let yOffset = 5;
-let maxHeight = heightCanvas * 0.9;
+
+/* obniżenie wysokości */
+let maxHeight = (heightCanvas * 0.9) - 19;
 
 for(let i=0;i<bars;i++){
 
@@ -356,16 +360,24 @@ let h=Math.min(maxHeight, heightCanvas*percent);
 let x=i*barWidth;
 let y=heightCanvas-h + yOffset;
 
-/* 🔴 uproszczony czerwony neon */
-ctx.fillStyle="#ff2a2a";
+/* HUD segmenty */
+let segmentHeight = 4;
+let gap = 2;
 
+let segments = Math.floor(h / (segmentHeight + gap));
+
+ctx.fillStyle="#ff2a2a";
 ctx.shadowBlur=6;
 ctx.shadowColor="#ff0000";
 
-ctx.fillRect(x,y,barWidth-1,h);
+for(let s=0;s<segments;s++){
+let segY = y + h - (s+1)*(segmentHeight+gap);
+ctx.fillRect(x, segY, barWidth-2, segmentHeight);
+}
 
 ctx.shadowBlur=0;
 
+/* peak */
 if(!peaks[i]) peaks[i]=0;
 
 if(h>peaks[i]){
@@ -379,7 +391,7 @@ if(peaks[i]<0) peaks[i]=0;
 let peakY=heightCanvas-peaks[i] + yOffset;
 
 ctx.fillStyle="#ff2a2a";
-ctx.fillRect(x,peakY,barWidth-1,3);
+ctx.fillRect(x,peakY,barWidth-2,2);
 
 }
 }
