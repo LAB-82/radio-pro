@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-<meta charset="UTF-8" />
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Radio App UI</title>
+<title>Radio App</title>
 
 <style>
 body {
@@ -15,9 +15,9 @@ body {
     height: 100vh;
 }
 
-/* LEWA LISTA */
+/* LISTA */
 #sidebar {
-    width: 300px;
+    width: 320px;
     background: #141414;
     overflow-y: auto;
     border-right: 1px solid #222;
@@ -27,15 +27,13 @@ body {
     padding: 10px;
     border-bottom: 1px solid #222;
     cursor: pointer;
-    transition: 0.2s;
-    font-size: 14px;
 }
 
 .station:hover {
     background: #222;
 }
 
-/* PRAWA STRONA */
+/* MAIN */
 #main {
     flex: 1;
     display: flex;
@@ -46,31 +44,20 @@ body {
 #header {
     padding: 12px;
     background: #1a1a1a;
-    font-size: 18px;
     font-weight: bold;
 }
 
-/* OCENY / IKONY */
+/* META */
 #meta {
     display: flex;
-    align-items: center;
-    gap: 10px;
+    justify-content: space-between;
     padding: 8px 12px;
     background: #151515;
-    color: #ccc;
     font-size: 13px;
+    color: #bbb;
 }
 
-.star {
-    color: gold;
-}
-
-.icon {
-    cursor: pointer;
-    font-size: 16px;
-}
-
-/* PLAYER AREA */
+/* PLAYER AREA (jak screen) */
 #playerBox {
     flex: 1;
     display: flex;
@@ -79,151 +66,146 @@ body {
     background: #000;
 }
 
-iframe {
-    width: 90%;
-    height: 90%;
-    border: none;
+#radioCard {
+    width: 320px;
+    background: #111;
     border-radius: 10px;
+    padding: 15px;
+    text-align: center;
+    box-shadow: 0 0 20px rgba(0,0,0,0.6);
 }
 
-/* DOLNY PANEL */
+#logo {
+    width: 200px;
+    height: 200px;
+    object-fit: contain;
+    background: #222;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+#stationName {
+    font-size: 16px;
+    margin-bottom: 10px;
+    color: #ddd;
+}
+
+/* CONTROLS */
 #controls {
-    height: 70px;
-    background: #111;
     display: flex;
-    align-items: center;
     justify-content: center;
     gap: 20px;
-    border-top: 1px solid #222;
+    margin-top: 10px;
 }
 
 .btn {
+    font-size: 22px;
     cursor: pointer;
-    font-size: 20px;
     user-select: none;
 }
 
-#status {
-    position: absolute;
-    left: 320px;
-    padding-left: 15px;
-    font-size: 13px;
-    color: #aaa;
+/* AUDIO */
+audio {
+    width: 100%;
+    margin-top: 10px;
 }
 </style>
 </head>
 
 <body>
 
-<!-- SIDEBAR -->
 <div id="sidebar"></div>
 
-<!-- MAIN -->
 <div id="main">
 
     <div id="header">🎧 Radio Player</div>
 
     <div id="meta">
-        <div class="star">⭐⭐⭐⭐☆</div>
-        <div>Głosy: 1070 • Średnia: 4.8</div>
-
-        <div style="margin-left:auto; display:flex; gap:10px;">
-            <div class="icon">❤️</div>
-            <div class="icon">🔔</div>
-            <div class="icon">📤 Udostępnij</div>
-        </div>
+        <div>⭐⭐⭐⭐☆</div>
+        <div>Głosy: 1070</div>
+        <div>❤️ 🔔 📤</div>
     </div>
 
     <div id="playerBox">
-        <iframe id="frame" src=""></iframe>
-    </div>
+        <div id="radioCard">
+            <img id="logo" src="">
+            <div id="stationName">Wybierz stację</div>
 
-    <div id="controls">
-        <div class="btn" onclick="prev()">⏮</div>
-        <div class="btn" onclick="play()">⏯</div>
-        <div class="btn" onclick="next()">⏭</div>
-        <div class="btn" onclick="mute()">🔊</div>
+            <audio id="audio" controls></audio>
+
+            <div id="controls">
+                <div class="btn" onclick="prev()">⏮</div>
+                <div class="btn" onclick="toggle()">⏯</div>
+                <div class="btn" onclick="next()">⏭</div>
+                <div class="btn" onclick="volume()">🔊</div>
+            </div>
+        </div>
     </div>
 
 </div>
 
 <script>
 
-// 📻 STACJE (Twoja lista + Muzyczne Radio)
+/* 🔥 LISTA STACJI (Twoja + Muzyczne Radio) */
 const stations = [
-    "Muzyczne Radio Jelenia Góra",
-    "Polskie Radio Jedynka",
-    "Polskie Radio Dwójka",
-    "Polskie Radio Trójka",
-    "Polskie Radio Czwórka",
-    "Radio Plus",
-    "RMF FM",
-    "Radio Zet",
-    "Radio Eska",
-    "Radio Wrocław",
-    "Radio Wnet",
-    "Tok FM",
-    "Antyradio",
-    "Radio Kolor",
-    "Open FM",
-    "Open FM Disco Polo",
-    "Disco Radio",
-    "Polish Radio London 24",
-    "Polskie Radio Dzieciom",
-    "Polskie Radio Chopin",
-    "Radio Yanosik",
-    "Radio Republika",
-    "Radio dla Ciebie",
-    "Radio Maryja",
-    "Radio Jasna Góra"
+    { name: "Muzyczne Radio Jelenia Góra", url: "https://streaming.gra.fm/muzyczneradio" },
+    { name: "Polskie Radio Jedynka", url: "https://stream3.polskieradio.pl/PR1.mp3" },
+    { name: "Polskie Radio Dwójka", url: "https://stream3.polskieradio.pl/PR2.mp3" },
+    { name: "Polskie Radio Trójka", url: "https://stream3.polskieradio.pl/PR3.mp3" },
+    { name: "Polskie Radio Czwórka", url: "https://stream3.polskieradio.pl/PR4.mp3" },
+    { name: "Radio Wrocław", url: "https://stream.radiowroclaw.pl:8000/rw_main" },
+    { name: "TOK FM", url: "https://radiostream.pl/tuba9-1.mp3" },
+    { name: "Antyradio", url: "https://n-4-1.dcs.redcdn.pl/sc/o2/Eurozet/live/antyradio.livx" },
+    { name: "Radio Maryja", url: "https://radio-maryja.pl/live.mp3" }
 ];
+
+const sidebar = document.getElementById("sidebar");
+const audio = document.getElementById("audio");
+const logo = document.getElementById("logo");
+const stationName = document.getElementById("stationName");
 
 let index = 0;
 
-const sidebar = document.getElementById("sidebar");
-const frame = document.getElementById("frame");
-
-// 🔥 MyRadioOnline search (działa dla wszystkich stacji)
-function url(name) {
-    return "https://myradioonline.pl/?s=" + encodeURIComponent(name);
-}
-
-// 🎧 PLAY STACJI
-function load(i) {
+/* 🎧 PLAY */
+function play(i) {
     index = i;
-    frame.src = url(stations[i]);
+
+    stationName.textContent = stations[i].name;
+    logo.src = "https://via.placeholder.com/200x200?text=RADIO";
+
+    audio.src = stations[i].url;
+    audio.play();
 }
 
-// SIDEBAR
+/* ⏯ */
+function toggle() {
+    if (audio.paused) audio.play();
+    else audio.pause();
+}
+
+/* NEXT/PREV */
+function next() {
+    index = (index + 1) % stations.length;
+    play(index);
+}
+
+function prev() {
+    index = (index - 1 + stations.length) % stations.length;
+    play(index);
+}
+
+function volume() {
+    audio.volume = audio.volume === 0 ? 1 : 0;
+}
+
+/* LISTA */
 stations.forEach((s, i) => {
     const div = document.createElement("div");
     div.className = "station";
-    div.innerText = s;
-    div.onclick = () => load(i);
+    div.textContent = s.name;
+    div.onclick = () => play(i);
     sidebar.appendChild(div);
 });
-
-// CONTROLS
-function prev() {
-    index = (index - 1 + stations.length) % stations.length;
-    load(index);
-}
-
-function next() {
-    index = (index + 1) % stations.length;
-    load(index);
-}
-
-function play() {
-    load(index);
-}
-
-function mute() {
-    alert("Mute działa wewnątrz playera MyRadioOnline");
-}
-
-// start
-load(0);
 
 </script>
 
