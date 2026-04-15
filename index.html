@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Polskie Radio App</title>
+<title>Radio App UI</title>
 
 <style>
 body {
@@ -11,40 +11,28 @@ body {
     font-family: Arial, sans-serif;
     background: #0b0b0b;
     color: white;
-    height: 100vh;
     display: flex;
+    height: 100vh;
 }
 
 /* LEWA LISTA */
-#list {
-    width: 320px;
-    background: #151515;
+#sidebar {
+    width: 300px;
+    background: #141414;
     overflow-y: auto;
     border-right: 1px solid #222;
 }
 
 .station {
-    display: flex;
-    align-items: center;
-    gap: 10px;
     padding: 10px;
-    cursor: pointer;
     border-bottom: 1px solid #222;
+    cursor: pointer;
     transition: 0.2s;
+    font-size: 14px;
 }
 
 .station:hover {
-    background: #242424;
-}
-
-.station img {
-    width: 40px;
-    height: 40px;
-    border-radius: 6px;
-}
-
-.station span {
-    font-size: 14px;
+    background: #222;
 }
 
 /* PRAWA STRONA */
@@ -54,25 +42,71 @@ body {
     flex-direction: column;
 }
 
-#player {
+/* HEADER */
+#header {
+    padding: 12px;
+    background: #1a1a1a;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+/* OCENY / IKONY */
+#meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    background: #151515;
+    color: #ccc;
+    font-size: 13px;
+}
+
+.star {
+    color: gold;
+}
+
+.icon {
+    cursor: pointer;
+    font-size: 16px;
+}
+
+/* PLAYER AREA */
+#playerBox {
     flex: 1;
-    background: black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #000;
 }
 
 iframe {
-    width: 100%;
-    height: 100%;
+    width: 90%;
+    height: 90%;
     border: none;
+    border-radius: 10px;
 }
 
-/* PANEL POD PLAYEREM */
-#panel {
-    height: 90px;
+/* DOLNY PANEL */
+#controls {
+    height: 70px;
     background: #111;
-    border-top: 1px solid #222;
     display: flex;
     align-items: center;
-    padding: 10px;
+    justify-content: center;
+    gap: 20px;
+    border-top: 1px solid #222;
+}
+
+.btn {
+    cursor: pointer;
+    font-size: 20px;
+    user-select: none;
+}
+
+#status {
+    position: absolute;
+    left: 320px;
+    padding-left: 15px;
     font-size: 13px;
     color: #aaa;
 }
@@ -81,20 +115,41 @@ iframe {
 
 <body>
 
-<!-- LISTA -->
-<div id="list"></div>
+<!-- SIDEBAR -->
+<div id="sidebar"></div>
 
-<!-- PLAYER -->
+<!-- MAIN -->
 <div id="main">
-    <div id="player">
+
+    <div id="header">🎧 Radio Player</div>
+
+    <div id="meta">
+        <div class="star">⭐⭐⭐⭐☆</div>
+        <div>Głosy: 1070 • Średnia: 4.8</div>
+
+        <div style="margin-left:auto; display:flex; gap:10px;">
+            <div class="icon">❤️</div>
+            <div class="icon">🔔</div>
+            <div class="icon">📤 Udostępnij</div>
+        </div>
+    </div>
+
+    <div id="playerBox">
         <iframe id="frame" src=""></iframe>
     </div>
-    <div id="panel">Wybierz stację aby rozpocząć</div>
+
+    <div id="controls">
+        <div class="btn" onclick="prev()">⏮</div>
+        <div class="btn" onclick="play()">⏯</div>
+        <div class="btn" onclick="next()">⏭</div>
+        <div class="btn" onclick="mute()">🔊</div>
+    </div>
+
 </div>
 
 <script>
 
-// 📻 LISTA STACJI (Twoja + MyRadioOnline search fallback)
+// 📻 STACJE (Twoja lista + Muzyczne Radio)
 const stations = [
     "Muzyczne Radio Jelenia Góra",
     "Polskie Radio Jedynka",
@@ -123,40 +178,52 @@ const stations = [
     "Radio Jasna Góra"
 ];
 
-// 🔥 MyRadioOnline search fallback (działa dla wszystkich stacji)
-function getUrl(name) {
+let index = 0;
+
+const sidebar = document.getElementById("sidebar");
+const frame = document.getElementById("frame");
+
+// 🔥 MyRadioOnline search (działa dla wszystkich stacji)
+function url(name) {
     return "https://myradioonline.pl/?s=" + encodeURIComponent(name);
 }
 
-const list = document.getElementById("list");
-const frame = document.getElementById("frame");
-const panel = document.getElementById("panel");
-
-// 🎧 ODTWARZANIE W IFRAME (jak aplikacja)
-function play(name) {
-    panel.textContent = "🎧 Ładowanie: " + name;
-
-    frame.src = getUrl(name);
-
-    setTimeout(() => {
-        panel.textContent = "📻 Teraz gra: " + name;
-    }, 1200);
+// 🎧 PLAY STACJI
+function load(i) {
+    index = i;
+    frame.src = url(stations[i]);
 }
 
-// 🧩 RENDER LISTY
-stations.forEach(name => {
+// SIDEBAR
+stations.forEach((s, i) => {
     const div = document.createElement("div");
     div.className = "station";
-
-    div.innerHTML = `
-        <img src="https://www.google.com/s2/favicons?domain=myradioonline.pl&sz=64">
-        <span>${name}</span>
-    `;
-
-    div.onclick = () => play(name);
-
-    list.appendChild(div);
+    div.innerText = s;
+    div.onclick = () => load(i);
+    sidebar.appendChild(div);
 });
+
+// CONTROLS
+function prev() {
+    index = (index - 1 + stations.length) % stations.length;
+    load(index);
+}
+
+function next() {
+    index = (index + 1) % stations.length;
+    load(index);
+}
+
+function play() {
+    load(index);
+}
+
+function mute() {
+    alert("Mute działa wewnątrz playera MyRadioOnline");
+}
+
+// start
+load(0);
 
 </script>
 
