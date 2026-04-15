@@ -1,236 +1,196 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>  
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
 <title>Muzyczne Radio PRO</title>
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
 
 <style>
-
-/* ================= BASE ================= */
-html, body{
-margin:0;
-padding:0;
-width:100%;
-height:100%;
-overflow:hidden;
-background:#000;
-font-family:"Orbitron",sans-serif;
-color:#ff2a2a;
-}
-
-/* ================= ARASAKA GRID (CIENKI TECHNICZNY) ================= */
 body{
-background:
-linear-gradient(rgba(255,0,0,0.06) 1px, transparent 1px),
-linear-gradient(90deg, rgba(255,0,0,0.06) 1px, transparent 1px);
-background-size:50px 50px;
+margin:0;
+background:#000;
+color:#fff;
+font-family:'Orbitron',sans-serif;
+display:flex;
+flex-direction:column;
+align-items:center;
+height:100vh;
+transition:0.4s;
 }
 
-/* ================= TITLE ================= */
+body.day{
+background:#eaeaea;
+color:#000;
+}
+
 #title{
-font-size:70px;
-margin-top:30px;
+font-size:88px;
+margin-top:50px;
 text-align:center;
-letter-spacing:10px;
-text-transform:uppercase;
-
 color:#ff2a2a;
-
-text-shadow:
-0 0 5px #ff0000,
-0 0 15px rgba(255,0,0,0.6);
+text-shadow:0 0 6px #ff2a2a,0 0 12px #ff0000;
 }
 
-/* ================= HUD PANEL ================= */
 #proEqualizer{
 display:block;
-margin:20px auto;
-
-width:900px;
-max-width:95vw;
-height:260px;
-
-background:rgba(0,0,0,0.35);
-
-/* cienkie ramki jak na obrazku */
-border:1px solid rgba(255,0,0,0.6);
-
-box-shadow:
-inset 0 0 20px rgba(255,0,0,0.2),
-0 0 10px rgba(255,0,0,0.5);
-
-/* 🔥 segmenty HUD */
-position:relative;
+margin:0 auto;
+margin-top:30px;
+margin-bottom:30px;
+border-radius:8px;
+overflow:hidden;
 }
 
-/* 🔥 linie poziome HUD */
-#proEqualizer::before{
-content:"";
-position:absolute;
-left:0;
-top:50%;
-width:100%;
-height:1px;
-background:rgba(255,0,0,0.3);
-}
-
-/* 🔥 linie pionowe HUD */
-#proEqualizer::after{
-content:"";
-position:absolute;
-top:0;
-left:33%;
-width:1px;
-height:100%;
-background:rgba(255,0,0,0.25);
-}
-
-/* ================= CANVAS ================= */
 canvas{
 display:block;
-width:900px !important;
-height:260px !important;
+height:260px;
+border-radius:8px;
 }
 
-/* ================= CONTROLS ================= */
 #controls{
 display:flex;
-justify-content:center;
+gap:8px;
+margin-top:20px;
+margin-bottom:20px;
 align-items:center;
-gap:12px;
-margin-top:10px;
-flex-wrap:wrap;
+justify-content:space-between;
 }
 
-/* ================= BUTTONS ================= */
-button{
-width:150px;
-height:44px;
-
-background:#020000;
-color:#ff2a2a;
-
-border:1px solid rgba(255,0,0,0.8);
-
-font-family:"Orbitron",sans-serif;
-letter-spacing:2px;
-
-box-shadow:
-0 0 6px rgba(255,0,0,0.5),
-inset 0 0 6px rgba(255,0,0,0.2);
-
-cursor:pointer;
-transition:0.15s;
-}
-
-button:hover{
-box-shadow:
-0 0 15px #ff0000;
-}
-
-/* ================= VOLUME ================= */
 .volumeWrapper{
-width:150px;
-height:44px;
-
+width:160px;
+height:45px;
 display:flex;
 align-items:center;
 justify-content:center;
+background:#111;
+border:2px solid #ff2a2a;
+box-shadow:0 0 6px #ff2a2a;
+}
 
-background:#020000;
-border:1px solid rgba(255,0,0,0.8);
+body.day .volumeWrapper{
+background:#d6d6d6;
+box-shadow:0 0 10px #ff2a2a;
+}
 
-box-shadow:0 0 8px rgba(255,0,0,0.5);
+button{
+width:160px;
+height:45px;
+background:#111;
+color:white;
+cursor:pointer;
+font-family:'Orbitron';
+transition:0.2s;
+border:2px solid #ff2a2a;
+box-shadow:0 0 6px #ff2a2a;
+}
+
+body.day button{
+background:#d6d6d6;
+color:#000;
+box-shadow:0 0 10px #ff2a2a;
 }
 
 #volume{
 width:120px;
-height:4px;
+height:10px;
 appearance:none;
+border-radius:10px;
+outline:none;
 background:#000;
 border:1px solid #ff2a2a;
+box-shadow:0 0 4px #ff2a2a;
 }
 
-/* 🔥 AKTYWNY TRACK */
 #volume.active{
-box-shadow:0 0 10px #ff0000;
+box-shadow:0 0 8px #ff0000;
+border:1px solid #ff0000;
 }
 
-/* 🔥 THUMB */
 #volume::-webkit-slider-thumb{
 -webkit-appearance:none;
-width:10px;
-height:10px;
-background:#ff2a2a;
-box-shadow:0 0 12px #ff0000;
+width:16px;
+height:16px;
+border-radius:4px;
+background:#ff0000;
+box-shadow:0 0 8px #ff0000;
 cursor:pointer;
 }
 
-/* ================= LINK ================= */
+#volume::-moz-range-thumb{
+width:16px;
+height:16px;
+border:none;
+border-radius:4px;
+background:#ff0000;
+box-shadow:0 0 8px #ff0000;
+cursor:pointer;
+}
+
+.playActive{ color:#ff2a2a; text-shadow:0 0 8px #ff0000; }
+.stopActive{ color:#ff2a2a; text-shadow:0 0 8px #ff0000; }
+
+.muteActive{
+color:#ff2a2a;
+text-shadow:0 0 8px #ff0000;
+animation:pulseMute 0.8s infinite alternate;
+}
+
+@keyframes pulseMute{
+from{ transform:scale(1); }
+to{ transform:scale(1.05); }
+}
+
+#modeBtn{
+font-size:22px;
+width:66px;
+height:49px;
+}
+
+/* 🔥 USUNIĘTE NIEBIESKIE PODŚWIETLENIE */
+body:not(.day) #modeBtn{
+color:#ff2a2a;
+text-shadow:0 0 6px #ff0000;
+background:#111;
+box-shadow:0 0 6px #ff0000;
+}
+
+body.day #modeBtn{
+color:#ff2a2a;
+text-shadow:0 0 6px #ff0000;
+background:#d6d6d6;
+box-shadow:0 0 6px #ff0000;
+}
+
 #bottomLink{
-position:absolute;
-bottom:15px;
-width:100%;
+margin-top:10px;
 text-align:center;
+width:100%;
 }
 
 #bottomLink a{
 color:#ff2a2a;
 text-decoration:none;
-font-size:16px;
-letter-spacing:2px;
-opacity:0.9;
+text-shadow:0 0 4px #ff0000;
+font-size:20px;
 }
-
-/* ================= MOBILE ================= */
-@media (max-width:768px){
-
-#title{
-font-size:36px;
-letter-spacing:6px;
-}
-
-#proEqualizer{
-height:180px;
-}
-
-canvas{
-height:180px !important;
-width:95vw !important;
-}
-
-button, .volumeWrapper{
-width:130px;
-height:40px;
-}
-
-}
-
 </style>
 </head>
 
 <body>
 
 <div id="title">Muzyczne Radio</div>
-
 <canvas id="proEqualizer"></canvas>
 
 <div id="controls">
-
 <button id="playBtn" onclick="playRadio()">PLAY</button>
 <button id="stopBtn" onclick="stopRadio()">STOP</button>
-<button id="muteBtn" onclick="muteRadio()">MUTE</button>
+<button id="muteBtn" onclick="muteRadio()">MUTE 🔊</button>
 
 <div class="volumeWrapper">
 <input id="volume" type="range" min="0" max="1" step="0.01" value="0.5">
 </div>
 
-<button id="modeBtn">🌙</button>
-
+<button id="modeBtn" onclick="toggleMode()">🌙</button>
 </div>
 
 <div id="bottomLink">
@@ -240,91 +200,189 @@ height:40px;
 <audio id="audio" crossorigin="anonymous"></audio>
 
 <script>
-
 const STREAM_URL="https://stream.rcs.revma.com/gzwc1xcq042vv";
 
-let audio=document.getElementById("audio");
-let volume=document.getElementById("volume");
-let canvas=document.getElementById("proEqualizer");
-let ctx=canvas.getContext("2d");
+const audio=document.getElementById("audio");
+const volume=document.getElementById("volume");
+
+const playBtn=document.getElementById("playBtn");
+const stopBtn=document.getElementById("stopBtn");
+const muteBtn=document.getElementById("muteBtn");
+const modeBtn=document.getElementById("modeBtn");
+
+const title=document.getElementById("title");
+const controls=document.getElementById("controls");
+
+const canvas=document.getElementById("proEqualizer");
+const ctx=canvas.getContext("2d");
+
+audio.volume=parseFloat(volume.value);
 
 let audioCtx, analyser, source, dataArray;
+let peaks=[];
 let animationStarted=false;
-
-audio.volume=volume.value;
 
 function setupAudio(){
 if(audioCtx) return;
 
 audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+
 source=audioCtx.createMediaElementSource(audio);
 
 analyser=audioCtx.createAnalyser();
 analyser.fftSize=512;
+analyser.smoothingTimeConstant=0.5;
 
 source.connect(analyser);
 analyser.connect(audioCtx.destination);
 
 dataArray=new Uint8Array(analyser.frequencyBinCount);
+
+for(let i=0;i<300;i++) peaks[i]=0;
 }
 
 function playRadio(){
+
 setupAudio();
-if(audioCtx.state==="suspended") audioCtx.resume();
+
+if(audioCtx.state === "suspended"){
+audioCtx.resume();
+}
+
 audio.src=STREAM_URL;
 audio.play();
-if(!animationStarted){animationStarted=true;draw();}
+
+playBtn.classList.add("playActive");
+stopBtn.classList.remove("stopActive");
+
+if(!animationStarted){
+animationStarted=true;
+draw();
+}
 }
 
 function stopRadio(){
+
 audio.pause();
+
+stopBtn.classList.add("stopActive");
+playBtn.classList.remove("playActive");
+
+setTimeout(()=>{
+stopBtn.classList.remove("stopActive");
+},1000);
+
+for(let i=0;i<peaks.length;i++){
+peaks[i]=0;
+}
 }
 
 function muteRadio(){
 audio.muted=!audio.muted;
+muteBtn.classList.toggle("muteActive");
 }
 
-/* 🔥 ACTIVE VOLUME */
-volume.addEventListener("input",()=>{
-audio.volume=parseFloat(volume.value);
+function toggleMode(){
+document.body.classList.toggle("day");
+modeBtn.innerText=document.body.classList.contains("day")?"☀️":"🌙";
+}
 
-if(Math.abs(volume.value-0.5)>0.02){
-volume.classList.add("active");
-}else{
+volume.addEventListener("input",()=>{
+let val=parseFloat(volume.value);
+audio.volume=val;
+
+if(Math.abs(val-0.5)<0.02){
 volume.classList.remove("active");
+}else{
+volume.classList.add("active");
 }
 });
 
-/* ================= EQ (CIENKI HUD STYLE) ================= */
+volume.dispatchEvent(new Event("input"));
+
+function resizeCanvas(){
+
+let dpr = window.devicePixelRatio || 1;
+let width = title.offsetWidth;
+
+canvas.width = width * dpr;
+canvas.height = 260 * dpr;
+
+canvas.style.width = width + "px";
+canvas.style.height = "260px";
+
+ctx.setTransform(1,0,0,1,0,0);
+ctx.scale(dpr, dpr);
+
+controls.style.width = width + "px";
+}
+
+window.addEventListener("load", resizeCanvas);
+window.addEventListener("resize", resizeCanvas);
+
 function draw(){
 requestAnimationFrame(draw);
 
-if(!analyser||!dataArray)return;
+if(!analyser || !dataArray) return;
 
 analyser.getByteFrequencyData(dataArray);
+drawEQ();
+}
 
-let w=900;
-let h=260;
+function drawEQ(){
 
-canvas.width=w;
-canvas.height=h;
+let dpr = window.devicePixelRatio || 1;
+let width = canvas.width / dpr;
+let heightCanvas = canvas.height / dpr;
 
-ctx.clearRect(0,0,w,h);
+ctx.clearRect(0,0,width,heightCanvas);
 
-let bars=90;
-let barW=w/bars;
+let bars = Math.max(1, Math.floor(width / 8));
+let barWidth = width / bars;
+
+let step=Math.max(1, Math.floor(dataArray.length/bars));
+
+let yOffset = 5;
+let maxHeight = heightCanvas * 0.9;
 
 for(let i=0;i<bars;i++){
-let v=dataArray[i]||0;
-let bh=(v/255)*h;
 
+let index=i*step;
+let value = dataArray[index] || 0;
+
+let percent=value/255;
+let h=Math.min(maxHeight, heightCanvas*percent);
+
+let x=i*barWidth;
+let y=heightCanvas-h + yOffset;
+
+/* 🔴 uproszczony czerwony neon */
 ctx.fillStyle="#ff2a2a";
 
-/* cienkie linie jak HUD */
-ctx.fillRect(i*barW,h-bh,barW*0.4,bh);
-}
+ctx.shadowBlur=6;
+ctx.shadowColor="#ff0000";
+
+ctx.fillRect(x,y,barWidth-1,h);
+
+ctx.shadowBlur=0;
+
+if(!peaks[i]) peaks[i]=0;
+
+if(h>peaks[i]){
+peaks[i]=h;
+}else{
+peaks[i]-=1.5;
 }
 
+if(peaks[i]<0) peaks[i]=0;
+
+let peakY=heightCanvas-peaks[i] + yOffset;
+
+ctx.fillStyle="#ff2a2a";
+ctx.fillRect(x,peakY,barWidth-1,3);
+
+}
+}
 </script>
 
 </body>
