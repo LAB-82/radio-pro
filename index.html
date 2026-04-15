@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Radio Polska App</title>
+<title>Polskie Radio App</title>
 
 <style>
 body {
@@ -11,12 +11,12 @@ body {
     font-family: Arial, sans-serif;
     background: #0b0b0b;
     color: white;
-    display: flex;
     height: 100vh;
+    display: flex;
 }
 
 /* LEWA LISTA */
-#sidebar {
+#list {
     width: 320px;
     background: #151515;
     overflow-y: auto;
@@ -34,13 +34,13 @@ body {
 }
 
 .station:hover {
-    background: #222;
+    background: #242424;
 }
 
 .station img {
-    width: 45px;
-    height: 45px;
-    border-radius: 8px;
+    width: 40px;
+    height: 40px;
+    border-radius: 6px;
 }
 
 .station span {
@@ -65,15 +65,15 @@ iframe {
     border: none;
 }
 
-/* DOLNY BAR */
-#nowPlaying {
-    height: 60px;
+/* PANEL POD PLAYEREM */
+#panel {
+    height: 90px;
     background: #111;
+    border-top: 1px solid #222;
     display: flex;
     align-items: center;
-    padding: 0 15px;
-    border-top: 1px solid #222;
-    font-size: 14px;
+    padding: 10px;
+    font-size: 13px;
     color: #aaa;
 }
 </style>
@@ -81,91 +81,82 @@ iframe {
 
 <body>
 
-<!-- SIDEBAR -->
-<div id="sidebar"></div>
+<!-- LISTA -->
+<div id="list"></div>
 
-<!-- MAIN -->
+<!-- PLAYER -->
 <div id="main">
     <div id="player">
         <iframe id="frame" src=""></iframe>
     </div>
-    <div id="nowPlaying">Wybierz stację aby rozpocząć</div>
+    <div id="panel">Wybierz stację aby rozpocząć</div>
 </div>
 
 <script>
 
-// 📻 LISTA STACJI (MyRadioOnline - stabilne linki embed)
+// 📻 LISTA STACJI (Twoja + MyRadioOnline search fallback)
 const stations = [
-    {
-        name: "Radio 357",
-        img: "https://upload.wikimedia.org/wikipedia/commons/2/2c/Radio_357_logo.png",
-        url: "https://myradioonline.pl/radio-357"
-    },
-    {
-        name: "Radio Nowy Świat",
-        img: "https://upload.wikimedia.org/wikipedia/commons/6/6f/Radio_Nowy_%C5%9Awiat_logo.png",
-        url: "https://myradioonline.pl/radio-nowy-swiat"
-    },
-    {
-        name: "TOK FM",
-        img: "https://myradioonline.pl/images/tokfm.png",
-        url: "https://myradioonline.pl/tok-fm"
-    },
-    {
-        name: "Antyradio",
-        img: "https://myradioonline.pl/images/antyradio.png",
-        url: "https://myradioonline.pl/antyradio"
-    },
-    {
-        name: ":contentReference[oaicite:0]{index=0}",
-        img: "https://myradioonline.pl/images/muzyczneradio.png",
-        url: "https://myradioonline.pl/muzyczne-radio"
-    },
-    {
-        name: "Radio Wrocław",
-        img: "https://myradioonline.pl/images/radiowroclaw.png",
-        url: "https://myradioonline.pl/radio-wroclaw"
-    },
-    {
-        name: "Radio Kraków",
-        img: "https://myradioonline.pl/images/radiokrakow.png",
-        url: "https://myradioonline.pl/radio-krakow"
-    },
-    {
-        name: "Radio Poznań",
-        img: "https://myradioonline.pl/images/radiopoznan.png",
-        url: "https://myradioonline.pl/radio-poznan"
-    }
+    "Muzyczne Radio Jelenia Góra",
+    "Polskie Radio Jedynka",
+    "Polskie Radio Dwójka",
+    "Polskie Radio Trójka",
+    "Polskie Radio Czwórka",
+    "Radio Plus",
+    "RMF FM",
+    "Radio Zet",
+    "Radio Eska",
+    "Radio Wrocław",
+    "Radio Wnet",
+    "Tok FM",
+    "Antyradio",
+    "Radio Kolor",
+    "Open FM",
+    "Open FM Disco Polo",
+    "Disco Radio",
+    "Polish Radio London 24",
+    "Polskie Radio Dzieciom",
+    "Polskie Radio Chopin",
+    "Radio Yanosik",
+    "Radio Republika",
+    "Radio dla Ciebie",
+    "Radio Maryja",
+    "Radio Jasna Góra"
 ];
 
-const sidebar = document.getElementById("sidebar");
+// 🔥 MyRadioOnline search fallback (działa dla wszystkich stacji)
+function getUrl(name) {
+    return "https://myradioonline.pl/?s=" + encodeURIComponent(name);
+}
+
+const list = document.getElementById("list");
 const frame = document.getElementById("frame");
-const nowPlaying = document.getElementById("nowPlaying");
+const panel = document.getElementById("panel");
 
-function play(station) {
-    nowPlaying.textContent = "🎧 Teraz gra: " + station.name;
+// 🎧 ODTWARZANIE W IFRAME (jak aplikacja)
+function play(name) {
+    panel.textContent = "🎧 Ładowanie: " + name;
 
-    // 🔥 KLUCZ: radio gra w środku aplikacji
-    frame.src = station.url;
+    frame.src = getUrl(name);
+
+    setTimeout(() => {
+        panel.textContent = "📻 Teraz gra: " + name;
+    }, 1200);
 }
 
-function render() {
-    stations.forEach(station => {
-        const div = document.createElement("div");
-        div.className = "station";
+// 🧩 RENDER LISTY
+stations.forEach(name => {
+    const div = document.createElement("div");
+    div.className = "station";
 
-        div.innerHTML = `
-            <img src="${station.img}" onerror="this.src='https://via.placeholder.com/45'">
-            <span>${station.name}</span>
-        `;
+    div.innerHTML = `
+        <img src="https://www.google.com/s2/favicons?domain=myradioonline.pl&sz=64">
+        <span>${name}</span>
+    `;
 
-        div.onclick = () => play(station);
+    div.onclick = () => play(name);
 
-        sidebar.appendChild(div);
-    });
-}
-
-render();
+    list.appendChild(div);
+});
 
 </script>
 
