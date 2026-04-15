@@ -50,7 +50,7 @@ body {
     font-weight: bold;
 }
 
-/* OCENY / IKONY */
+/* META */
 #meta {
     display: flex;
     align-items: center;
@@ -80,64 +80,64 @@ body {
     position: relative;
 }
 
-/* iframe */
-iframe {
+/* 🔥 PLAYER APP STYLE */
+#radioPlayer{
     width: 90%;
     height: 90%;
-    border: none;
-    border-radius: 10px;
-}
-
-/* 🔥 DODANY PANEL MYRADIOONLINE STYLE */
-#radioOverlay {
-    position: absolute;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(20,20,20,0.95);
-    padding: 15px 20px;
-    border-radius: 12px;
+    background: #111;
+    border-radius: 14px;
     display: flex;
-    align-items: center;
-    gap: 15px;
-    box-shadow: 0 0 20px rgba(0,0,0,0.6);
-}
-
-#radioLogo {
-    width: 40px;
-    height: 40px;
-    background: #333;
-    border-radius: 8px;
-    display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    font-size: 10px;
-    text-align: center;
+    position: relative;
+    box-shadow: 0 0 25px rgba(0,0,0,0.7);
 }
 
-#playBtn {
-    background: #1db954;
-    border: none;
-    color: white;
+/* LOGO */
+#logoBox img{
+    width: 220px;
+    height: auto;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+/* BIG PLAY */
+#bigPlay{
+    font-size: 70px;
+    cursor: pointer;
+    user-select: none;
+    transition: 0.2s;
+}
+
+#bigPlay:hover{
+    transform: scale(1.1);
+}
+
+/* BOTTOM BAR */
+#bottomBar{
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #222;
     padding: 10px 18px;
-    border-radius: 20px;
-    cursor: pointer;
-    font-weight: bold;
-}
-
-#playBtn:hover {
-    background: #1ed760;
-}
-
-#miniControls {
+    border-radius: 30px;
     display: flex;
-    gap: 10px;
-    font-size: 16px;
+    gap: 18px;
+    font-size: 18px;
     cursor: pointer;
-    color: #ccc;
 }
 
-/* DOLNY PANEL */
+#bottomBar div{
+    transition: 0.2s;
+}
+
+#bottomBar div:hover{
+    transform: scale(1.2);
+}
+
+/* CONTROLS */
 #controls {
     height: 70px;
     background: #111;
@@ -153,23 +153,13 @@ iframe {
     font-size: 20px;
     user-select: none;
 }
-
-#status {
-    position: absolute;
-    left: 320px;
-    padding-left: 15px;
-    font-size: 13px;
-    color: #aaa;
-}
 </style>
 </head>
 
 <body>
 
-<!-- SIDEBAR -->
 <div id="sidebar"></div>
 
-<!-- MAIN -->
 <div id="main">
 
     <div id="header">🎧 Radio Player</div>
@@ -187,23 +177,29 @@ iframe {
 
     <div id="playerBox">
 
-        <!-- 🔥 DODANY WZORZEC PLAYA -->
-        <div id="radioOverlay">
-            <div id="radioLogo">LOGO</div>
-            <button id="playBtn" onclick="play()">PLAY</button>
-            <div id="miniControls">
-                <span onclick="prev()">⏮</span>
-                <span onclick="next()">⏭</span>
-                <span onclick="mute()">🔊</span>
+        <!-- 🔥 APP PLAYER -->
+        <div id="radioPlayer">
+
+            <div id="logoBox">
+                <img id="stationLogo" src="https://via.placeholder.com/220x120?text=RADIO" />
             </div>
+
+            <div id="bigPlay" onclick="togglePlay()">▶</div>
+
+            <div id="bottomBar">
+                <div onclick="prev()">⏮</div>
+                <div onclick="togglePlay()" id="playIcon">▶</div>
+                <div onclick="next()">⏭</div>
+                <div onclick="mute()">🔊</div>
+            </div>
+
         </div>
 
-        <iframe id="frame" src=""></iframe>
     </div>
 
     <div id="controls">
         <div class="btn" onclick="prev()">⏮</div>
-        <div class="btn" onclick="play()">⏯</div>
+        <div class="btn" onclick="togglePlay()">⏯</div>
         <div class="btn" onclick="next()">⏭</div>
         <div class="btn" onclick="mute()">🔊</div>
     </div>
@@ -242,21 +238,21 @@ const stations = [
 ];
 
 let index = 0;
+let playing = false;
 
 const sidebar = document.getElementById("sidebar");
-const frame = document.getElementById("frame");
 
-function url(name) {
-    return "https://myradioonline.pl/?s=" + encodeURIComponent(name);
+function updateLogo(name){
+    document.getElementById("stationLogo").src =
+        "https://via.placeholder.com/220x120?text=" + encodeURIComponent(name);
 }
 
-function load(i) {
+function load(i){
     index = i;
-    frame.src = url(stations[i]);
-
-    // update logo text
-    document.getElementById("radioLogo").innerText =
-        stations[i].split(" ").slice(0,2).join(" ");
+    updateLogo(stations[i]);
+    playing = false;
+    document.getElementById("bigPlay").innerText = "▶";
+    document.getElementById("playIcon").innerText = "▶";
 }
 
 stations.forEach((s, i) => {
@@ -267,22 +263,24 @@ stations.forEach((s, i) => {
     sidebar.appendChild(div);
 });
 
-function prev() {
+function togglePlay(){
+    playing = !playing;
+    document.getElementById("bigPlay").innerText = playing ? "⏸" : "▶";
+    document.getElementById("playIcon").innerText = playing ? "⏸" : "▶";
+}
+
+function prev(){
     index = (index - 1 + stations.length) % stations.length;
     load(index);
 }
 
-function next() {
+function next(){
     index = (index + 1) % stations.length;
     load(index);
 }
 
-function play() {
-    load(index);
-}
-
-function mute() {
-    alert("Mute działa wewnątrz playera MyRadioOnline");
+function mute(){
+    alert("Mute (do podpięcia streamu audio)");
 }
 
 load(0);
