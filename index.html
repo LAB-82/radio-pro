@@ -7,20 +7,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#000000">
 
-<link rel="manifest" href="manifest.json">
-
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
-<link rel="apple-touch-icon" href="icon-192.png">
-
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
 
 <style>
-
-/* ================= YOUR ORIGINAL UI (UNCHANGED) ================= */
 
 html, body{
 margin:0;
@@ -32,18 +21,18 @@ overflow:hidden;
 
 body{
 background:#000;
-color:#fff;
+color:#ff2a2a;
 font-family:'Orbitron',sans-serif;
 display:flex;
 flex-direction:column;
 align-items:center;
 height:100vh;
-transition:0.4s;
+transition:0.3s;
 }
 
 body.day{
-background:#eaeaea;
-color:#000;
+background:#1a0000;
+color:#ff2a2a;
 }
 
 #title{
@@ -51,16 +40,13 @@ font-size:88px;
 margin-top:50px;
 text-align:center;
 color:#ff2a2a;
-text-shadow:0 0 5px #ff2a2a,0 0 15px #ff0000,0 0 30px #ff0000,0 0 60px #ff0000;
+text-shadow:0 0 8px #ff0000,0 0 20px #ff0000,0 0 40px #ff0000;
 }
 
 #proEqualizer{
 display:block;
-margin:0 auto;
-margin-top:30px;
-margin-bottom:30px;
+margin:30px auto;
 border-radius:8px;
-overflow:hidden;
 }
 
 canvas{
@@ -82,22 +68,20 @@ flex-wrap:wrap;
 button{
 width:160px;
 height:45px;
-background:#111;
-color:white;
+background:#0a0a0a;
+color:#ff2a2a;
 cursor:pointer;
 font-family:'Orbitron';
-transition:0.2s;
 border:2px solid #ff2a2a;
-box-shadow:0 0 10px #ff2a2a;
+box-shadow:0 0 10px #ff0000;
 display:flex;
 align-items:center;
 justify-content:center;
+box-sizing:border-box;
 }
 
-body.day button{
-background:#d6d6d6;
-color:#000;
-box-shadow:0 0 40px #ff2a2a,0 0 80px #ff0000;
+button:hover{
+box-shadow:0 0 20px #ff0000,0 0 40px #ff0000;
 }
 
 .volumeWrapper{
@@ -106,50 +90,27 @@ height:45px;
 display:flex;
 align-items:center;
 justify-content:center;
-background:#111;
+background:#0a0a0a;
 border:2px solid #ff2a2a;
-box-shadow:0 0 10px #ff2a2a;
+box-shadow:0 0 10px #ff0000;
 box-sizing:border-box;
-}
-
-body.day .volumeWrapper{
-background:#d6d6d6;
-box-shadow:0 0 40px #ff2a2a,0 0 80px #ff0000;
 }
 
 #volume{
 width:120px;
 height:10px;
 appearance:none;
-border-radius:10px;
-outline:none;
-background:#000;
+background:#111;
 border:1px solid #ff2a2a;
-box-shadow:0 0 6px #ff2a2a;
-}
-
-#volume.active{
-box-shadow:0 0 10px #ff0000;
-border:1px solid #ff0000;
+box-shadow:0 0 6px #ff0000;
 }
 
 #volume::-webkit-slider-thumb{
 -webkit-appearance:none;
 width:16px;
 height:16px;
-border-radius:4px;
 background:#ff0000;
-box-shadow:0 0 10px red,0 0 20px red;
-cursor:pointer;
-}
-
-#volume::-moz-range-thumb{
-width:16px;
-height:16px;
-border:none;
-border-radius:4px;
-background:#ff0000;
-box-shadow:0 0 10px red,0 0 20px red;
+box-shadow:0 0 12px #ff0000;
 cursor:pointer;
 }
 
@@ -158,21 +119,9 @@ font-size:22px;
 width:66px;
 height:49px;
 background:#111;
-color:#ffff00;
+color:#ff2a2a;
 border:2px solid #ff2a2a;
-box-shadow:0 0 12px #00ccff,0 0 24px #00aaff;
-}
-
-body:not(.day) #modeBtn{
-background:#111;
-color:#ffff00;
-text-shadow:0 0 8px #ffff00,0 0 16px #ffff66;
-}
-
-body.day #modeBtn{
-background:#00ccff;
-color:#ffff00;
-box-shadow:0 0 12px #00ccff,0 0 24px #00aaff;
+box-shadow:0 0 15px #ff0000;
 }
 
 #bottomLink{
@@ -184,7 +133,7 @@ width:100%;
 #bottomLink a{
 color:#ff2a2a;
 text-decoration:none;
-text-shadow:0 0 6px red;
+text-shadow:0 0 10px #ff0000;
 font-size:20px;
 }
 
@@ -224,15 +173,13 @@ const audio=document.getElementById("audio");
 const volume=document.getElementById("volume");
 const canvas=document.getElementById("proEqualizer");
 const ctx=canvas.getContext("2d");
-const controls=document.getElementById("controls");
-const title=document.getElementById("title");
 
 audio.volume=parseFloat(volume.value);
 
 let audioCtx, analyser, source, dataArray;
 let animationStarted=false;
 
-/* ================= SAFE PWA FIX (NO UI IMPACT) ================= */
+/* SAFE SW KILL (NO UI IMPACT) */
 if('serviceWorker' in navigator){
 window.addEventListener('load', async () => {
 try{
@@ -295,7 +242,7 @@ volume.addEventListener("input",()=>{
 audio.volume=parseFloat(volume.value);
 });
 
-/* CANVAS STABLE */
+/* CANVAS */
 function resizeCanvas(){
 let dpr=window.devicePixelRatio||1;
 
@@ -329,7 +276,7 @@ let bars=80;
 let barWidth=width/bars;
 let step=Math.floor(dataArray.length/bars);
 
-ctx.fillStyle="#ff2a2a";
+ctx.fillStyle="#ff0000";
 
 for(let i=0;i<bars;i++){
 let value=dataArray[i*step]||0;
