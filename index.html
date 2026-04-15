@@ -2,114 +2,116 @@
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
-<title>Muzyczne Radio PRO</title>
+<title>MUZYCZNE RADIO // ARASAKA SYSTEM</title>
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
 
 <style>
 
+/* ================= RESET ================= */
 html, body{
 margin:0;
 padding:0;
 width:100%;
 height:100%;
 overflow:hidden;
-}
-
-/* 🔧 FIX: stabilizacja layoutu + brak „rozjeżdżania” */
-body{
 background:#000;
-color:#ff2a2a;
 font-family:"Orbitron",sans-serif;
-display:flex;
-flex-direction:column;
-align-items:center;
-height:100vh;
-}
-
-/* 🔥 FIX TITLE (stabilny glow, bez glitch overflow) */
-#title{
-font-size:78px;
-margin-top:40px;
-text-align:center;
-letter-spacing:6px;
 color:#ff2a2a;
-text-shadow:
-0 0 8px #ff0000,
-0 0 20px #ff0000,
-0 0 40px rgba(255,0,0,0.6);
-
-/* FIX: brak przesuwania */
-line-height:1.1;
 }
 
-/* 🔧 CANVAS FIX (rozjeżdżanie + scaling) */
+/* ================= ARASAKA BACKGROUND ================= */
+body{
+background:
+radial-gradient(circle at center, #120000 0%, #000 55%, #000 100%),
+repeating-linear-gradient(
+90deg,
+rgba(255,0,0,0.04),
+rgba(255,0,0,0.04) 1px,
+transparent 1px,
+transparent 6px
+);
+box-shadow: inset 0 0 200px rgba(255,0,0,0.15);
+}
+
+/* ================= TITLE ARASAKA ================= */
+#title{
+font-size:76px;
+margin-top:35px;
+text-align:center;
+letter-spacing:10px;
+text-transform:uppercase;
+
+color:#ff2a2a;
+
+text-shadow:
+0 0 10px #ff0000,
+0 0 30px #ff0000,
+0 0 80px rgba(255,0,0,0.6);
+
+position:relative;
+}
+
+/* ================= HUD FRAME ================= */
 #proEqualizer{
 display:block;
 margin:20px auto;
-max-width:95vw;
-border-radius:10px;
+width:90vw;        /* 🔧 FIX: stabilna szerokość */
+max-width:1100px;
+height:260px;
+
+border:1px solid rgba(255,0,0,0.4);
+border-radius:8px;
+
 box-shadow:
 0 0 20px #ff0000,
-0 0 50px rgba(255,0,0,0.3);
+0 0 60px rgba(255,0,0,0.3);
+
+background:rgba(0,0,0,0.4);
 }
 
-canvas{
-display:block;
-width:100%;
-height:260px;
-}
-
-/* 🔧 CONTROLS FIX (wyrównanie + brak overflow) */
+/* ================= CONTROLS ================= */
 #controls{
 display:flex;
 gap:10px;
-margin-top:20px;
-flex-wrap:wrap;
 justify-content:center;
 align-items:center;
-max-width:100vw;
-padding:0 10px;
-box-sizing:border-box;
+flex-wrap:wrap;
+margin-top:15px;
 }
 
-/* 🔥 CYBER BUTTONS (stabilne wymiary) */
+/* ================= ARASAKA BUTTONS ================= */
 button{
 width:150px;
 height:44px;
 
-background:#0a0000;
+background:linear-gradient(180deg,#0a0000,#1a0000);
 color:#ff2a2a;
-
-font-family:"Orbitron",sans-serif;
-font-size:14px;
-letter-spacing:2px;
-
-cursor:pointer;
 
 border:1px solid #ff2a2a;
 
+font-family:"Orbitron",sans-serif;
+letter-spacing:2px;
+text-transform:uppercase;
+
 box-shadow:
-0 0 10px #ff0000,
-inset 0 0 10px rgba(255,0,0,0.2);
+0 0 12px #ff0000,
+inset 0 0 10px rgba(255,0,0,0.25);
 
-display:flex;
-align-items:center;
-justify-content:center;
-
+cursor:pointer;
 transition:0.2s;
 }
 
 button:hover{
-transform:scale(1.05);
+transform:scale(1.06);
 box-shadow:
-0 0 25px #ff0000,
-0 0 60px rgba(255,0,0,0.5);
+0 0 30px #ff0000,
+0 0 70px rgba(255,0,0,0.5);
 }
 
-/* 🔧 VOLUME FIX (NIE ROZJEŻDŻA SIĘ) */
+/* ================= VOLUME ================= */
 .volumeWrapper{
 width:150px;
 height:44px;
@@ -117,10 +119,10 @@ display:flex;
 align-items:center;
 justify-content:center;
 
-background:#0a0000;
+background:rgba(0,0,0,0.6);
 border:1px solid #ff2a2a;
-box-shadow:0 0 12px #ff0000;
-box-sizing:border-box;
+
+box-shadow:0 0 15px #ff0000;
 }
 
 #volume{
@@ -133,53 +135,37 @@ box-shadow:0 0 10px #ff0000;
 border-radius:10px;
 }
 
-/* 🔥 THUMB FIX */
 #volume::-webkit-slider-thumb{
 -webkit-appearance:none;
 width:14px;
 height:14px;
 background:#ff2a2a;
-box-shadow:0 0 12px #ff0000;
-border-radius:2px;
+box-shadow:0 0 15px #ff0000;
 cursor:pointer;
+border-radius:2px;
 }
 
-/* 🔧 MODE BUTTON FIX */
+/* ================= MODE ================= */
 #modeBtn{
 width:60px;
 height:44px;
-font-size:18px;
 background:#000;
 border:1px solid #ff2a2a;
 color:#ff2a2a;
-box-shadow:0 0 12px #ff0000;
+box-shadow:0 0 15px #ff0000;
 }
 
-/* 🔥 STATUS STABILNE */
-.playActive{
-text-shadow:0 0 15px #ff0000;
-}
-
-.stopActive{
-text-shadow:0 0 15px #aa0000;
-}
-
-.muteActive{
-color:#ff8800;
-text-shadow:0 0 15px orange;
-}
-
-/* 🔧 MOBILE FIX */
+/* ================= MOBILE ================= */
 @media (max-width: 768px){
 
 #title{
 font-size:38px;
-letter-spacing:3px;
-margin-top:20px;
+letter-spacing:4px;
 }
 
-canvas{
+#proEqualizer{
 height:180px;
+width:95vw;
 }
 
 button, .volumeWrapper{
@@ -187,17 +173,26 @@ width:130px;
 height:40px;
 }
 
-#controls{
-gap:6px;
 }
+
+/* ================= CANVAS STABILIZATION FIX ================= */
+canvas{
+display:block;
+width:100%;
+height:260px;
 }
+
+/* ================= STATUS ================= */
+.playActive{ text-shadow:0 0 20px #ff0000; }
+.stopActive{ text-shadow:0 0 20px #aa0000; }
+.muteActive{ text-shadow:0 0 20px orange; }
 
 </style>
 </head>
 
 <body>
 
-<div id="title">Muzyczne Radio</div>
+<div id="title">ARASAKA AUDIO SYSTEM</div>
 
 <canvas id="proEqualizer"></canvas>
 
@@ -211,85 +206,113 @@ gap:6px;
 <input id="volume" type="range" min="0" max="1" step="0.01" value="0.5">
 </div>
 
-<button id="modeBtn" onclick="toggleMode()">🌙</button>
+<button id="modeBtn">🌙</button>
 
 </div>
 
 <audio id="audio" crossorigin="anonymous"></audio>
 
 <script>
+
 const STREAM_URL="https://stream.rcs.revma.com/gzwc1xcq042vv";
 
 let audio=document.getElementById("audio");
 let volume=document.getElementById("volume");
-let playBtn=document.getElementById("playBtn");
-let stopBtn=document.getElementById("stopBtn");
-let muteBtn=document.getElementById("muteBtn");
-let modeBtn=document.getElementById("modeBtn");
 let canvas=document.getElementById("proEqualizer");
 let ctx=canvas.getContext("2d");
 
-audio.volume=parseFloat(volume.value);
+let playBtn=document.getElementById("playBtn");
+let stopBtn=document.getElementById("stopBtn");
+let muteBtn=document.getElementById("muteBtn");
+
+audio.volume=volume.value;
 
 let audioCtx, analyser, source, dataArray;
 let animationStarted=false;
 
+/* ================= AUDIO ================= */
 function setupAudio(){
 if(audioCtx) return;
+
 audioCtx=new (window.AudioContext||window.webkitAudioContext)();
 source=audioCtx.createMediaElementSource(audio);
+
 analyser=audioCtx.createAnalyser();
 analyser.fftSize=512;
+
 source.connect(analyser);
 analyser.connect(audioCtx.destination);
+
 dataArray=new Uint8Array(analyser.frequencyBinCount);
 }
 
+/* ================= PLAY ================= */
 function playRadio(){
 setupAudio();
+
 if(audioCtx.state==="suspended") audioCtx.resume();
+
 audio.src=STREAM_URL;
 audio.play();
+
 playBtn.classList.add("playActive");
 stopBtn.classList.remove("stopActive");
-if(!animationStarted){animationStarted=true;draw();}
+
+if(!animationStarted){
+animationStarted=true;
+draw();
+}
 }
 
+/* ================= STOP ================= */
 function stopRadio(){
 audio.pause();
 stopBtn.classList.add("stopActive");
 playBtn.classList.remove("playActive");
+
 setTimeout(()=>stopBtn.classList.remove("stopActive"),800);
 }
 
+/* ================= MUTE ================= */
 function muteRadio(){
 audio.muted=!audio.muted;
 muteBtn.classList.toggle("muteActive");
 }
 
+/* ================= VOLUME ================= */
 volume.addEventListener("input",()=>{
 audio.volume=parseFloat(volume.value);
 });
 
+/* ================= STABLE ARASAKA EQ ================= */
 function draw(){
 requestAnimationFrame(draw);
-if(!analyser||!dataArray)return;
+
+if(!analyser||!dataArray) return;
 
 analyser.getByteFrequencyData(dataArray);
 
 let w=canvas.width=canvas.offsetWidth;
-let h=canvas.height=260;
+let h=canvas.height=canvas.offsetHeight;
 
 ctx.clearRect(0,0,w,h);
 
-for(let i=0;i<80;i++){
+/* FIX: stała siatka – brak rozjeżdżania */
+let bars=80;
+let barWidth=w/bars;
+
+for(let i=0;i<bars;i++){
+
 let v=dataArray[i]||0;
 let bh=(v/255)*h;
 
 ctx.fillStyle="#ff2a2a";
-ctx.fillRect(i*8,h-bh,6,bh);
+
+/* FIX: stały grid */
+ctx.fillRect(i*barWidth,h-bh,barWidth*0.7,bh);
 }
 }
+
 </script>
 
 </body>
