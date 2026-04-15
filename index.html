@@ -1,398 +1,291 @@
-<!DOCTYPE html>  
+<!DOCTYPE html>
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
-<title>Muzyczne Radio PRO</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+<title>LOTTO AI SINGULARITY MODE</title>
 
 <style>
-body{
-margin:0;
-background:#000;
-color:#fff;
-font-family:'Orbitron',sans-serif;
-display:flex;
-flex-direction:column;
-align-items:center;
-height:100vh;
-transition:0.4s;
+*{box-sizing:border-box;}
+html,body{
+ margin:0;height:100%;
+ background:#ffd800;
+ font-family:Arial,Helvetica,sans-serif;
+ display:flex;justify-content:center;align-items:flex-start;
+ overflow:hidden;
+}
+#app{
+ width:1200px;height:800px;
+ display:flex;flex-direction:column;padding-top:10px;
+}
+header{
+ height:120px;margin:0 10px;border-radius:12px;
+
+ /* === TU JEST DODANE ZDJĘCIE === */
+ background-image:url('header.png');
+ background-size:cover;
+ background-position:center;
+
+ display:flex;justify-content:space-between;align-items:center;
+ padding:0;
+ color:transparent;
+ font-size:0;
+}
+.header-right{display:none;}
+
+.panel{flex:1;padding:8px;display:flex;flex-direction:column;gap:6px;}
+.game{
+ height:62px;background:linear-gradient(#ffe95e,#f2d43c);
+ border-radius:12px;padding:6px 12px;
+ display:flex;align-items:center;gap:10px;
+}
+.title{
+ display:flex;align-items:center;gap:8px;
+ font-size:16px;font-weight:bold;min-width:320px;color:#003a8f;
+}
+.icon{font-size:18px;}
+.icon.lotto{color:#0b6cd4;}
+.icon.mini{color:#c8a200;}
+.icon.multi{color:#6a1b9a;}
+.icon.keno{color:#ff9800;}
+.icon.pensja{color:#2e7d32;}
+.icon.euro{color:#d4af37;}
+.icon.szybkie{color:#ff7043;}
+
+select{
+ margin-left:6px;padding:3px 6px;
+ border-radius:5px;border:1px solid #003c8f;
+ font-weight:bold;font-size:14px;background:white;
 }
 
-body.day{
-background:#eaeaea;
-color:#000;
+.balls{
+ flex:1;height:40px;display:flex;flex-wrap:wrap;gap:5px;overflow:hidden;
 }
 
-#title{
-font-size:88px;
-margin-top:50px;
-text-align:center;
-color:#ff2a2a;
-text-shadow:0 0 5px #ff2a2a,0 0 15px #ff0000,0 0 30px #ff0000,0 0 60px #ff0000;
+.ball{
+ width:32px;height:32px;border-radius:50%;
+ display:flex;align-items:center;justify-content:center;
+ font-weight:bold;color:white;font-size:13px;
+ box-shadow:
+  inset 0 3px 6px rgba(255,255,255,0.4),
+  inset 0 -3px 6px rgba(0,0,0,0.4),
+  0 2px 4px rgba(0,0,0,0.3);
 }
 
-#proEqualizer{
-display:block;
-margin:0 auto;
-margin-top:30px;
-margin-bottom:30px;
-border-radius:8px;
-overflow:hidden;
-}
+.ball.lotto{background:radial-gradient(circle at 30% 30%, #6bd0ff, #0b6cd4 60%, #003a8f);}
+.ball.mini{background:radial-gradient(circle at 30% 30%, #fff176, #fbc02d 60%, #8d6e00);}
+.ball.multi{background:radial-gradient(circle at 30% 30%, #ba68c8, #6a1b9a 60%, #2e003e);}
+.ball.keno{background:radial-gradient(circle at 30% 30%, #ffcc80, #ff9800 60%, #6d3b00);}
+.ball.pensja{background:radial-gradient(circle at 30% 30%, #a5d6a7, #2e7d32 60%, #1b5e20);}
+.ball.euro{background:radial-gradient(circle at 30% 30%, #fff8c4, #d4af37 60%, #6b5500);}
+.ball.szybkie{background:radial-gradient(circle at 30% 30%, #ffab91, #ff7043 60%, #bf360c);}
 
-canvas{
-display:block;
-height:260px;
-border-radius:8px;
-}
-
-#controls{
-display:flex;
-gap:8px;
-margin-top:20px;
-margin-bottom:20px;
-align-items:center;
-justify-content:space-between;
-}
-
-.volumeWrapper{
-width:160px;
-height:45px;
-display:flex;
-align-items:center;
-justify-content:center;
-background:#111;
-border:2px solid #ff2a2a;
-box-shadow:0 0 10px #ff2a2a;
-}
-
-body.day .volumeWrapper{
-background:#d6d6d6;
-box-shadow:0 0 40px #ff2a2a,0 0 80px #ff0000;
-}
+.extra{filter:brightness(1.1);color:black;}
 
 button{
-width:160px;
-height:45px;
-background:#111;
-color:white;
-cursor:pointer;
-font-family:'Orbitron';
-transition:0.2s;
-border:2px solid #ff2a2a;
-box-shadow:0 0 10px #ff2a2a;
-}
-
-body.day button{
-background:#d6d6d6;
-color:#000;
-box-shadow:0 0 40px #ff2a2a,0 0 80px #ff0000;
-}
-
-#volume{
-width:120px;
-height:10px;
-appearance:none;
-border-radius:10px;
-outline:none;
-background:#000;
-border:1px solid #ff2a2a;
-box-shadow:0 0 6px #ff2a2a;
-}
-
-#volume.active{
-box-shadow:0 0 10px #ff0000;
-border:1px solid #ff0000;
-}
-
-#volume::-webkit-slider-thumb{
--webkit-appearance:none;
-width:16px;
-height:16px;
-border-radius:4px;
-background:#ff0000;
-box-shadow:0 0 10px red,0 0 20px red;
-cursor:pointer;
-}
-
-#volume::-moz-range-thumb{
-width:16px;
-height:16px;
-border:none;
-border-radius:4px;
-background:#ff0000;
-box-shadow:0 0 10px red,0 0 20px red;
-cursor:pointer;
-}
-
-.playActive{ color:#00ff00; text-shadow:0 0 10px #00ff00; }
-.stopActive{ color:#ff4444; text-shadow:0 0 10px red; }
-
-.muteActive{
-color:#ffaa00;
-text-shadow:0 0 10px orange;
-animation:pulseMute 0.8s infinite alternate;
-}
-
-@keyframes pulseMute{
-from{ transform:scale(1); }
-to{ transform:scale(1.1); }
-}
-
-#modeBtn{
-font-size:22px;
-width:66px;
-height:49px;
-}
-
-body:not(.day) #modeBtn{
-color:#ffff00;
-text-shadow:0 0 8px #ffff00,0 0 16px #ffff66;
-background:#111;
-}
-
-body.day #modeBtn{
-color:#ffff00;
-text-shadow:0 0 8px #ffff00,0 0 16px #ffff66;
-background:#00ccff;
-box-shadow:0 0 12px #00ccff,0 0 24px #00aaff;
-}
-
-#bottomLink{
-margin-top:10px;
-text-align:center;
-width:100%;
-}
-
-#bottomLink a{
-color:#ff2a2a;
-text-decoration:none;
-text-shadow:0 0 6px red;
-font-size:20px;
+ background:#003c8f;color:white;border:none;
+ padding:5px 10px;border-radius:6px;
+ cursor:pointer;font-weight:bold;font-size:13px;
 }
 </style>
 </head>
 
 <body>
 
-<div id="title">Muzyczne Radio</div>
-<canvas id="proEqualizer"></canvas>
+<div id="app">
 
-<div id="controls">
-<button id="playBtn" onclick="playRadio()">PLAY</button>
-<button id="stopBtn" onclick="stopRadio()">STOP</button>
-<button id="muteBtn" onclick="muteRadio()">MUTE 🔊</button>
+<header>
+ <div></div>
+ <div class="header-right"></div>
+</header>
 
-<div class="volumeWrapper">
-<input id="volume" type="range" min="0" max="1" step="0.01" value="0.5">
+<div class="panel">
+
+<div class="game">
+ <div class="title"><span class="icon lotto">⭐</span>Lotto
+  <select id="lottoCount"><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option></select>
+ </div>
+ <div class="balls" id="lottoBalls"></div>
+ <button onclick="drawGame('lotto')">LOSUJ</button>
 </div>
 
-<button id="modeBtn" onclick="toggleMode()">🌙</button>
+<div class="game">
+ <div class="title"><span class="icon mini">⭐</span>Mini Lotto
+  <select id="miniCount"><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option></select>
+ </div>
+ <div class="balls" id="miniBalls"></div>
+ <button onclick="drawGame('mini')">LOSUJ</button>
 </div>
 
-<div id="bottomLink">
-<a href="https://www.muzyczneradio.pl" target="_blank">www.muzyczneradio.pl</a>
+<div class="game">
+ <div class="title"><span class="icon multi">🔢</span>Multi Multi
+  <select id="multiCount"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option></select>
+ </div>
+ <div class="balls" id="multiBalls"></div>
+ <button onclick="drawGame('multi')">LOSUJ</button>
 </div>
 
-<audio id="audio" crossorigin="anonymous"></audio>
+<div class="game">
+ <div class="title"><span class="icon keno">❗</span>Keno
+  <select id="kenoCount"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option></select>
+ </div>
+ <div class="balls" id="kenoBalls"></div>
+ <button onclick="drawGame('keno')">LOSUJ</button>
+</div>
+
+<div class="game">
+ <div class="title"><span class="icon pensja">☘️</span>Ekstra Pensja</div>
+ <div class="balls" id="pensjaBalls"></div>
+ <button onclick="drawGame('pensja')">LOSUJ</button>
+</div>
+
+<div class="game">
+ <div class="title"><span class="icon euro">🏆</span>EuroJackpot
+  <select id="euroCount"><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option selected>10</option></select>
+  <select id="euroExtra"><option>0</option><option>1</option><option selected>2</option></select>
+ </div>
+ <div class="balls" id="euroBalls"></div>
+ <button onclick="drawGame('euro')">LOSUJ</button>
+</div>
+
+<div class="game">
+ <div class="title"><span class="icon szybkie">☄️</span>Szybkie 600
+  <select id="szybkieCount"><option>6</option><option>7</option><option>8</option><option>9</option><option selected>10</option></select>
+ </div>
+ <div class="balls" id="szybkieBalls"></div>
+ <button onclick="drawGame('szybkie')">LOSUJ</button>
+</div>
+
+</div>
+</div>
 
 <script>
-const STREAM_URL="https://stream.rcs.revma.com/gzwc1xcq042vv";
 
-const audio=document.getElementById("audio");
-const volume=document.getElementById("volume");
+const clock=document.getElementById("clock");
+const date=document.getElementById("date");
 
-const playBtn=document.getElementById("playBtn");
-const stopBtn=document.getElementById("stopBtn");
-const muteBtn=document.getElementById("muteBtn");
-const modeBtn=document.getElementById("modeBtn");
-
-const title=document.getElementById("title");
-const controls=document.getElementById("controls");
-
-const canvas=document.getElementById("proEqualizer");
-const ctx=canvas.getContext("2d");
-
-/* 🔧 FIX – ustawiamy źródło raz */
-audio.src = STREAM_URL;
-
-audio.volume=parseFloat(volume.value);
-
-let audioCtx, analyser, source, dataArray;
-let peaks=[];
-let animationStarted=false;
-
-function setupAudio(){
-if(audioCtx) return;
-
-audioCtx=new (window.AudioContext||window.webkitAudioContext)();
-
-source=audioCtx.createMediaElementSource(audio);
-
-analyser=audioCtx.createAnalyser();
-analyser.fftSize=512;
-analyser.smoothingTimeConstant=0.5;
-
-source.connect(analyser);
-analyser.connect(audioCtx.destination);
-
-dataArray=new Uint8Array(analyser.frequencyBinCount);
-
-for(let i=0;i<300;i++) peaks[i]=0;
-}
-
-async function playRadio(){
-
-setupAudio();
-
-if(audioCtx.state === "suspended"){
-await audioCtx.resume();
-}
-
-/* 🔧 FIX – NIE resetujemy src */
-try{
-await audio.play();
-}catch(e){
-console.log(e);
-}
-
-playBtn.classList.add("playActive");
-stopBtn.classList.remove("stopActive");
-
-if(!animationStarted){
-animationStarted=true;
-draw();
-}
-}
-
-function stopRadio(){
-
-audio.pause();
-
-stopBtn.classList.add("stopActive");
-playBtn.classList.remove("playActive");
-
-setTimeout(()=>{
-stopBtn.classList.remove("stopActive");
+setInterval(()=>{
+ let d=new Date();
+ if(clock) clock.textContent=d.toLocaleTimeString();
+ if(date) date.textContent=d.toLocaleDateString();
 },1000);
 
-for(let i=0;i<peaks.length;i++){
-peaks[i]=0;
-}
-}
+/* ===== SINGULARITY ENGINE ===== */
 
-function muteRadio(){
-audio.muted=!audio.muted;
-muteBtn.classList.toggle("muteActive");
-}
+let db=JSON.parse(localStorage.getItem("singularityDB")||"{}");
 
-function toggleMode(){
-document.body.classList.toggle("day");
-modeBtn.innerText=document.body.classList.contains("day")?"☀️":"🌙";
+function save(){localStorage.setItem("singularityDB",JSON.stringify(db));}
+
+function update(max,nums){
+ if(!db[max]) db[max]=[];
+ db[max].push(...nums);
+ if(db[max].length>20000) db[max].splice(0,5000);
+ save();
 }
 
-volume.addEventListener("input",()=>{
-let val=parseFloat(volume.value);
-audio.volume=val;
+function buildStats(max){
+ let freq=Array(max+1).fill(0);
+ if(db[max]) db[max].forEach(n=>freq[n]++);
+ let total=freq.reduce((a,b)=>a+b,0)||1;
 
-if(Math.abs(val-0.5)<0.02){
-volume.classList.remove("active");
-}else{
-volume.classList.add("active");
-}
-});
-
-volume.dispatchEvent(new Event("input"));
-
-function resizeCanvas(){
-
-let dpr = window.devicePixelRatio || 1;
-let width = title.offsetWidth;
-
-canvas.width = width * dpr;
-canvas.height = 260 * dpr;
-
-canvas.style.width = width + "px";
-canvas.style.height = "260px";
-
-ctx.setTransform(1,0,0,1,0,0);
-ctx.scale(dpr, dpr);
-
-controls.style.width = width + "px";
+ return freq.map(f=>f/total);
 }
 
-window.addEventListener("load", resizeCanvas);
-window.addEventListener("resize", resizeCanvas);
-
-function draw(){
-requestAnimationFrame(draw);
-
-if(!analyser || !dataArray) return;
-
-analyser.getByteFrequencyData(dataArray);
-drawEQ();
+function entropy(set){
+ let diffs=[];
+ for(let i=1;i<set.length;i++) diffs.push(set[i]-set[i-1]);
+ return diffs.reduce((a,b)=>a+b,0);
 }
 
-function drawEQ(){
+function score(set,max){
+ let freq=buildStats(max);
+ let s=0;
 
-let dpr = window.devicePixelRatio || 1;
-let width = canvas.width / dpr;
-let heightCanvas = canvas.height / dpr;
+ set.forEach(n=>{
+  s+=1/(freq[n]+0.01);
+ });
 
-ctx.clearRect(0,0,width,heightCanvas);
+ s+=entropy(set)*0.3;
 
-let bars = Math.max(1, Math.floor(width / 8));
-let barWidth = width / bars;
+ let seq=0;
+ for(let i=1;i<set.length;i++){
+  if(set[i]-set[i-1]===1) seq++;
+ }
+ s-=seq*2;
 
-let step=Math.max(1, Math.floor(dataArray.length/bars));
-
-let yOffset = 5;
-let maxHeight = heightCanvas * 0.9;
-
-for(let i=0;i<bars;i++){
-
-let index=i*step;
-
-let value = dataArray[index] || 0;
-
-let percent=value/255;
-let h=Math.min(maxHeight, heightCanvas*percent);
-
-let x=i*barWidth;
-let y=heightCanvas-h + yOffset;
-
-let gradient=ctx.createLinearGradient(0,heightCanvas,0,0);
-gradient.addColorStop(0,"#ff0000");
-gradient.addColorStop(0.6,"#ff5555");
-gradient.addColorStop(1,"#ffffff");
-
-ctx.fillStyle=gradient;
-
-ctx.shadowBlur=5;
-ctx.shadowColor="red";
-
-ctx.fillRect(x,y,barWidth-1,h);
-
-ctx.shadowBlur=0;
-
-if(!peaks[i]) peaks[i]=0;
-
-if(h>peaks[i]){
-peaks[i]=h;
-}else{
-peaks[i]-=1.5;
+ return s;
 }
 
-if(peaks[i]<0) peaks[i]=0;
+function singularity(max,count){
 
-let peakY=heightCanvas-peaks[i] + yOffset;
+ let best=null, bestScore=-Infinity;
 
-ctx.fillStyle="#ff2222";
-ctx.fillRect(x,peakY,barWidth-1,3);
+ for(let i=0;i<200;i++){
 
+  let s=new Set();
+  while(s.size<count) s.add(Math.floor(Math.random()*max)+1);
+
+  let arr=[...s].sort((a,b)=>a-b);
+  let sc=score(arr,max);
+
+  if(sc>bestScore){
+   bestScore=sc;
+   best=arr;
+  }
+ }
+
+ if(!best){
+  let f=new Set();
+  while(f.size<count) f.add(Math.floor(Math.random()*max)+1);
+  return [...f];
+ }
+
+ return best;
 }
+
+function drawGame(game){
+
+ let main=[],extra=[],max=0;
+
+ if(game==="lotto"){max=49;main=singularity(max,lottoCount.value);}
+ else if(game==="mini"){max=42;main=singularity(max,miniCount.value);}
+ else if(game==="multi"){max=80;main=singularity(max,multiCount.value);}
+ else if(game==="keno"){max=70;main=singularity(max,kenoCount.value);}
+
+ else if(game==="pensja"){
+  max=35;
+  main=singularity(max,5);
+  extra=[Math.floor(Math.random()*4)+1];
+ }
+
+ else if(game==="euro"){
+  max=50;
+  main=singularity(max,euroCount.value);
+  extra=singularity(12,euroExtra.value);
+ }
+
+ else if(game==="szybkie"){max=32;main=singularity(max,szybkieCount.value);}
+
+ update(max,main);
+ render(game,main,extra);
 }
+
+function render(id,main,extra){
+ let div=document.getElementById(id+"Balls");
+ div.innerHTML="";
+ main.forEach(n=>{
+  let el=document.createElement("div");
+  el.className="ball "+id;
+  el.textContent=n;
+  div.appendChild(el);
+ });
+ extra.forEach(n=>{
+  let el=document.createElement("div");
+  el.className="ball extra "+id;
+  el.textContent=n;
+  div.appendChild(el);
+ });
+}
+
 </script>
 
 </body>
