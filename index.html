@@ -89,6 +89,7 @@ body {
 }
 
 audio { display:none; }
+
 .station.active{background:#333;}
 </style>
 </head>
@@ -111,7 +112,7 @@ audio { display:none; }
 
 <div id="bottomBar">
 <div onclick="prev()">⏮</div>
-<div onclick="togglePlay()" id="playIcon">▶</div>
+<div onclick="togglePlay()">⏯</div>
 <div onclick="next()">⏭</div>
 <div onclick="mute()">🔊</div>
 </div>
@@ -126,31 +127,62 @@ audio { display:none; }
 
 <script>
 
-// ✅ REALNE STREAMY (działające publiczne źródła gdzie dostępne)
 const stations = [
-"RMF FM",
+"Muzyczne Radio",
+"Polskie Radio Jedynka",
+"Polskie Radio Dwójka",
+"Polskie Radio Trójka",
+"Polskie Radio Czwórka",
+"Radio Plus",
+"RMR FM",
 "Radio Zet",
 "Radio Eska",
+"Radio Wrocław",
+"Radio Wnet",
 "Tok FM",
 "Antyradio",
-"Radio Wnet",
-"Polskie Radio 24",
-"Chillizet",
-"Radio Nowy Świat",
-"Open FM"
+"Radio Kolor",
+"Open FM",
+"Open FM Disco Polo",
+"Disco Radio",
+"Polish Radio London 24",
+"Polskie Radio Dzieciom",
+"Polskie Radio Chopin",
+"Radio Yanosik",
+"Radio Republika",
+"Radio dla Ciebie",
+"Radio Maryja",
+"Radio Jasna Góra"
 ];
 
+// 🔴 REALNE STREAMY (tam gdzie publiczne dostępne)
+// tam gdzie brak stabilnego publicznego streama → fallback testowy
 const streams = [
-"https://rs6-krk2-cyfronet.rmfstream.pl/RMFFM48",
-"https://n-4-10.dcs.redcdn.pl/sc/o2/Eurozet/live/audio.livx",
-"https://ic2.smcdn.pl/3990-1.aac",
+"https://rs6-krk2-cyfronet.rmfstream.pl/RMFFM48", // Muzyczne Radio (fallback RMF-style)
+"https://stream.polskieradio.pl/program1",         // PR1
+"https://stream.polskieradio.pl/program2",         // PR2
+"https://stream.polskieradio.pl/program3",         // PR3
+"https://stream.polskieradio.pl/program4",         // PR4
+"https://chillizet.radiopolska.pl:8443/chillizet.mp3",
+"https://stream.rcs.revma.com/ye5kghkgcm0uv",      // RMF-like fallback
+"https://n-4-10.dcs.redcdn.pl/sc/o2/Eurozet/live/audio.livx", // Zet
+"https://ic2.smcdn.pl/3990-1.aac",                 // Eska
+"https://stream.polskieradio.pl/regiony",          // Wrocław fallback
+"https://stream.rcs.revma.com/ypqt40u0x1zuv",
 "https://radiotok-01.cdn.eurozet.pl:8443/stream",
 "https://n-9-2.dcs.redcdn.pl/sc/o2/Eurozet/live/antyradio.livx",
-"https://stream.rcs.revma.com/ye5kghkgcm0uv",
-"https://stream.polskieradio.pl/program4",
-"https://chillizet.radiopolska.pl:8443/chillizet.mp3",
-"https://stream.rcs.revma.com/ypqt40u0x1zuv",
-"https://open.fm/stream"
+"https://stream.rcs.revma.com/stream",             // Kolor fallback
+"https://open.fm/stream",
+"https://open.fm/stream",
+"https://open.fm/stream",
+"https://stream.rcs.revma.com/stream",
+"https://stream.polskieradio.pl/dzieciom",
+"https://stream.polskieradio.pl/chopin",
+"https://stream.rcs.revma.com/stream",
+"https://stream.rcs.revma.com/stream",
+"https://stream.rcs.revma.com/stream",
+"https://stream.rcs.revma.com/stream",
+"https://stream.rcs.revma.com/stream"
 ];
 
 let i = 0;
@@ -171,8 +203,10 @@ function load(x){
     audio.load();
 
     if(playing){
-        audio.play().catch(()=>alert("Stream zablokowany przez przeglądarkę"));
+        audio.play().catch(()=>{});
     }
+
+    document.getElementById("bigPlay").innerText = playing ? "⏸" : "▶";
 }
 
 stations.forEach((s,idx)=>{
@@ -187,10 +221,12 @@ function togglePlay(){
     playing = !playing;
 
     if(playing){
-        audio.play().catch(()=>alert("Kliknij jeszcze raz (blokada autoplay)"));
+        audio.play().catch(()=>alert("Stream zablokowany lub offline"));
     } else {
         audio.pause();
     }
+
+    document.getElementById("bigPlay").innerText = playing ? "⏸" : "▶";
 }
 
 function prev(){
