@@ -3,22 +3,41 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Polskie Radio Online</title>
+<title>Smart Polskie Radio</title>
 
 <style>
 body {
     margin: 0;
     font-family: Arial, sans-serif;
-    background: #0f0f0f;
+    background: #0e0e0e;
     color: white;
 }
 
 header {
-    padding: 15px;
+    padding: 14px;
     text-align: center;
     font-size: 22px;
     background: #1a1a1a;
     font-weight: bold;
+}
+
+#filters {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    padding: 10px;
+    flex-wrap: wrap;
+}
+
+.filter {
+    padding: 6px 12px;
+    background: #2a2a2a;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.filter.active {
+    background: #ff3b3b;
 }
 
 #stations {
@@ -34,20 +53,25 @@ header {
     border-radius: 10px;
     padding: 10px;
     cursor: pointer;
-    transition: 0.2s;
     text-align: center;
+    transition: 0.2s;
 }
 
 .station:hover {
+    transform: scale(1.04);
     background: #2a2a2a;
-    transform: scale(1.03);
 }
 
 .station img {
     width: 60px;
     height: 60px;
     border-radius: 10px;
-    margin-bottom: 8px;
+}
+
+.tag {
+    font-size: 10px;
+    color: #aaa;
+    margin-top: 5px;
 }
 
 #player {
@@ -57,99 +81,151 @@ header {
     background: #111;
     padding: 10px;
     display: flex;
-    align-items: center;
     gap: 10px;
+    align-items: center;
     border-top: 1px solid #333;
 }
 
 button {
     padding: 8px 12px;
     border: none;
+    border-radius: 6px;
     background: #ff3b3b;
     color: white;
     cursor: pointer;
-    border-radius: 6px;
 }
 </style>
 </head>
 
 <body>
 
-<header>📻 Polskie Radio Online</header>
+<header>📻 Smart Polskie Radio</header>
+
+<div id="filters">
+    <div class="filter active" onclick="setFilter('all')">Wszystkie</div>
+    <div class="filter" onclick="setFilter('music')">Muzyczne</div>
+    <div class="filter" onclick="setFilter('talk')">Talk</div>
+    <div class="filter" onclick="setFilter('noncommercial')">Niekomercyjne</div>
+</div>
 
 <div id="stations"></div>
 
 <div id="player">
-    <div id="now">Kliknij stację aby rozpocząć</div>
+    <div id="now">Kliknij stację</div>
     <button onclick="stopRadio()">Stop</button>
     <audio id="audio" controls></audio>
 </div>
 
 <script>
 
-const stations = [
-    { name: "RMF FM", img: "https://myradioonline.pl/images/rmffm.png", url: "https://rs6-krk2-cyfronet.rmfstream.pl/RMFFM48" },
-    { name: "Radio ZET", img: "https://myradioonline.pl/images/radiozet.png", url: "https://zt03.cdn.eurozet.pl/ZET010.mp3" },
-    { name: "Radio ESKA", img: "https://myradioonline.pl/images/eska.png", url: "https://waw02-01.cdn.eurozet.pl/eska.mp3" },
-    { name: "VOX FM", img: "https://myradioonline.pl/images/voxfm.png", url: "https://stream.voxfm.pl/vox.mp3" },
-    { name: "Antyradio", img: "https://myradioonline.pl/images/antyradio.png", url: "https://n-4-1.dcs.redcdn.pl/sc/o2/Eurozet/live/antyradio.livx" }
+// 🎧 BAZA STACJI (rozszerzalna)
+let stations = [
+    {
+        name: "RMF FM",
+        img: "https://myradioonline.pl/images/rmffm.png",
+        url: "https://rs6-krk2-cyfronet.rmfstream.pl/RMFFM48",
+        type: "music",
+        tags: ["commercial"]
+    },
+    {
+        name: "Radio ZET",
+        img: "https://myradioonline.pl/images/radiozet.png",
+        url: "https://zt03.cdn.eurozet.pl/ZET010.mp3",
+        type: "music",
+        tags: ["commercial"]
+    },
+    {
+        name: "Radio Nowy Świat",
+        img: "https://upload.wikimedia.org/wikipedia/commons/6/6f/Radio_Nowy_%C5%9Awiat_logo.png",
+        url: "https://stream.rcs.revma.com/ypqt40u0x1zuv",
+        type: "music",
+        tags: ["noncommercial", "music"]
+    },
+    {
+        name: "Radio 357",
+        img: "https://upload.wikimedia.org/wikipedia/commons/2/2c/Radio_357_logo.png",
+        url: "https://stream.rcs.revma.com/ye5kghkgcm0uv",
+        type: "music",
+        tags: ["noncommercial", "music"]
+    },
+    {
+        name: "TOK FM",
+        img: "https://myradioonline.pl/images/tokfm.png",
+        url: "https://radiostream.pl/tuba9-1.mp3",
+        type: "talk",
+        tags: ["talk"]
+    },
+    {
+        name: "Radio Maryja",
+        img: "https://upload.wikimedia.org/wikipedia/commons/3/3b/Radio_Maryja_logo.png",
+        url: "https://radio-maryja.pl/live.mp3",
+        type: "talk",
+        tags: ["talk"]
+    }
 ];
+
+let currentFilter = "all";
 
 const stationsDiv = document.getElementById("stations");
 const audio = document.getElementById("audio");
 const now = document.getElementById("now");
 
-function playRadio(station) {
-    try {
-        now.textContent = "Ładowanie: " + station.name;
+function render() {
+    stationsDiv.innerHTML = "";
 
-        audio.pause();
-        audio.src = station.url;
-        audio.load();
-
-        const playPromise = audio.play();
-
-        if (playPromise !== undefined) {
-            playPromise
-                .then(() => {
-                    now.textContent = "Gra: " + station.name;
-                })
-                .catch(err => {
-                    now.textContent = "Błąd odtwarzania (blokada przeglądarki)";
-                    console.error(err);
-                });
-        }
-
-    } catch (e) {
-        console.error(e);
-        now.textContent = "Błąd odtwarzania";
-    }
-}
-
-function createStation(station) {
-    const div = document.createElement("div");
-    div.className = "station";
-
-    div.innerHTML = `
-        <img src="${station.img}" onerror="this.src='https://via.placeholder.com/60'">
-        <div>${station.name}</div>
-    `;
-
-    // 🔥 TYLKO KLIK — to działa zawsze
-    div.addEventListener("click", () => {
-        playRadio(station);
+    let filtered = stations.filter(s => {
+        if (currentFilter === "all") return true;
+        if (currentFilter === "music") return s.type === "music";
+        if (currentFilter === "talk") return s.type === "talk";
+        if (currentFilter === "noncommercial") return s.tags.includes("noncommercial");
     });
 
-    stationsDiv.appendChild(div);
+    filtered.forEach(station => {
+        const div = document.createElement("div");
+        div.className = "station";
+
+        div.innerHTML = `
+            <img src="${station.img}" onerror="this.src='https://via.placeholder.com/60'">
+            <div>${station.name}</div>
+            <div class="tag">${station.type}</div>
+        `;
+
+        // ✔ tylko klik (wymóg przeglądarek)
+        div.onclick = () => play(station);
+
+        stationsDiv.appendChild(div);
+    });
 }
 
-stations.forEach(createStation);
+function play(station) {
+    now.textContent = "Gra: " + station.name;
+
+    audio.pause();
+    audio.src = station.url;
+    audio.load();
+
+    audio.play().catch(err => {
+        console.log(err);
+        now.textContent = "Kliknij ponownie (blokada przeglądarki)";
+    });
+}
 
 function stopRadio() {
     audio.pause();
     audio.src = "";
     now.textContent = "Zatrzymano";
 }
+
+function setFilter(f) {
+    currentFilter = f;
+
+    document.querySelectorAll(".filter").forEach(el => el.classList.remove("active"));
+    event.target.classList.add("active");
+
+    render();
+}
+
+render();
 
 </script>
 
