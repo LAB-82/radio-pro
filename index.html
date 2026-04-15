@@ -7,14 +7,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#000000">
 
-<link rel="manifest" href="manifest.json">
-
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
-<link rel="apple-touch-icon" href="icon-192.png">
-
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<!-- 🔥 HARD NO-CACHE (KLUCZ) -->
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
 
@@ -36,6 +32,7 @@ display:flex;
 flex-direction:column;
 align-items:center;
 height:100vh;
+transition:0.4s;
 }
 
 body.day{
@@ -48,30 +45,23 @@ font-size:88px;
 margin-top:50px;
 text-align:center;
 color:#ff2a2a;
-}
-
-#proEqualizer{
-display:block;
-margin:0 auto;
-margin-top:30px;
-margin-bottom:30px;
-border-radius:8px;
+text-shadow:0 0 5px #ff2a2a,0 0 15px #ff0000,0 0 30px #ff0000,0 0 60px #ff0000;
 }
 
 canvas{
 display:block;
 height:260px;
+border-radius:8px;
+margin-top:30px;
+margin-bottom:30px;
 }
 
 #controls{
 display:flex;
 gap:8px;
-margin-top:20px;
-margin-bottom:20px;
 align-items:center;
-justify-content:center;
+justify-content:space-between;
 flex-wrap:wrap;
-width:100%;
 }
 
 button{
@@ -129,19 +119,6 @@ text-decoration:none;
 font-size:20px;
 }
 
-/* ================= MOBILE ONLY MINIMUM FIX ================= */
-@media (max-width: 768px){
-#title{
-font-size:42px;
-margin-top:20px;
-}
-
-canvas{
-width:95vw;
-height:200px;
-}
-}
-
 </style>
 </head>
 
@@ -179,28 +156,26 @@ const volume=document.getElementById("volume");
 const canvas=document.getElementById("proEqualizer");
 const ctx=canvas.getContext("2d");
 const controls=document.getElementById("controls");
+const title=document.getElementById("title");
 
 audio.volume=parseFloat(volume.value);
 
 let audioCtx, analyser, source, dataArray;
 let animationStarted=false;
 
-/* ================= PWA FIX (BEZ DOTYKANIA UI) ================= */
+/* ================= FULL CACHE KILL ================= */
+(async function killCache(){
+try{
 if('serviceWorker' in navigator){
-window.addEventListener('load', async () => {
-try {
 const regs = await navigator.serviceWorker.getRegistrations();
-for(let reg of regs){
+for(const reg of regs){
 await reg.unregister();
 }
-
-await navigator.serviceWorker.register('sw.js?v=' + Date.now());
-
-} catch(e){}
-});
 }
+}catch(e){}
+})();
 
-/* AUDIO */
+/* ================= AUDIO ================= */
 function setupAudio(){
 if(audioCtx) return;
 
@@ -225,7 +200,7 @@ if(audioCtx.state==="suspended"){
 audioCtx.resume();
 }
 
-audio.src=STREAM_URL;
+audio.src=STREAM_URL + "?v=" + Date.now(); // 🔥 CACHE BYPASS STREAM
 audio.play();
 
 if(!animationStarted){
@@ -251,7 +226,7 @@ volume.addEventListener("input",()=>{
 audio.volume=parseFloat(volume.value);
 });
 
-/* STABILNY CANVAS (NIE DYNAMIC WIDTH — TO ROZJEŻDŻAŁO UI) */
+/* ================= STABLE CANVAS (NO LAYOUT SHIFT) ================= */
 function resizeCanvas(){
 let dpr=window.devicePixelRatio||1;
 
@@ -268,7 +243,7 @@ ctx.scale(dpr,dpr);
 window.addEventListener("load",resizeCanvas);
 window.addEventListener("resize",resizeCanvas);
 
-/* EQ */
+/* ================= EQ ================= */
 function draw(){
 requestAnimationFrame(draw);
 
