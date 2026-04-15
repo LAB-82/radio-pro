@@ -336,17 +336,14 @@ let heightCanvas = canvas.height / dpr;
 
 ctx.clearRect(0,0,width,heightCanvas);
 
-/* pełna szerokość */
-let maxWidth = width;
-
-let bars = Math.max(1, Math.floor(maxWidth / 10));
-let barWidth = maxWidth / bars;
+/* idealne dopasowanie szerokości */
+let bars = Math.max(1, Math.floor(width / 9));
+let barWidth = width / bars;
 
 let step=Math.max(1, Math.floor(dataArray.length/bars));
 
 let yOffset = 5;
 
-/* obniżenie wysokości */
 let maxHeight = (heightCanvas * 0.9) - 19;
 
 for(let i=0;i<bars;i++){
@@ -354,43 +351,40 @@ for(let i=0;i<bars;i++){
 let index=i*step;
 let value = dataArray[index] || 0;
 
-let percent=value/255;
-let h=Math.min(maxHeight, heightCanvas*percent);
+/* lepsza dynamika */
+let percent = Math.pow(value / 255, 1.4);
+
+let targetHeight = heightCanvas * percent;
+let h = Math.min(maxHeight, targetHeight);
+
+/* płynność */
+if(!peaks[i]) peaks[i]=0;
+peaks[i] += (h - peaks[i]) * 0.25;
 
 let x=i*barWidth;
-let y=heightCanvas-h + yOffset;
+let y=heightCanvas-peaks[i] + yOffset;
 
-/* HUD – wydajny */
+/* HUD */
 let segmentHeight = 5;
-let gap = 3;
+let gap = 2;
 
-let segments = Math.floor(h / (segmentHeight + gap));
+let segments = Math.floor(peaks[i] / (segmentHeight + gap));
 
 ctx.fillStyle="#ff2a2a";
 ctx.shadowBlur=4;
 ctx.shadowColor="#ff0000";
 
-for(let s=0;s<segments;s+=2){
-let segY = y + h - (s+1)*(segmentHeight+gap);
-ctx.fillRect(x, segY, barWidth-2, segmentHeight);
+for(let s=0;s<segments;s++){
+let segY = y + peaks[i] - (s+1)*(segmentHeight+gap);
+ctx.fillRect(x, segY, barWidth-1, segmentHeight);
 }
 
 ctx.shadowBlur=0;
 
-if(!peaks[i]) peaks[i]=0;
-
-if(h>peaks[i]){
-peaks[i]=h;
-}else{
-peaks[i]-=1.2;
-}
-
-if(peaks[i]<0) peaks[i]=0;
-
 let peakY=heightCanvas-peaks[i] + yOffset;
 
 ctx.fillStyle="#ff2a2a";
-ctx.fillRect(x,peakY,barWidth-2,2);
+ctx.fillRect(x,peakY,barWidth-1,2);
 
 }
 }
