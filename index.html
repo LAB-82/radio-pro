@@ -16,9 +16,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-<!-- 🌌 SPACE FONTS -->
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Audiowide&display=swap" rel="stylesheet">
+<!-- 🌐 METAVERSE NEON FONT -->
+<link href="https://fonts.googleapis.com/css2?family=Tilt+Neon&display=swap" rel="stylesheet">
 
 <style>
 
@@ -30,13 +29,13 @@ height:100%;
 overflow:hidden;
 }
 
-/* ================= SPACE UI ONLY FONT CHANGE ================= */
+/* ================= ONLY FONT CHANGE ================= */
 body{
 background: radial-gradient(circle at center, #050000 0%, #000000 60%, #000000 100%);
 color:#ff2a2a;
 
-/* 🚀 SPACE UI PRO FONT */
-font-family:"Audiowide","Orbitron",sans-serif;
+/* 🌐 METAVERSE FONT */
+font-family:"Tilt Neon","Orbitron",sans-serif;
 
 display:flex;
 flex-direction:column;
@@ -106,8 +105,7 @@ height:45px;
 background: linear-gradient(145deg, #0a0000, #120000);
 color:#ff2a2a;
 
-/* 🚀 FONT ONLY CHANGE */
-font-family:"Audiowide","Orbitron",sans-serif;
+font-family:"Tilt Neon","Orbitron",sans-serif;
 
 cursor:pointer;
 transition:0.2s;
@@ -139,7 +137,7 @@ transform:scale(0.95);
 box-shadow:0 0 5px #ff0000;
 }
 
-/* ================= VOLUME ================= */
+/* ================= 🔥 FIXED VOLUME SLIDER ================= */
 .volumeWrapper{
 width:160px;
 height:45px;
@@ -149,20 +147,44 @@ justify-content:center;
 
 background: linear-gradient(145deg, #0a0000, #120000);
 
-border:1px solid #ff2a2a;
+/* FIX: stronger neon frame */
+border:2px solid #ff2a2a;
 
 box-shadow:
-0 0 10px #ff0000,
+0 0 12px #ff0000,
+0 0 25px rgba(255,0,0,0.6),
 inset 0 0 10px rgba(255,0,0,0.2);
+
+border-radius:6px;
 }
 
+/* slider track */
 #volume{
 width:120px;
 height:6px;
 appearance:none;
-background:#000;
+
+background:#0a0000;
+
+/* FIX: visible inner glow border */
 border:1px solid #ff2a2a;
-box-shadow:0 0 8px #ff0000;
+
+box-shadow:
+0 0 10px #ff0000,
+inset 0 0 8px rgba(255,0,0,0.5);
+
+border-radius:10px;
+}
+
+/* slider thumb */
+#volume::-webkit-slider-thumb{
+-webkit-appearance:none;
+width:14px;
+height:14px;
+background:#ff2a2a;
+box-shadow:0 0 12px #ff0000;
+border-radius:3px;
+cursor:pointer;
 }
 
 /* ================= MODE BUTTON ================= */
@@ -174,9 +196,7 @@ background:#000;
 border:1px solid #ff2a2a;
 box-shadow:0 0 15px #ff0000;
 color:#ff2a2a;
-
-/* FONT ONLY CHANGE */
-font-family:"Audiowide","Orbitron",sans-serif;
+font-family:"Tilt Neon","Orbitron",sans-serif;
 }
 
 /* ================= STATUS ================= */
@@ -271,7 +291,7 @@ font-size:18px;
 <script>
 const STREAM_URL="https://stream.rcs.revma.com/gzwc1xcq042vv";
 
-/* JS BEZ ZMIAN */
+/* BEZ ZMIAN JS */
 let audio=document.getElementById("audio");
 let volume=document.getElementById("volume");
 let playBtn=document.getElementById("playBtn");
