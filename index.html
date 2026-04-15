@@ -19,10 +19,7 @@ height:100vh;
 transition:0.4s;
 }
 
-body.day{
-background:#eaeaea;
-color:#000;
-}
+body.day{ background:#eaeaea; color:#000; }
 
 #title{
 font-size:88px;
@@ -30,15 +27,6 @@ margin-top:50px;
 text-align:center;
 color:#ff2a2a;
 text-shadow:0 0 6px #ff2a2a,0 0 12px #ff0000;
-}
-
-#proEqualizer{
-display:block;
-margin:0 auto;
-margin-top:30px;
-margin-bottom:30px;
-border-radius:8px;
-overflow:hidden;
 }
 
 canvas{
@@ -57,120 +45,25 @@ justify-content:space-between;
 }
 
 .volumeWrapper{
-width:160px;
-height:45px;
-display:flex;
-align-items:center;
-justify-content:center;
+width:160px;height:45px;
+display:flex;align-items:center;justify-content:center;
 background:#111;
 border:2px solid #ff2a2a;
 box-shadow:0 0 6px #ff2a2a;
-}
-
-body.day .volumeWrapper{
-background:#d6d6d6;
-box-shadow:0 0 10px #ff2a2a;
 }
 
 button{
-width:160px;
-height:45px;
-background:#111;
-color:white;
-cursor:pointer;
-font-family:'Orbitron';
-transition:0.2s;
+width:160px;height:45px;
+background:#111;color:white;
 border:2px solid #ff2a2a;
 box-shadow:0 0 6px #ff2a2a;
-}
-
-body.day button{
-background:#d6d6d6;
-color:#000;
-box-shadow:0 0 10px #ff2a2a;
+cursor:pointer;
 }
 
 #volume{
-width:120px;
-height:10px;
-appearance:none;
-border-radius:10px;
-outline:none;
+width:120px;height:10px;
 background:#000;
 border:1px solid #ff2a2a;
-box-shadow:0 0 4px #ff2a2a;
-}
-
-#volume.active{
-box-shadow:0 0 8px #ff0000;
-border:1px solid #ff0000;
-}
-
-#volume::-webkit-slider-thumb{
--webkit-appearance:none;
-width:16px;
-height:16px;
-border-radius:4px;
-background:#ff0000;
-box-shadow:0 0 8px #ff0000;
-cursor:pointer;
-}
-
-#volume::-moz-range-thumb{
-width:16px;
-height:16px;
-border:none;
-border-radius:4px;
-background:#ff0000;
-box-shadow:0 0 8px #ff0000;
-cursor:pointer;
-}
-
-.playActive{ color:#ff2a2a; text-shadow:0 0 8px #ff0000; }
-.stopActive{ color:#ff2a2a; text-shadow:0 0 8px #ff0000; }
-
-.muteActive{
-color:#ff2a2a;
-text-shadow:0 0 8px #ff0000;
-animation:pulseMute 0.8s infinite alternate;
-}
-
-@keyframes pulseMute{
-from{ transform:scale(1); }
-to{ transform:scale(1.05); }
-}
-
-#modeBtn{
-font-size:22px;
-width:66px;
-height:45px;
-}
-
-body:not(.day) #modeBtn{
-color:#ff2a2a;
-text-shadow:0 0 6px #ff0000;
-background:#111;
-box-shadow:0 0 6px #ff0000;
-}
-
-body.day #modeBtn{
-color:#ff2a2a;
-text-shadow:0 0 6px #ff0000;
-background:#d6d6d6;
-box-shadow:0 0 6px #ff0000;
-}
-
-#bottomLink{
-margin-top:10px;
-text-align:center;
-width:100%;
-}
-
-#bottomLink a{
-color:#ff2a2a;
-text-decoration:none;
-text-shadow:0 0 4px #ff0000;
-font-size:20px;
 }
 </style>
 </head>
@@ -192,10 +85,6 @@ font-size:20px;
 <button id="modeBtn" onclick="toggleMode()">🌙</button>
 </div>
 
-<div id="bottomLink">
-<a href="https://www.muzyczneradio.pl" target="_blank">www.muzyczneradio.pl</a>
-</div>
-
 <audio id="audio" crossorigin="anonymous"></audio>
 
 <script>
@@ -203,15 +92,6 @@ const STREAM_URL="https://stream.rcs.revma.com/gzwc1xcq042vv";
 
 const audio=document.getElementById("audio");
 const volume=document.getElementById("volume");
-
-const playBtn=document.getElementById("playBtn");
-const stopBtn=document.getElementById("stopBtn");
-const muteBtn=document.getElementById("muteBtn");
-const modeBtn=document.getElementById("modeBtn");
-
-const title=document.getElementById("title");
-const controls=document.getElementById("controls");
-
 const canvas=document.getElementById("proEqualizer");
 const ctx=canvas.getContext("2d");
 
@@ -243,22 +123,16 @@ draw();
 }
 
 function stopRadio(){ audio.pause(); }
-
 function muteRadio(){ audio.muted=!audio.muted; }
-
-function toggleMode(){
-document.body.classList.toggle("day");
-modeBtn.innerText=document.body.classList.contains("day")?"☀️":"🌙";
-}
 
 volume.addEventListener("input",()=>{
 audio.volume=parseFloat(volume.value);
 });
 
-/* resize */
+/* RESIZE */
 function resizeCanvas(){
 let dpr=window.devicePixelRatio||1;
-let width=title.offsetWidth;
+let width=document.getElementById("title").offsetWidth;
 
 canvas.width=width*dpr;
 canvas.height=260*dpr;
@@ -268,8 +142,6 @@ canvas.style.height="260px";
 
 ctx.setTransform(1,0,0,1,0,0);
 ctx.scale(dpr,dpr);
-
-controls.style.width=width+"px";
 }
 
 window.addEventListener("load",resizeCanvas);
@@ -277,13 +149,13 @@ window.addEventListener("resize",resizeCanvas);
 
 function draw(){
 requestAnimationFrame(draw);
-
 if(!analyser) return;
 
 analyser.getByteFrequencyData(dataArray);
 render();
 }
 
+/* ===== NEW RAINBOW EQ STYLE ===== */
 function render(){
 
 let dpr=window.devicePixelRatio||1;
@@ -292,36 +164,48 @@ let h=canvas.height/dpr;
 
 ctx.clearRect(0,0,w,h);
 
-/* HUD */
-ctx.strokeStyle="rgba(255,255,255,0.08)";
-for(let y=0;y<h;y+=20){
-ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke();
-}
-
-/* ===== REAL LOG SPECTRUM ===== */
-let bars=90;
-let step=Math.floor(dataArray.length / bars);
+let bars=80;
+let barWidth=w/bars;
 
 for(let i=0;i<bars;i++){
 
-/* logarithmic perception mapping */
-let logIndex=Math.floor(Math.pow(i/bars,2) * dataArray.length);
-let value=dataArray[logIndex]||0;
-
-let barHeight=(value/255)*(h*0.9);
-let barWidth=w/bars;
+let v=dataArray[Math.floor(i*(dataArray.length/bars))]||0;
+let percent=v/255;
+let barHeight=percent*h*0.9;
 
 let x=i*barWidth;
-let y=h-barHeight+5;
+let y=h-barHeight;
 
-ctx.fillStyle="#ff2a2a";
-ctx.shadowBlur=6;
-ctx.shadowColor="#ff0000";
+/* rainbow gradient per bar */
+let hue=(i/bars)*280+10;
 
-ctx.fillRect(x,y,barWidth-1,barHeight);
+ctx.fillStyle=`hsl(${hue},100%,55%)`;
+
+ctx.shadowBlur=18;
+ctx.shadowColor=`hsl(${hue},100%,60%)`;
+
+/* rounded bar look */
+roundRect(x,y,barWidth-2,barHeight,6);
+ctx.fill();
 
 ctx.shadowBlur=0;
 }
+}
+
+/* rounded rect helper */
+function roundRect(x,y,w,h,r){
+ctx.beginPath();
+ctx.moveTo(x+r,y);
+ctx.lineTo(x+w-r,y);
+ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+ctx.lineTo(x+w,y+h-r);
+ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
+ctx.lineTo(x+r,y+h);
+ctx.quadraticCurveTo(x,y+h,x,y+h-r);
+ctx.lineTo(x,y+r);
+ctx.quadraticCurveTo(x,y,x+r,y);
+ctx.closePath();
+ctx.fill();
 }
 </script>
 
