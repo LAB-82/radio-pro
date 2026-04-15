@@ -19,10 +19,7 @@ height:100vh;
 transition:0.4s;
 }
 
-body.day{
-background:#eaeaea;
-color:#000;
-}
+body.day{ background:#eaeaea; color:#000; }
 
 #title{
 font-size:88px;
@@ -41,11 +38,7 @@ border-radius:8px;
 overflow:hidden;
 }
 
-canvas{
-display:block;
-height:260px;
-border-radius:8px;
-}
+canvas{ display:block; height:260px; border-radius:8px; }
 
 #controls{
 display:flex;
@@ -57,121 +50,27 @@ justify-content:space-between;
 }
 
 .volumeWrapper{
-width:160px;
-height:45px;
-display:flex;
-align-items:center;
-justify-content:center;
-background:#111;
-border:2px solid #ff2a2a;
+width:160px;height:45px;
+display:flex;align-items:center;justify-content:center;
+background:#111;border:2px solid #ff2a2a;
 box-shadow:0 0 6px #ff2a2a;
-}
-
-body.day .volumeWrapper{
-background:#d6d6d6;
-box-shadow:0 0 10px #ff2a2a;
 }
 
 button{
-width:160px;
-height:45px;
-background:#111;
-color:white;
-cursor:pointer;
-font-family:'Orbitron';
-transition:0.2s;
+width:160px;height:45px;
+background:#111;color:white;
+cursor:pointer;font-family:'Orbitron';
 border:2px solid #ff2a2a;
 box-shadow:0 0 6px #ff2a2a;
 }
 
-body.day button{
-background:#d6d6d6;
-color:#000;
-box-shadow:0 0 10px #ff2a2a;
-}
-
 #volume{
-width:120px;
-height:10px;
-appearance:none;
-border-radius:10px;
-outline:none;
-background:#000;
-border:1px solid #ff2a2a;
-box-shadow:0 0 4px #ff2a2a;
+width:120px;height:10px;
+background:#000;border:1px solid #ff2a2a;
 }
 
-#volume.active{
-box-shadow:0 0 8px #ff0000;
-border:1px solid #ff0000;
-}
+#bottomLink a{ color:#ff2a2a;text-decoration:none; }
 
-#volume::-webkit-slider-thumb{
--webkit-appearance:none;
-width:16px;
-height:16px;
-border-radius:4px;
-background:#ff0000;
-box-shadow:0 0 8px #ff0000;
-cursor:pointer;
-}
-
-#volume::-moz-range-thumb{
-width:16px;
-height:16px;
-border:none;
-border-radius:4px;
-background:#ff0000;
-box-shadow:0 0 8px #ff0000;
-cursor:pointer;
-}
-
-.playActive{ color:#ff2a2a; text-shadow:0 0 8px #ff0000; }
-.stopActive{ color:#ff2a2a; text-shadow:0 0 8px #ff0000; }
-
-.muteActive{
-color:#ff2a2a;
-text-shadow:0 0 8px #ff0000;
-animation:pulseMute 0.8s infinite alternate;
-}
-
-@keyframes pulseMute{
-from{ transform:scale(1); }
-to{ transform:scale(1.05); }
-}
-
-#modeBtn{
-font-size:22px;
-width:66px;
-height:45px;
-}
-
-body:not(.day) #modeBtn{
-color:#ff2a2a;
-text-shadow:0 0 6px #ff0000;
-background:#111;
-box-shadow:0 0 6px #ff0000;
-}
-
-body.day #modeBtn{
-color:#ff2a2a;
-text-shadow:0 0 6px #ff0000;
-background:#d6d6d6;
-box-shadow:0 0 6px #ff0000;
-}
-
-#bottomLink{
-margin-top:10px;
-text-align:center;
-width:100%;
-}
-
-#bottomLink a{
-color:#ff2a2a;
-text-decoration:none;
-text-shadow:0 0 4px #ff0000;
-font-size:20px;
-}
 </style>
 </head>
 
@@ -215,27 +114,37 @@ const controls=document.getElementById("controls");
 const canvas=document.getElementById("proEqualizer");
 const ctx=canvas.getContext("2d");
 
-audio.volume=parseFloat(volume.value);
-
-let audioCtx, analyser, source, dataArray;
+let audioCtx, source, splitter;
+let analyserL, analyserR;
+let dataL, dataR;
 let peaks=[];
-let animationStarted=false;
 
 function setupAudio(){
+
 if(audioCtx) return;
 
-audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+audioCtx = new (window.AudioContext||window.webkitAudioContext)();
 
-source=audioCtx.createMediaElementSource(audio);
+source = audioCtx.createMediaElementSource(audio);
 
-analyser=audioCtx.createAnalyser();
-analyser.fftSize=512;
-analyser.smoothingTimeConstant=0.5;
+/* REAL STEREO SPLIT */
+splitter = audioCtx.createChannelSplitter(2);
 
-source.connect(analyser);
-analyser.connect(audioCtx.destination);
+analyserL = audioCtx.createAnalyser();
+analyserR = audioCtx.createAnalyser();
 
-dataArray=new Uint8Array(analyser.frequencyBinCount);
+analyserL.fftSize = 512;
+analyserR.fftSize = 512;
+
+source.connect(splitter);
+splitter.connect(analyserL,0);
+splitter.connect(analyserR,1);
+
+analyserL.connect(audioCtx.destination);
+analyserR.connect(audioCtx.destination);
+
+dataL = new Uint8Array(analyserL.frequencyBinCount);
+dataR = new Uint8Array(analyserR.frequencyBinCount);
 
 for(let i=0;i<300;i++) peaks[i]=0;
 }
@@ -244,41 +153,21 @@ function playRadio(){
 
 setupAudio();
 
-if(audioCtx.state === "suspended"){
-audioCtx.resume();
-}
+if(audioCtx.state==="suspended") audioCtx.resume();
 
 audio.src=STREAM_URL;
 audio.play();
 
-playBtn.classList.add("playActive");
-stopBtn.classList.remove("stopActive");
-
-if(!animationStarted){
-animationStarted=true;
 draw();
-}
 }
 
 function stopRadio(){
-
 audio.pause();
-
-stopBtn.classList.add("stopActive");
-playBtn.classList.remove("playActive");
-
-setTimeout(()=>{
-stopBtn.classList.remove("stopActive");
-},1000);
-
-for(let i=0;i<peaks.length;i++){
-peaks[i]=0;
-}
+for(let i=0;i<peaks.length;i++) peaks[i]=0;
 }
 
 function muteRadio(){
 audio.muted=!audio.muted;
-muteBtn.classList.toggle("muteActive");
 }
 
 function toggleMode(){
@@ -287,130 +176,79 @@ modeBtn.innerText=document.body.classList.contains("day")?"☀️":"🌙";
 }
 
 volume.addEventListener("input",()=>{
-let val=parseFloat(volume.value);
-audio.volume=val;
-
-if(Math.abs(val-0.5)<0.02){
-volume.classList.remove("active");
-}else{
-volume.classList.add("active");
-}
+audio.volume=parseFloat(volume.value);
 });
 
-volume.dispatchEvent(new Event("input"));
-
 function resizeCanvas(){
+let dpr=window.devicePixelRatio||1;
+let width=title.offsetWidth;
 
-let dpr = window.devicePixelRatio || 1;
-let width = title.offsetWidth;
+canvas.width=width*dpr;
+canvas.height=260*dpr;
 
-canvas.width = width * dpr;
-canvas.height = 260 * dpr;
-
-canvas.style.width = width + "px";
-canvas.style.height = "260px";
+canvas.style.width=width+"px";
+canvas.style.height="260px";
 
 ctx.setTransform(1,0,0,1,0,0);
-ctx.scale(dpr, dpr);
+ctx.scale(dpr,dpr);
 
-controls.style.width = width + "px";
+controls.style.width=width+"px";
 }
 
-window.addEventListener("load", resizeCanvas);
-window.addEventListener("resize", resizeCanvas);
+window.addEventListener("load",resizeCanvas);
+window.addEventListener("resize",resizeCanvas);
 
 function draw(){
 requestAnimationFrame(draw);
 
-if(!analyser || !dataArray) return;
+if(!analyserL||!analyserR) return;
 
-analyser.getByteFrequencyData(dataArray);
-drawEQ();
+analyserL.getByteFrequencyData(dataL);
+analyserR.getByteFrequencyData(dataR);
+
+render();
 }
 
-function drawEQ(){
+function render(){
 
-let dpr = window.devicePixelRatio || 1;
-let width = canvas.width / dpr;
-let heightCanvas = canvas.height / dpr;
+let dpr=window.devicePixelRatio||1;
+let width=canvas.width/dpr;
+let h=canvas.height/dpr;
 
-ctx.clearRect(0,0,width,heightCanvas);
+ctx.clearRect(0,0,width,h);
 
 /* HUD */
-ctx.save();
 ctx.strokeStyle="rgba(255,255,255,0.08)";
-ctx.lineWidth=1;
-
-for(let y=0;y<heightCanvas;y+=20){
-ctx.beginPath();
-ctx.moveTo(0,y);
-ctx.lineTo(width,y);
-ctx.stroke();
+for(let y=0;y<h;y+=20){
+ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(width,y);ctx.stroke();
 }
 
-for(let x=0;x<width;x+=30){
-ctx.beginPath();
-ctx.moveTo(x,0);
-ctx.lineTo(x,heightCanvas);
-ctx.stroke();
-}
-ctx.restore();
+let bars=60;
+let half=width/2;
+let bw=half/bars;
 
-/* ===== STEREO SPLIT ===== */
-let mid = Math.floor(dataArray.length / 2);
-
-let leftData = dataArray.slice(0, mid);
-let rightData = dataArray.slice(mid);
-
-let bars = Math.max(1, Math.floor(width / 4));
-let halfWidth = width / 2;
-
-function drawSide(data, offsetX){
-
-let barWidth = halfWidth / bars;
-let step = Math.max(1, Math.floor(data.length / bars));
-
-let yOffset = 5;
-let maxHeight = heightCanvas * 0.9;
+function drawSide(data, offset){
 
 for(let i=0;i<bars;i++){
 
-let index=i*step;
-let value = data[index] || 0;
+let v=data[i]||0;
+let hh=(v/255)*(h*0.9);
 
-let percent=value/255;
-let h=Math.min(maxHeight, heightCanvas*percent);
-
-let x=offsetX + i*barWidth;
-let y=heightCanvas-h + yOffset;
+let x=offset+i*bw;
+let y=h-hh+5;
 
 ctx.fillStyle="#ff2a2a";
 ctx.shadowBlur=6;
 ctx.shadowColor="#ff0000";
 
-ctx.fillRect(x,y,barWidth-1,h);
+ctx.fillRect(x,y,bw-1,hh);
 
 ctx.shadowBlur=0;
-
-if(!peaks[i]) peaks[i]=0;
-
-if(h>peaks[i]){
-peaks[i]=h;
-}else{
-peaks[i]-=1.5;
-}
-
-if(peaks[i]<0) peaks[i]=0;
-
-let peakY=heightCanvas-peaks[i] + yOffset;
-
-ctx.fillRect(x,peakY,barWidth-1,3);
 }
 }
 
-drawSide(leftData, 0);
-drawSide(rightData, halfWidth);
-
+drawSide(dataL,0);
+drawSide(dataR,half);
 }
 </script>
 
