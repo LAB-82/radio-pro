@@ -72,9 +72,13 @@ background:#d6d6d6;
 box-shadow:0 0 10px #ff2a2a;
 }
 
+/* 🔧 ALL BUTTONS MATCH PLAY EXACTLY */
 button{
 width:160px;
 height:45px;
+padding:0;
+margin:0;
+box-sizing:border-box;
 background:#111;
 color:white;
 cursor:pointer;
@@ -82,6 +86,10 @@ font-family:'Orbitron';
 transition:0.2s;
 border:2px solid #ff2a2a;
 box-shadow:0 0 6px #ff2a2a;
+display:flex;
+align-items:center;
+justify-content:center;
+line-height:45px;
 }
 
 body.day button{
@@ -143,7 +151,7 @@ to{ transform:scale(1.05); }
 #modeBtn{
 font-size:22px;
 width:66px;
-height:49px;
+height:45px;
 }
 
 body:not(.day) #modeBtn{
@@ -336,9 +344,28 @@ let heightCanvas = canvas.height / dpr;
 
 ctx.clearRect(0,0,width,heightCanvas);
 
-/* 🔧 KLUCZOWA POPRAWKA */
-let bars = Math.max(1, Math.floor(width / 4)); // było /8
+/* ===== HUD GRID (LIGHT WHITE RESTORED) ===== */
+ctx.save();
+ctx.strokeStyle="rgba(255,255,255,0.08)";
+ctx.lineWidth=1;
 
+for(let y=0;y<heightCanvas;y+=20){
+ctx.beginPath();
+ctx.moveTo(0,y);
+ctx.lineTo(width,y);
+ctx.stroke();
+}
+
+for(let x=0;x<width;x+=30){
+ctx.beginPath();
+ctx.moveTo(x,0);
+ctx.lineTo(x,heightCanvas);
+ctx.stroke();
+}
+ctx.restore();
+
+/* EQ */
+let bars = Math.max(1, Math.floor(width / 4));
 let barWidth = width / bars;
 let step=Math.max(1, Math.floor(dataArray.length/bars));
 
