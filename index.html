@@ -228,7 +228,7 @@ source=audioCtx.createMediaElementSource(audio);
 
 analyser=audioCtx.createAnalyser();
 analyser.fftSize=512;
-analyser.smoothingTimeConstant=0.7;
+analyser.smoothingTimeConstant=0.85;
 
 source.connect(analyser);
 analyser.connect(audioCtx.destination);
@@ -280,7 +280,9 @@ canvas.height = 260 * dpr;
 canvas.style.width = width + "px";
 canvas.style.height = "260px";
 
+ctx.setTransform(1,0,0,1,0,0);
 ctx.scale(dpr,dpr);
+
 controls.style.width = width + "px";
 }
 
@@ -296,7 +298,7 @@ drawEQ();
 }
 
 /* =======================
-   NOWY EQUALIZER (VECTOR STYLE)
+   FINAL: SPECTRUM BARS (jak na obrazku)
 ======================= */
 function drawEQ(){
 
@@ -306,31 +308,41 @@ let height = canvas.height / dpr;
 
 ctx.clearRect(0,0,width,height);
 
-let step = Math.floor(dataArray.length / 200);
+let bars = 64;
+let barWidth = width / bars;
+let step = Math.floor(dataArray.length / bars);
 
-ctx.lineWidth = 3;
-ctx.shadowBlur = 20;
+for(let i=0;i<bars;i++){
 
-ctx.beginPath();
+let v = dataArray[i * step] || 0;
+let percent = v / 255;
+let h = percent * height * 0.9;
 
-for(let i=0;i<200;i++){
+let x = i * barWidth;
+let y = height - h;
 
-let v = dataArray[i*step] || 0;
-let x = (i/200)*width;
-let y = height - (v/255)*height*0.9;
+let hue = i * 5;
 
-let hue = 0 + (i*2);
-ctx.strokeStyle = `hsl(${hue},100%,60%)`;
+// neon gradient per bar
+let grad = ctx.createLinearGradient(0, y, 0, height);
+grad.addColorStop(0, `hsl(${hue},100%,60%)`);
+grad.addColorStop(1, `hsl(${hue},100%,30%)`);
+
+ctx.fillStyle = grad;
+
+// glow
+ctx.shadowBlur = 18;
 ctx.shadowColor = `hsl(${hue},100%,50%)`;
 
-if(i===0){
-ctx.moveTo(x,y);
-}else{
-ctx.lineTo(x,y);
-}
-}
+// bar
+ctx.fillRect(x+1, y, barWidth-2, h);
 
-ctx.stroke();
+// peak cap (jak w equalizerach)
+ctx.fillStyle = "#fff";
+ctx.fillRect(x+1, y, barWidth-2, 2);
+
+ctx.shadowBlur = 0;
+}
 }
 </script>
 
