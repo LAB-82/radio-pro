@@ -1,222 +1,436 @@
-const express = require("express");
-const fetch = require("node-fetch");
-
-const app = express();
-
-/* =========================
-   TYLKO PEWNE STREAMY (MP3/AAC DIRECT)
-========================= */
-const FIXED = [
-  { name: "SomaFM Groove Salad", url: "http://ice4.somafm.com/groovesalad-128-mp3" },
-  { name: "SomaFM Drone Zone", url: "http://ice4.somafm.com/dronezone-128-mp3" },
-  { name: "HBR1 Trance (DE)", url: "http://radio.hbr1.com:19800/trance.ogg" },
-  { name: "HBR1 Dream Factory", url: "http://radio.hbr1.com:19800/dreamfactory.ogg" }
-];
-
-/* =========================
-   API (tylko filtr MP3/AAC)
-========================= */
-app.get("/stations", async (req, res) => {
-  try {
-    const r = await fetch(
-      "https://de1.api.radio-browser.info/json/stations/search?tagList=trance;techno;electronic&limit=80"
-    );
-
-    const data = await r.json();
-
-    const dynamic = data
-      .filter(s =>
-        s.url_resolved &&
-        (
-          s.codec === "MP3" ||
-          s.codec === "AAC" ||
-          s.codec === "AAC+"
-        )
-      )
-      .map(s => ({
-        name: s.name,
-        url: s.url_resolved
-      }));
-
-    res.json([...FIXED, ...dynamic]);
-
-  } catch {
-    res.json(FIXED);
-  }
-});
-
-/* =========================
-   FRONTEND (bez dolnego paska)
-========================= */
-app.get("/", (req, res) => {
-  res.send(`
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
-<title>RADIO FIX PRO</title>
+<title>Muzyczne Radio PRO</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#000000">
+
+<link rel="manifest" href="manifest.json">
+
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
 
 <style>
+
+html, body{
+margin:0;
+padding:0;
+width:100%;
+height:100%;
+overflow:hidden;
+}
+
+/* ================= CYBER BODY ================= */
 body{
-  margin:0;
-  font-family:Arial;
-  background:#0b0b0b;
-  color:white;
-  display:flex;
-  height:100vh;
+background: radial-gradient(circle at center, #050505 0%, #000000 60%, #000000 100%);
+color:#00ffea;
+font-family:'Orbitron',sans-serif;
+display:flex;
+flex-direction:column;
+align-items:center;
+height:100vh;
+transition:0.4s;
 }
 
-#sidebar{
-  width:340px;
-  background:#141414;
-  overflow:auto;
-  border-right:1px solid #222;
+/* ================= MATRIX TITLE ================= */
+#title{
+font-size:88px;
+margin-top:50px;
+text-align:center;
+
+/* MATRIX / CYBER GLOW */
+color:#00ff9d;
+text-shadow:
+0 0 5px #00ff9d,
+0 0 15px #00ffaa,
+0 0 30px #00ffcc,
+0 0 60px #00ffea;
+
+letter-spacing:6px;
+text-transform:uppercase;
+animation:glitch 2s infinite;
 }
 
-.station{
-  padding:10px;
-  border-bottom:1px solid #222;
-  cursor:pointer;
+/* glitch effect */
+@keyframes glitch{
+0%{transform:translate(0);}
+20%{transform:translate(-1px,1px);}
+40%{transform:translate(1px,-1px);}
+60%{transform:translate(-1px,0);}
+80%{transform:translate(1px,1px);}
+100%{transform:translate(0);}
 }
 
-.station:hover{background:#222;}
-.station.active{background:#333;font-weight:bold;}
-
-#main{
-  flex:1;
-  display:flex;
-  flex-direction:column;
+/* ================= CANVAS ================= */
+#proEqualizer{
+display:block;
+margin:0 auto;
+margin-top:30px;
+margin-bottom:30px;
+border-radius:10px;
+overflow:hidden;
+box-shadow:
+0 0 20px #00ff9d,
+0 0 40px #00ffaa;
 }
 
-#top{
-  padding:10px;
-  background:#1a1a1a;
-  display:flex;
-  justify-content:space-between;
+canvas{
+display:block;
+height:260px;
+border-radius:10px;
 }
 
-#player{
-  flex:1;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  background:black;
-  flex-direction:column;
+/* ================= CYBER BUTTONS ================= */
+#controls{
+display:flex;
+gap:10px;
+margin-top:20px;
+margin-bottom:20px;
+align-items:center;
+justify-content:space-between;
+flex-wrap:wrap;
 }
 
-#play{
-  font-size:100px;
-  cursor:pointer;
-  user-select:none;
+/* MAIN CYBER BUTTON STYLE */
+button{
+width:160px;
+height:45px;
+
+background: linear-gradient(145deg, #050505, #0a0a0a);
+color:#00ffcc;
+
+cursor:pointer;
+font-family:'Orbitron';
+transition:0.2s;
+
+border:1px solid #00ff9d;
+
+box-shadow:
+0 0 10px #00ff9d,
+inset 0 0 10px rgba(0,255,170,0.2);
+
+display:flex;
+align-items:center;
+justify-content:center;
+
+letter-spacing:2px;
+text-transform:uppercase;
 }
 
-audio{display:none;}
+/* hover cyber glow */
+button:hover{
+transform:scale(1.05);
+box-shadow:
+0 0 20px #00ffea,
+0 0 40px #00ffaa;
+border-color:#00ffea;
+}
+
+/* active press */
+button:active{
+transform:scale(0.95);
+box-shadow:0 0 5px #00ff9d;
+}
+
+/* ================= VOLUME ================= */
+.volumeWrapper{
+width:160px;
+height:45px;
+display:flex;
+align-items:center;
+justify-content:center;
+
+background: linear-gradient(145deg, #050505, #0a0a0a);
+
+border:1px solid #00ff9d;
+
+box-shadow:
+0 0 10px #00ff9d,
+inset 0 0 10px rgba(0,255,170,0.2);
+}
+
+#volume{
+width:120px;
+height:6px;
+appearance:none;
+background:#000;
+border:1px solid #00ff9d;
+box-shadow:0 0 8px #00ff9d;
+}
+
+/* thumb cyber */
+#volume::-webkit-slider-thumb{
+-webkit-appearance:none;
+width:14px;
+height:14px;
+background:#00ffcc;
+box-shadow:0 0 10px #00ffcc;
+border-radius:2px;
+cursor:pointer;
+}
+
+/* ================= MODE BUTTON ================= */
+#modeBtn{
+font-size:22px;
+width:66px;
+height:49px;
+background:#000;
+border:1px solid #00ff9d;
+box-shadow:0 0 15px #00ff9d;
+color:#00ff9d;
+}
+
+#modeBtn:hover{
+box-shadow:0 0 30px #00ffaa;
+}
+
+/* ================= STATUS COLORS ================= */
+.playActive{
+color:#00ff9d;
+text-shadow:0 0 10px #00ff9d;
+}
+
+.stopActive{
+color:#ff004c;
+text-shadow:0 0 10px #ff004c;
+}
+
+.muteActive{
+color:#ffaa00;
+text-shadow:0 0 10px orange;
+animation:pulseMute 0.8s infinite alternate;
+}
+
+@keyframes pulseMute{
+from{transform:scale(1);}
+to{transform:scale(1.1);}
+}
+
+/* ================= MOBILE FIX ================= */
+@media (max-width: 768px){
+
+#title{
+font-size:42px;
+margin-top:20px;
+letter-spacing:3px;
+}
+
+canvas{
+width:95vw;
+height:200px;
+}
+
+#controls{
+justify-content:center;
+gap:8px;
+}
+
+button, .volumeWrapper{
+width:140px;
+height:44px;
+}
+}
+
+#bottomLink{
+margin-top:10px;
+text-align:center;
+width:100%;
+}
+
+#bottomLink a{
+color:#00ff9d;
+text-decoration:none;
+text-shadow:0 0 10px #00ff9d;
+font-size:18px;
+}
+
 </style>
 </head>
 
 <body>
 
-<div id="sidebar"></div>
+<div id="title">Muzyczne Radio</div>
 
-<div id="main">
+<canvas id="proEqualizer"></canvas>
 
-<div id="top">🎧 RADIO FIX PRO (ONLY PLAYABLE STREAMS)</div>
+<div id="controls">
 
-<div id="player">
-  <div id="play">▶</div>
+<button id="playBtn" onclick="playRadio()">PLAY</button>
+<button id="stopBtn" onclick="stopRadio()">STOP</button>
+<button id="muteBtn" onclick="muteRadio()">MUTE 🔊</button>
+
+<div class="volumeWrapper">
+<input id="volume" type="range" min="0" max="1" step="0.01" value="0.5">
 </div>
 
+<button id="modeBtn" onclick="toggleMode()">🌙</button>
+
 </div>
 
-<audio id="audio"></audio>
+<div id="bottomLink">
+<a href="https://www.muzyczneradio.pl" target="_blank">www.muzyczneradio.pl</a>
+</div>
+
+<audio id="audio" crossorigin="anonymous"></audio>
 
 <script>
+const STREAM_URL="https://stream.rcs.revma.com/gzwc1xcq042vv";
 
-let stations = [];
-let index = 0;
-let playing = false;
+const audio=document.getElementById("audio");
+const volume=document.getElementById("volume");
 
-const audio = document.getElementById("audio");
-const sidebar = document.getElementById("sidebar");
-const playBtn = document.getElementById("play");
+const playBtn=document.getElementById("playBtn");
+const stopBtn=document.getElementById("stopBtn");
+const muteBtn=document.getElementById("muteBtn");
+const modeBtn=document.getElementById("modeBtn");
 
-/* LOAD */
-async function loadStations(){
-  const r = await fetch("/stations");
-  stations = await r.json();
+const title=document.getElementById("title");
+const controls=document.getElementById("controls");
 
-  render();
-  load(0);
+const canvas=document.getElementById("proEqualizer");
+const ctx=canvas.getContext("2d");
+
+audio.volume=parseFloat(volume.value);
+
+let audioCtx, analyser, source, dataArray;
+let peaks=[];
+let animationStarted=false;
+
+/* JS NIE ZMIENIONE */
+function setupAudio(){
+if(audioCtx) return;
+
+audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+
+source=audioCtx.createMediaElementSource(audio);
+
+analyser=audioCtx.createAnalyser();
+analyser.fftSize=512;
+analyser.smoothingTimeConstant=0.5;
+
+source.connect(analyser);
+analyser.connect(audioCtx.destination);
+
+dataArray=new Uint8Array(analyser.frequencyBinCount);
+
+for(let i=0;i<300;i++) peaks[i]=0;
 }
 
-/* RENDER */
-function render(){
-  sidebar.innerHTML = "";
+function playRadio(){
+setupAudio();
+if(audioCtx.state === "suspended") audioCtx.resume();
 
-  stations.forEach((s,i)=>{
-    const div = document.createElement("div");
-    div.className="station";
-    div.innerText=s.name;
-    div.onclick=()=>load(i);
-    sidebar.appendChild(div);
-  });
+audio.src=STREAM_URL;
+audio.play();
+
+playBtn.classList.add("playActive");
+stopBtn.classList.remove("stopActive");
+
+if(!animationStarted){
+animationStarted=true;
+draw();
+}
 }
 
-/* LOAD + VALIDATION */
-function load(i){
-  index = i;
+function stopRadio(){
+audio.pause();
 
-  const station = stations[index];
-  if(!station) return;
+stopBtn.classList.add("stopActive");
+playBtn.classList.remove("playActive");
 
-  document.querySelectorAll(".station").forEach((el,idx)=>{
-    el.classList.toggle("active", idx===i);
-  });
+setTimeout(()=>{
+stopBtn.classList.remove("stopActive");
+},1000);
 
-  audio.src = station.url;
-  audio.load();
-
-  if(playing){
-    audio.play().catch(()=>next());
-  }
+for(let i=0;i<peaks.length;i++) peaks[i]=0;
 }
 
-/* PLAY */
-function toggle(){
-  playing = !playing;
-
-  if(playing){
-    audio.play().catch(()=>next());
-    playBtn.innerText="⏸";
-  } else {
-    audio.pause();
-    playBtn.innerText="▶";
-  }
+function muteRadio(){
+audio.muted=!audio.muted;
+muteBtn.classList.toggle("muteActive");
 }
 
-/* AUTO SKIP (KLUCZ) */
-audio.onerror = () => next();
-audio.onstalled = () => next();
-
-/* NEXT */
-function next(){
-  index = (index + 1) % stations.length;
-  load(index);
+function toggleMode(){
+document.body.classList.toggle("day");
+modeBtn.innerText=document.body.classList.contains("day")?"☀️":"🌙";
 }
 
-/* CLICK */
-playBtn.onclick = toggle;
+volume.addEventListener("input",()=>{
+let val=parseFloat(volume.value);
+audio.volume=val;
+volume.classList.toggle("active",Math.abs(val-0.5)>=0.02);
+});
 
-loadStations();
+volume.dispatchEvent(new Event("input"));
 
+function resizeCanvas(){
+let dpr = window.devicePixelRatio || 1;
+let width = title.offsetWidth;
+
+canvas.width = width * dpr;
+canvas.height = 260 * dpr;
+
+canvas.style.width = width + "px";
+canvas.style.height = "260px";
+
+ctx.setTransform(1,0,0,1,0,0);
+ctx.scale(dpr, dpr);
+
+controls.style.width = width + "px";
+}
+
+window.addEventListener("load", resizeCanvas);
+window.addEventListener("resize", resizeCanvas);
+
+function draw(){
+requestAnimationFrame(draw);
+if(!analyser || !dataArray) return;
+
+analyser.getByteFrequencyData(dataArray);
+drawEQ();
+}
+
+function drawEQ(){
+let dpr = window.devicePixelRatio || 1;
+let width = canvas.width / dpr;
+let heightCanvas = canvas.height / dpr;
+
+ctx.clearRect(0,0,width,heightCanvas);
+
+let bars = Math.max(1, Math.floor(width / 8));
+let barWidth = width / bars;
+let step=Math.max(1, Math.floor(dataArray.length/bars));
+
+for(let i=0;i<bars;i++){
+
+let value = dataArray[i*step] || 0;
+let h = (value/255)*heightCanvas;
+
+let x=i*barWidth;
+let y=heightCanvas-h;
+
+let gradient=ctx.createLinearGradient(0,heightCanvas,0,0);
+gradient.addColorStop(0,"#003322");
+gradient.addColorStop(0.5,"#00ff9d");
+gradient.addColorStop(1,"#00ffff");
+
+ctx.fillStyle=gradient;
+ctx.shadowBlur=10;
+ctx.shadowColor="#00ff9d";
+
+ctx.fillRect(x,y,barWidth-1,h);
+ctx.shadowBlur=0;
+}
+}
 </script>
 
 </body>
 </html>
-  `);
-});
-
-/* ========================= */
-app.listen(3000, () => {
-  console.log("RADIO FIX RUNNING http://localhost:3000");
-});
