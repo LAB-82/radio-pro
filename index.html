@@ -336,7 +336,7 @@ let heightCanvas = canvas.height / dpr;
 
 ctx.clearRect(0,0,width,heightCanvas);
 
-/* ===== HUD GRID BACKGROUND ===== */
+/* HUD GRID */
 ctx.save();
 ctx.strokeStyle="rgba(255,42,42,0.08)";
 ctx.lineWidth=1;
@@ -356,17 +356,16 @@ ctx.stroke();
 }
 ctx.restore();
 
-/* ===== CLIP RIGHT SIDE (TO MIDDLE) ===== */
+/* FULL WIDTH EQ (FIXED) */
 ctx.save();
-ctx.beginPath();
-ctx.rect(0,0,width/2,heightCanvas);
-ctx.clip();
 
+/* ❌ usunięte przycięcie do połowy */
+ 
 let bars = Math.max(1, Math.floor(width / 8));
 let barWidth = width / bars;
 let step=Math.max(1, Math.floor(dataArray.length/bars));
 
-let yOffset = 5 + 19; // ~0.5cm visual downshift
+let yOffset = 5 + 19;
 let maxHeight = (heightCanvas * 0.9) - 19;
 
 for(let i=0;i<bars;i++){
