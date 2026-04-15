@@ -3,75 +3,76 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Polskie Radio Online</title>
+<title>Radio Polska App</title>
 
 <style>
 body {
     margin: 0;
     font-family: Arial, sans-serif;
-    background: #0f0f0f;
+    background: #0b0b0b;
     color: white;
+    display: flex;
+    height: 100vh;
 }
 
-header {
-    padding: 14px;
-    text-align: center;
-    font-size: 22px;
-    background: #1a1a1a;
-    font-weight: bold;
-}
-
-#stations {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-    gap: 12px;
-    padding: 15px;
-    padding-bottom: 90px;
+/* LEWA LISTA */
+#sidebar {
+    width: 320px;
+    background: #151515;
+    overflow-y: auto;
+    border-right: 1px solid #222;
 }
 
 .station {
-    background: #1c1c1c;
-    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
     padding: 10px;
     cursor: pointer;
-    text-align: center;
+    border-bottom: 1px solid #222;
     transition: 0.2s;
 }
 
 .station:hover {
-    transform: scale(1.04);
-    background: #2a2a2a;
+    background: #222;
 }
 
 .station img {
-    width: 60px;
-    height: 60px;
-    border-radius: 10px;
-    margin-bottom: 8px;
+    width: 45px;
+    height: 45px;
+    border-radius: 8px;
+}
+
+.station span {
+    font-size: 14px;
+}
+
+/* PRAWA STRONA */
+#main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
 }
 
 #player {
-    position: fixed;
-    bottom: 0;
+    flex: 1;
+    background: black;
+}
+
+iframe {
     width: 100%;
-    background: #111;
-    padding: 10px;
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    border-top: 1px solid #333;
-}
-
-button {
-    padding: 8px 12px;
+    height: 100%;
     border: none;
-    border-radius: 6px;
-    background: #ff3b3b;
-    color: white;
-    cursor: pointer;
 }
 
-#status {
+/* DOLNY BAR */
+#nowPlaying {
+    height: 60px;
+    background: #111;
+    display: flex;
+    align-items: center;
+    padding: 0 15px;
+    border-top: 1px solid #222;
     font-size: 14px;
     color: #aaa;
 }
@@ -80,78 +81,87 @@ button {
 
 <body>
 
-<header>📻 Polskie Radio Online</header>
+<!-- SIDEBAR -->
+<div id="sidebar"></div>
 
-<div id="stations"></div>
-
-<div id="player">
-    <div id="status">Kliknij stację aby uruchomić</div>
-    <button onclick="stopRadio()">Stop</button>
+<!-- MAIN -->
+<div id="main">
+    <div id="player">
+        <iframe id="frame" src=""></iframe>
+    </div>
+    <div id="nowPlaying">Wybierz stację aby rozpocząć</div>
 </div>
 
 <script>
 
-// 📻 PROSTA LISTA (tylko działające / stabilne przez MyRadioOnline)
+// 📻 LISTA STACJI (MyRadioOnline - stabilne linki embed)
 const stations = [
-    {
-        name: "Radio Nowy Świat",
-        img: "https://upload.wikimedia.org/wikipedia/commons/6/6f/Radio_Nowy_%C5%9Awiat_logo.png",
-        url: "https://myradioonline.pl/radio-nowy-swiat",
-    },
     {
         name: "Radio 357",
         img: "https://upload.wikimedia.org/wikipedia/commons/2/2c/Radio_357_logo.png",
-        url: "https://myradioonline.pl/radio-357",
+        url: "https://myradioonline.pl/radio-357"
+    },
+    {
+        name: "Radio Nowy Świat",
+        img: "https://upload.wikimedia.org/wikipedia/commons/6/6f/Radio_Nowy_%C5%9Awiat_logo.png",
+        url: "https://myradioonline.pl/radio-nowy-swiat"
     },
     {
         name: "TOK FM",
         img: "https://myradioonline.pl/images/tokfm.png",
-        url: "https://myradioonline.pl/tok-fm",
+        url: "https://myradioonline.pl/tok-fm"
     },
     {
         name: "Antyradio",
         img: "https://myradioonline.pl/images/antyradio.png",
-        url: "https://myradioonline.pl/antyradio",
+        url: "https://myradioonline.pl/antyradio"
     },
     {
-        name: ":contentReference[oaicite:1]{index=1}",
+        name: ":contentReference[oaicite:0]{index=0}",
         img: "https://myradioonline.pl/images/muzyczneradio.png",
         url: "https://myradioonline.pl/muzyczne-radio"
+    },
+    {
+        name: "Radio Wrocław",
+        img: "https://myradioonline.pl/images/radiowroclaw.png",
+        url: "https://myradioonline.pl/radio-wroclaw"
+    },
+    {
+        name: "Radio Kraków",
+        img: "https://myradioonline.pl/images/radiokrakow.png",
+        url: "https://myradioonline.pl/radio-krakow"
+    },
+    {
+        name: "Radio Poznań",
+        img: "https://myradioonline.pl/images/radiopoznan.png",
+        url: "https://myradioonline.pl/radio-poznan"
     }
 ];
 
-const stationsDiv = document.getElementById("stations");
-const status = document.getElementById("status");
+const sidebar = document.getElementById("sidebar");
+const frame = document.getElementById("frame");
+const nowPlaying = document.getElementById("nowPlaying");
 
-// 🔥 KLUCZ: otwieramy MyRadioOnline (działa zawsze)
 function play(station) {
-    status.textContent = "Otwieranie: " + station.name;
+    nowPlaying.textContent = "🎧 Teraz gra: " + station.name;
 
-    // otwiera w tej samej karcie (stabilne działanie streamu)
-    window.open(station.url, "_blank");
-
-    status.textContent = "Odtwarzanie w MyRadioOnline: " + station.name;
-}
-
-function stopRadio() {
-    status.textContent = "Zatrzymano (zamknij kartę radia)";
+    // 🔥 KLUCZ: radio gra w środku aplikacji
+    frame.src = station.url;
 }
 
 function render() {
-    stationsDiv.innerHTML = "";
-
     stations.forEach(station => {
         const div = document.createElement("div");
         div.className = "station";
 
         div.innerHTML = `
-            <img src="${station.img}" onerror="this.src='https://via.placeholder.com/60'">
-            <div>${station.name}</div>
+            <img src="${station.img}" onerror="this.src='https://via.placeholder.com/45'">
+            <span>${station.name}</span>
         `;
 
         div.onclick = () => play(station);
 
-        stationsDiv.appendChild(div);
+        sidebar.appendChild(div);
     });
 }
 
