@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Trance & Techno Radio</title>
+<title>Trance Techno Radio</title>
 
 <style>
 body {
@@ -89,6 +89,7 @@ body {
 }
 
 audio { display:none; }
+
 .station.active{background:#333;}
 </style>
 </head>
@@ -99,9 +100,9 @@ audio { display:none; }
 
 <div id="main">
 
-<div id="header">🎧 TRANCE & TECHNO RADIO WORLD</div>
+<div id="header">🎧 TRANCE / TECHNO WORLD</div>
 
-<div id="meta">🌍 Live Electronic Music Streams</div>
+<div id="meta">🌍 Live Electronic Radio Streams</div>
 
 <div id="playerBox">
 
@@ -126,42 +127,42 @@ audio { display:none; }
 
 <script>
 
-// 🌍 REALNE STACJE TRANCE / TECHNO
+// 🌍 REALNE STACJE (trance / techno / EDM)
 const stations = [
-"DI.FM Trance",
-"DI.FM Techno",
-"Afterhours.FM Trance",
-"AH.FM Main Stage",
-"Trance Energy Radio",
-"1Mix Trance",
-"1Mix Techno",
+"DI.FM - Trance",
+"DI.FM - Techno",
+"Afterhours FM (AH.FM)",
+"1Mix Radio Trance",
+"1Mix Radio Techno",
+"Sunshine Live - Techno",
+"Technobase FM",
 "Party107 Trance",
 "EDM Radio Trance",
-"Sunshine Live Techno",
-"Technobase FM",
-"Pure FM Trance",
-"ETN FM Trance",
+"Record Trance (Radio Record)",
 "Global DJ Broadcast",
-"Radio Record Trance"
+"ETN.FM Trance",
+"Pure FM Trance",
+"Intense Radio (Trance)",
+"Frisky Radio (Progressive/Techno)"
 ];
 
-// 🎧 REALNE STREAMY (public radio / online stations)
+// 🎧 REAL STREAMY (public endpoints / stable sources)
 const streams = [
 "https://prem2.di.fm/trance_hi",
 "https://prem2.di.fm/techno_hi",
 "https://listen.afterhours.fm/aafm",
-"https://ah.fm/stream",
-"https://stream.tranceenergy.nl/stream",
 "https://listen.1mix.co.uk/1mix_trance",
 "https://listen.1mix.co.uk/1mix_techno",
-"https://stream.party107.com/party107",
-"https://edmradio.ru:8000/trance",
 "https://stream.sunshine-live.de/techno",
 "https://technobase.fm/stream",
-"https://purefm.de/stream",
+"https://stream.party107.com/party107",
+"https://edmradio.ru:8000/trance",
+"https://radiorecord.hostingradio.ru/trance96.aacp",
+"https://globaldjbroadcast.com/stream",
 "https://etn.fm/stream",
-"https://di.fm/globaldj",
-"https://radiorecord.hostingradio.ru/trance96.aacp"
+"https://purefm.de/stream",
+"https://stream.intenseradio.net/trance",
+"https://friskyradio.com/stream"
 ];
 
 let i = 0;
@@ -198,7 +199,7 @@ function togglePlay(){
     playing = !playing;
 
     if(playing){
-        audio.play().catch(()=>alert("Kliknij ponownie (blokada autoplay)"));
+        audio.play().catch(()=>alert("Kliknij ponownie (blokada przeglądarki)"));
     } else {
         audio.pause();
     }
