@@ -28,10 +28,10 @@ height:100%;
 overflow:hidden;
 }
 
-/* ================= CYBER BODY ================= */
+/* ================= RED RADIO BODY ================= */
 body{
-background: radial-gradient(circle at center, #050505 0%, #000000 60%, #000000 100%);
-color:#00ffea;
+background: radial-gradient(circle at center, #050000 0%, #000000 60%, #000000 100%);
+color:#ff2a2a;
 font-family:'Orbitron',sans-serif;
 display:flex;
 flex-direction:column;
@@ -40,33 +40,43 @@ height:100vh;
 transition:0.4s;
 }
 
-/* ================= MATRIX TITLE ================= */
+/* ================= RADIO LOGO STYLE TITLE ================= */
 #title{
-font-size:88px;
+font-size:92px;
 margin-top:50px;
 text-align:center;
 
-/* MATRIX / CYBER GLOW */
-color:#00ff9d;
-text-shadow:
-0 0 5px #00ff9d,
-0 0 15px #00ffaa,
-0 0 30px #00ffcc,
-0 0 60px #00ffea;
-
-letter-spacing:6px;
 text-transform:uppercase;
-animation:glitch 2s infinite;
+letter-spacing:8px;
+font-weight:800;
+
+/* RADIO LOGO STYLE */
+color:#ff1e1e;
+background: linear-gradient(180deg, #ff4d4d, #b30000);
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+
+text-shadow:
+0 0 5px #ff1e1e,
+0 0 15px #ff0000,
+0 0 30px #cc0000,
+0 0 60px #8b0000;
+
+position:relative;
 }
 
-/* glitch effect */
-@keyframes glitch{
-0%{transform:translate(0);}
-20%{transform:translate(-1px,1px);}
-40%{transform:translate(1px,-1px);}
-60%{transform:translate(-1px,0);}
-80%{transform:translate(1px,1px);}
-100%{transform:translate(0);}
+/* delikatny glow puls */
+#title::after{
+content:"";
+position:absolute;
+left:50%;
+top:50%;
+transform:translate(-50%,-50%);
+width:100%;
+height:100%;
+background:radial-gradient(circle, rgba(255,0,0,0.15), transparent 70%);
+filter:blur(10px);
+z-index:-1;
 }
 
 /* ================= CANVAS ================= */
@@ -78,8 +88,8 @@ margin-bottom:30px;
 border-radius:10px;
 overflow:hidden;
 box-shadow:
-0 0 20px #00ff9d,
-0 0 40px #00ffaa;
+0 0 20px #ff0000,
+0 0 40px #aa0000;
 }
 
 canvas{
@@ -88,7 +98,7 @@ height:260px;
 border-radius:10px;
 }
 
-/* ================= CYBER BUTTONS ================= */
+/* ================= RED CYBER BUTTONS ================= */
 #controls{
 display:flex;
 gap:10px;
@@ -99,23 +109,23 @@ justify-content:space-between;
 flex-wrap:wrap;
 }
 
-/* MAIN CYBER BUTTON STYLE */
+/* BUTTON STYLE */
 button{
 width:160px;
 height:45px;
 
-background: linear-gradient(145deg, #050505, #0a0a0a);
-color:#00ffcc;
+background: linear-gradient(145deg, #0a0000, #120000);
+color:#ff2a2a;
 
 cursor:pointer;
 font-family:'Orbitron';
 transition:0.2s;
 
-border:1px solid #00ff9d;
+border:1px solid #ff2a2a;
 
 box-shadow:
-0 0 10px #00ff9d,
-inset 0 0 10px rgba(0,255,170,0.2);
+0 0 10px #ff0000,
+inset 0 0 10px rgba(255,0,0,0.2);
 
 display:flex;
 align-items:center;
@@ -125,19 +135,17 @@ letter-spacing:2px;
 text-transform:uppercase;
 }
 
-/* hover cyber glow */
 button:hover{
 transform:scale(1.05);
 box-shadow:
-0 0 20px #00ffea,
-0 0 40px #00ffaa;
-border-color:#00ffea;
+0 0 20px #ff2a2a,
+0 0 40px #ff0000;
+border-color:#ff6666;
 }
 
-/* active press */
 button:active{
 transform:scale(0.95);
-box-shadow:0 0 5px #00ff9d;
+box-shadow:0 0 5px #ff0000;
 }
 
 /* ================= VOLUME ================= */
@@ -148,13 +156,13 @@ display:flex;
 align-items:center;
 justify-content:center;
 
-background: linear-gradient(145deg, #050505, #0a0a0a);
+background: linear-gradient(145deg, #0a0000, #120000);
 
-border:1px solid #00ff9d;
+border:1px solid #ff2a2a;
 
 box-shadow:
-0 0 10px #00ff9d,
-inset 0 0 10px rgba(0,255,170,0.2);
+0 0 10px #ff0000,
+inset 0 0 10px rgba(255,0,0,0.2);
 }
 
 #volume{
@@ -162,17 +170,16 @@ width:120px;
 height:6px;
 appearance:none;
 background:#000;
-border:1px solid #00ff9d;
-box-shadow:0 0 8px #00ff9d;
+border:1px solid #ff2a2a;
+box-shadow:0 0 8px #ff0000;
 }
 
-/* thumb cyber */
 #volume::-webkit-slider-thumb{
 -webkit-appearance:none;
 width:14px;
 height:14px;
-background:#00ffcc;
-box-shadow:0 0 10px #00ffcc;
+background:#ff2a2a;
+box-shadow:0 0 10px #ff0000;
 border-radius:2px;
 cursor:pointer;
 }
@@ -183,28 +190,28 @@ font-size:22px;
 width:66px;
 height:49px;
 background:#000;
-border:1px solid #00ff9d;
-box-shadow:0 0 15px #00ff9d;
-color:#00ff9d;
+border:1px solid #ff2a2a;
+box-shadow:0 0 15px #ff0000;
+color:#ff2a2a;
 }
 
 #modeBtn:hover{
-box-shadow:0 0 30px #00ffaa;
+box-shadow:0 0 30px #ff0000;
 }
 
-/* ================= STATUS COLORS ================= */
+/* ================= STATUS ================= */
 .playActive{
-color:#00ff9d;
-text-shadow:0 0 10px #00ff9d;
+color:#ff2a2a;
+text-shadow:0 0 10px #ff0000;
 }
 
 .stopActive{
-color:#ff004c;
-text-shadow:0 0 10px #ff004c;
+color:#ff0000;
+text-shadow:0 0 10px #aa0000;
 }
 
 .muteActive{
-color:#ffaa00;
+color:#ff8800;
 text-shadow:0 0 10px orange;
 animation:pulseMute 0.8s infinite alternate;
 }
@@ -214,13 +221,13 @@ from{transform:scale(1);}
 to{transform:scale(1.1);}
 }
 
-/* ================= MOBILE FIX ================= */
+/* ================= MOBILE ================= */
 @media (max-width: 768px){
 
 #title{
-font-size:42px;
+font-size:44px;
 margin-top:20px;
-letter-spacing:3px;
+letter-spacing:4px;
 }
 
 canvas{
@@ -246,9 +253,9 @@ width:100%;
 }
 
 #bottomLink a{
-color:#00ff9d;
+color:#ff2a2a;
 text-decoration:none;
-text-shadow:0 0 10px #00ff9d;
+text-shadow:0 0 10px #ff0000;
 font-size:18px;
 }
 
@@ -300,11 +307,11 @@ const ctx=canvas.getContext("2d");
 
 audio.volume=parseFloat(volume.value);
 
+/* JS 100% BEZ ZMIAN */
 let audioCtx, analyser, source, dataArray;
 let peaks=[];
 let animationStarted=false;
 
-/* JS NIE ZMIENIONE */
 function setupAudio(){
 if(audioCtx) return;
 
@@ -418,13 +425,13 @@ let x=i*barWidth;
 let y=heightCanvas-h;
 
 let gradient=ctx.createLinearGradient(0,heightCanvas,0,0);
-gradient.addColorStop(0,"#003322");
-gradient.addColorStop(0.5,"#00ff9d");
-gradient.addColorStop(1,"#00ffff");
+gradient.addColorStop(0,"#220000");
+gradient.addColorStop(0.5,"#ff2a2a");
+gradient.addColorStop(1,"#ffffff");
 
 ctx.fillStyle=gradient;
 ctx.shadowBlur=10;
-ctx.shadowColor="#00ff9d";
+ctx.shadowColor="#ff0000";
 
 ctx.fillRect(x,y,barWidth-1,h);
 ctx.shadowBlur=0;
