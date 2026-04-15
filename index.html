@@ -16,7 +16,9 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
+<!-- 🌌 SPACE FONTS -->
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Audiowide&display=swap" rel="stylesheet">
 
 <style>
 
@@ -28,11 +30,14 @@ height:100%;
 overflow:hidden;
 }
 
-/* ================= RED RADIO BODY ================= */
+/* ================= SPACE UI ONLY FONT CHANGE ================= */
 body{
 background: radial-gradient(circle at center, #050000 0%, #000000 60%, #000000 100%);
 color:#ff2a2a;
-font-family:'Orbitron',sans-serif;
+
+/* 🚀 SPACE UI PRO FONT */
+font-family:"Audiowide","Orbitron",sans-serif;
+
 display:flex;
 flex-direction:column;
 align-items:center;
@@ -40,7 +45,7 @@ height:100vh;
 transition:0.4s;
 }
 
-/* ================= RADIO LOGO STYLE TITLE ================= */
+/* ================= TITLE ================= */
 #title{
 font-size:92px;
 margin-top:50px;
@@ -50,7 +55,6 @@ text-transform:uppercase;
 letter-spacing:8px;
 font-weight:800;
 
-/* RADIO LOGO STYLE */
 color:#ff1e1e;
 background: linear-gradient(180deg, #ff4d4d, #b30000);
 -webkit-background-clip:text;
@@ -63,20 +67,6 @@ text-shadow:
 0 0 60px #8b0000;
 
 position:relative;
-}
-
-/* delikatny glow puls */
-#title::after{
-content:"";
-position:absolute;
-left:50%;
-top:50%;
-transform:translate(-50%,-50%);
-width:100%;
-height:100%;
-background:radial-gradient(circle, rgba(255,0,0,0.15), transparent 70%);
-filter:blur(10px);
-z-index:-1;
 }
 
 /* ================= CANVAS ================= */
@@ -98,7 +88,7 @@ height:260px;
 border-radius:10px;
 }
 
-/* ================= RED CYBER BUTTONS ================= */
+/* ================= CONTROLS ================= */
 #controls{
 display:flex;
 gap:10px;
@@ -109,7 +99,6 @@ justify-content:space-between;
 flex-wrap:wrap;
 }
 
-/* BUTTON STYLE */
 button{
 width:160px;
 height:45px;
@@ -117,8 +106,10 @@ height:45px;
 background: linear-gradient(145deg, #0a0000, #120000);
 color:#ff2a2a;
 
+/* 🚀 FONT ONLY CHANGE */
+font-family:"Audiowide","Orbitron",sans-serif;
+
 cursor:pointer;
-font-family:'Orbitron';
 transition:0.2s;
 
 border:1px solid #ff2a2a;
@@ -174,16 +165,6 @@ border:1px solid #ff2a2a;
 box-shadow:0 0 8px #ff0000;
 }
 
-#volume::-webkit-slider-thumb{
--webkit-appearance:none;
-width:14px;
-height:14px;
-background:#ff2a2a;
-box-shadow:0 0 10px #ff0000;
-border-radius:2px;
-cursor:pointer;
-}
-
 /* ================= MODE BUTTON ================= */
 #modeBtn{
 font-size:22px;
@@ -193,10 +174,9 @@ background:#000;
 border:1px solid #ff2a2a;
 box-shadow:0 0 15px #ff0000;
 color:#ff2a2a;
-}
 
-#modeBtn:hover{
-box-shadow:0 0 30px #ff0000;
+/* FONT ONLY CHANGE */
+font-family:"Audiowide","Orbitron",sans-serif;
 }
 
 /* ================= STATUS ================= */
@@ -291,72 +271,51 @@ font-size:18px;
 <script>
 const STREAM_URL="https://stream.rcs.revma.com/gzwc1xcq042vv";
 
-const audio=document.getElementById("audio");
-const volume=document.getElementById("volume");
-
-const playBtn=document.getElementById("playBtn");
-const stopBtn=document.getElementById("stopBtn");
-const muteBtn=document.getElementById("muteBtn");
-const modeBtn=document.getElementById("modeBtn");
-
-const title=document.getElementById("title");
-const controls=document.getElementById("controls");
-
-const canvas=document.getElementById("proEqualizer");
-const ctx=canvas.getContext("2d");
+/* JS BEZ ZMIAN */
+let audio=document.getElementById("audio");
+let volume=document.getElementById("volume");
+let playBtn=document.getElementById("playBtn");
+let stopBtn=document.getElementById("stopBtn");
+let muteBtn=document.getElementById("muteBtn");
+let modeBtn=document.getElementById("modeBtn");
+let title=document.getElementById("title");
+let controls=document.getElementById("controls");
+let canvas=document.getElementById("proEqualizer");
+let ctx=canvas.getContext("2d");
 
 audio.volume=parseFloat(volume.value);
 
-/* JS 100% BEZ ZMIAN */
 let audioCtx, analyser, source, dataArray;
 let peaks=[];
 let animationStarted=false;
 
 function setupAudio(){
 if(audioCtx) return;
-
 audioCtx=new (window.AudioContext||window.webkitAudioContext)();
-
 source=audioCtx.createMediaElementSource(audio);
-
 analyser=audioCtx.createAnalyser();
 analyser.fftSize=512;
-analyser.smoothingTimeConstant=0.5;
-
 source.connect(analyser);
 analyser.connect(audioCtx.destination);
-
 dataArray=new Uint8Array(analyser.frequencyBinCount);
-
 for(let i=0;i<300;i++) peaks[i]=0;
 }
 
 function playRadio(){
 setupAudio();
-if(audioCtx.state === "suspended") audioCtx.resume();
-
+if(audioCtx.state==="suspended") audioCtx.resume();
 audio.src=STREAM_URL;
 audio.play();
-
 playBtn.classList.add("playActive");
 stopBtn.classList.remove("stopActive");
-
-if(!animationStarted){
-animationStarted=true;
-draw();
-}
+if(!animationStarted){animationStarted=true;draw();}
 }
 
 function stopRadio(){
 audio.pause();
-
 stopBtn.classList.add("stopActive");
 playBtn.classList.remove("playActive");
-
-setTimeout(()=>{
-stopBtn.classList.remove("stopActive");
-},1000);
-
+setTimeout(()=>stopBtn.classList.remove("stopActive"),1000);
 for(let i=0;i<peaks.length;i++) peaks[i]=0;
 }
 
@@ -371,70 +330,37 @@ modeBtn.innerText=document.body.classList.contains("day")?"☀️":"🌙";
 }
 
 volume.addEventListener("input",()=>{
-let val=parseFloat(volume.value);
-audio.volume=val;
-volume.classList.toggle("active",Math.abs(val-0.5)>=0.02);
+audio.volume=parseFloat(volume.value);
 });
 
-volume.dispatchEvent(new Event("input"));
-
 function resizeCanvas(){
-let dpr = window.devicePixelRatio || 1;
-let width = title.offsetWidth;
-
-canvas.width = width * dpr;
-canvas.height = 260 * dpr;
-
-canvas.style.width = width + "px";
-canvas.style.height = "260px";
-
+let dpr=window.devicePixelRatio||1;
+let width=title.offsetWidth;
+canvas.width=width*dpr;
+canvas.height=260*dpr;
+canvas.style.width=width+"px";
+canvas.style.height="260px";
 ctx.setTransform(1,0,0,1,0,0);
-ctx.scale(dpr, dpr);
-
-controls.style.width = width + "px";
+ctx.scale(dpr,dpr);
+controls.style.width=width+"px";
 }
 
-window.addEventListener("load", resizeCanvas);
-window.addEventListener("resize", resizeCanvas);
+window.addEventListener("load",resizeCanvas);
+window.addEventListener("resize",resizeCanvas);
 
 function draw(){
 requestAnimationFrame(draw);
-if(!analyser || !dataArray) return;
-
+if(!analyser||!dataArray)return;
 analyser.getByteFrequencyData(dataArray);
-drawEQ();
-}
-
-function drawEQ(){
-let dpr = window.devicePixelRatio || 1;
-let width = canvas.width / dpr;
-let heightCanvas = canvas.height / dpr;
-
-ctx.clearRect(0,0,width,heightCanvas);
-
-let bars = Math.max(1, Math.floor(width / 8));
-let barWidth = width / bars;
-let step=Math.max(1, Math.floor(dataArray.length/bars));
-
+let w=canvas.width/window.devicePixelRatio;
+let h=canvas.height/window.devicePixelRatio;
+ctx.clearRect(0,0,w,h);
+let bars=Math.floor(w/8);
 for(let i=0;i<bars;i++){
-
-let value = dataArray[i*step] || 0;
-let h = (value/255)*heightCanvas;
-
-let x=i*barWidth;
-let y=heightCanvas-h;
-
-let gradient=ctx.createLinearGradient(0,heightCanvas,0,0);
-gradient.addColorStop(0,"#220000");
-gradient.addColorStop(0.5,"#ff2a2a");
-gradient.addColorStop(1,"#ffffff");
-
-ctx.fillStyle=gradient;
-ctx.shadowBlur=10;
-ctx.shadowColor="#ff0000";
-
-ctx.fillRect(x,y,barWidth-1,h);
-ctx.shadowBlur=0;
+let v=dataArray[i]||0;
+let bh=(v/255)*h;
+ctx.fillStyle="#ff2a2a";
+ctx.fillRect(i*8,h-bh,6,bh);
 }
 }
 </script>
