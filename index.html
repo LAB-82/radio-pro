@@ -297,9 +297,9 @@ analyser.getByteFrequencyData(dataArray);
 drawEQ();
 }
 
-/* =======================
-   FINAL SPECTRUM (zgodny z obrazkiem)
-======================= */
+/* =========================
+   FINAL EQ — jak na obrazku
+========================= */
 function drawEQ(){
 
 let dpr = window.devicePixelRatio || 1;
@@ -312,13 +312,13 @@ let bars = 64;
 let barWidth = width / bars;
 let step = Math.floor(dataArray.length / bars);
 
-/* globalny gradient jak w referencji */
+/* spójny neon gradient */
 let grad = ctx.createLinearGradient(0,0,width,0);
-grad.addColorStop(0.0,"#ff0000");
-grad.addColorStop(0.2,"#ff7a00");
-grad.addColorStop(0.4,"#ffe600");
-grad.addColorStop(0.6,"#00ffcc");
-grad.addColorStop(1.0,"#0066ff");
+grad.addColorStop(0.0,"#ff2a2a");
+grad.addColorStop(0.25,"#ff7a18");
+grad.addColorStop(0.5,"#ffe600");
+grad.addColorStop(0.75,"#00e5ff");
+grad.addColorStop(1.0,"#2a6bff");
 
 for(let i=0;i<bars;i++){
 
@@ -329,16 +329,13 @@ let h = percent * height * 0.9;
 let x = i * barWidth;
 let y = height - h;
 
-/* glow neon */
-ctx.fillStyle = grad;
-ctx.shadowBlur = 20;
-ctx.shadowColor = "#ff0033";
+ctx.shadowBlur = 16;
+ctx.shadowColor = "#ff3b3b";
 
-/* słupek */
+ctx.fillStyle = grad;
 ctx.fillRect(x+1, y, barWidth-2, h);
 
-/* peak */
-ctx.fillStyle = "#ffffff";
+ctx.fillStyle = "rgba(255,255,255,0.85)";
 ctx.fillRect(x+1, y, barWidth-2, 2);
 
 ctx.shadowBlur = 0;
