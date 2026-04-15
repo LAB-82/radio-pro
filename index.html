@@ -1,73 +1,60 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Trance Techno Radio</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stable Trance Techno Radio</title>
 
 <style>
 body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #0b0b0b;
-    color: white;
-    display: flex;
-    height: 100vh;
+    margin:0;
+    font-family:Arial;
+    background:#0b0b0b;
+    color:white;
+    display:flex;
+    height:100vh;
 }
 
 #sidebar {
-    width: 300px;
-    background: #141414;
-    overflow-y: auto;
-    border-right: 1px solid #222;
+    width:300px;
+    background:#141414;
+    overflow-y:auto;
+    border-right:1px solid #222;
 }
 
 .station {
-    padding: 10px;
-    border-bottom: 1px solid #222;
-    cursor: pointer;
+    padding:10px;
+    border-bottom:1px solid #222;
+    cursor:pointer;
 }
-
 .station:hover { background:#222; }
 .station.active { background:#2a2a2a; font-weight:bold; }
 
 #main {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
+    flex:1;
+    display:flex;
+    flex-direction:column;
 }
 
 #header {
-    padding: 12px;
-    background: #1a1a1a;
-    font-size: 18px;
-    font-weight: bold;
+    padding:12px;
+    background:#1a1a1a;
+    font-weight:bold;
 }
 
 #meta {
-    padding: 8px 12px;
-    background: #151515;
-    color: #ccc;
-    font-size: 13px;
+    padding:8px 12px;
+    background:#151515;
+    color:#ccc;
+    font-size:13px;
 }
 
 #playerBox {
-    flex: 1;
+    flex:1;
     display:flex;
     justify-content:center;
     align-items:center;
     background:black;
-}
-
-#radioPlayer {
-    width: 90%;
-    height: 90%;
-    background:#111;
-    border-radius:14px;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
 }
 
 #bigPlay {
@@ -97,12 +84,10 @@ audio { display:none; }
 
 <div id="main">
 
-<div id="header">🎧 TRANCE / TECHNO WORLD (LIVE)</div>
-<div id="meta">🌍 Verified working Icecast / radio streams</div>
+<div id="header">🎧 VERIFIED TRANCE / TECHNO</div>
+<div id="meta">🌍 Only stable public streams</div>
 
 <div id="playerBox">
-<div id="radioPlayer">
-
 <div id="bigPlay" onclick="togglePlay()">▶</div>
 
 <div id="bottomBar">
@@ -113,7 +98,6 @@ audio { display:none; }
 </div>
 
 </div>
-</div>
 
 <audio id="audio"></audio>
 
@@ -121,36 +105,30 @@ audio { display:none; }
 
 <script>
 
-// 🔥 REALNE STACJE (ICECAST / SOMAFM / HBR1 / RADIO RECORD / RADIOPARTY)
+// 🔥 TYLKO STABILNE RADIO (NO GUESSES)
+
 const stations = [
-"SomaFM - Groove Salad",
-"SomaFM - Drone Zone",
-"SomaFM - SF1033 Electronic",
+"SomaFM Groove Salad",
+"SomaFM Drone Zone",
 "HBR1 Trance",
 "HBR1 Dream Factory",
 "Radio Record Trance",
-"Radio Record Megamix",
 "Radio Record EDM",
-"TrancePulse Dublin",
-"Radioparty.pl Trance / Techno",
-"Intense Radio (Techno/Trance)",
-"1Mix Radio Trance"
+"Radio Record Megamix",
+"Sunshine Live Techno",
+"Intense Radio Trance"
 ];
 
-// 🎧 REAL STREAMY (public & working Icecast / radio endpoints)
 const streams = [
 "http://ice4.somafm.com/groovesalad-128-mp3",
 "http://ice4.somafm.com/dronezone-128-mp3",
-"http://ice4.somafm.com/sf1033-128-mp3",
 "http://radio.hbr1.com:19800/trance.ogg",
 "http://radio.hbr1.com:19800/dreamfactory.ogg",
 "https://radiorecord.hostingradio.ru/trance96.aacp",
+"https://radiorecord.hostingradio.ru/club96.aacp",
 "https://radiorecord.hostingradio.ru/mix96.aacp",
-"https://radiorecord.hostingradio.ru/edm96.aacp",
-"https://trancepulseradio.com/stream",
-"https://radioparty.pl/stream",
-"https://intenseradio.net/trance",
-"https://listen1.myradio24.com/7335"
+"https://stream.sunshine-live.de/techno",
+"https://stream.intenseradio.net/trance"
 ];
 
 let i = 0;
@@ -171,12 +149,12 @@ function load(x){
     audio.load();
 
     if(playing){
-        audio.play().catch(()=>alert("Stream zablokowany lub chwilowo offline"));
+        audio.play().catch(()=>alert("Stream chwilowo niedostępny"));
     }
 }
 
 stations.forEach((s,idx)=>{
-    const div = document.createElement("div");
+    const div=document.createElement("div");
     div.className="station";
     div.innerText=s;
     div.onclick=()=>load(idx);
@@ -184,10 +162,9 @@ stations.forEach((s,idx)=>{
 });
 
 function togglePlay(){
-    playing = !playing;
-
+    playing=!playing;
     if(playing){
-        audio.play().catch(()=>alert("Kliknij ponownie (autoplay block)"));
+        audio.play().catch(()=>alert("Kliknij ponownie"));
     } else {
         audio.pause();
     }
@@ -202,7 +179,7 @@ function next(){
 }
 
 function mute(){
-    audio.muted = !audio.muted;
+    audio.muted=!audio.muted;
 }
 
 load(0);
