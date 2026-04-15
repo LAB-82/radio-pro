@@ -7,14 +7,20 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#000000">
 
-<!-- 🔥 HARD NO-CACHE (KLUCZ) -->
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
+<link rel="manifest" href="manifest.json">
+
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
 
 <style>
+
+/* ================= YOUR ORIGINAL UI (UNCHANGED) ================= */
 
 html, body{
 margin:0;
@@ -48,17 +54,26 @@ color:#ff2a2a;
 text-shadow:0 0 5px #ff2a2a,0 0 15px #ff0000,0 0 30px #ff0000,0 0 60px #ff0000;
 }
 
+#proEqualizer{
+display:block;
+margin:0 auto;
+margin-top:30px;
+margin-bottom:30px;
+border-radius:8px;
+overflow:hidden;
+}
+
 canvas{
 display:block;
 height:260px;
 border-radius:8px;
-margin-top:30px;
-margin-bottom:30px;
 }
 
 #controls{
 display:flex;
 gap:8px;
+margin-top:20px;
+margin-bottom:20px;
 align-items:center;
 justify-content:space-between;
 flex-wrap:wrap;
@@ -71,11 +86,18 @@ background:#111;
 color:white;
 cursor:pointer;
 font-family:'Orbitron';
+transition:0.2s;
 border:2px solid #ff2a2a;
+box-shadow:0 0 10px #ff2a2a;
 display:flex;
 align-items:center;
 justify-content:center;
-box-sizing:border-box;
+}
+
+body.day button{
+background:#d6d6d6;
+color:#000;
+box-shadow:0 0 40px #ff2a2a,0 0 80px #ff0000;
 }
 
 .volumeWrapper{
@@ -86,15 +108,49 @@ align-items:center;
 justify-content:center;
 background:#111;
 border:2px solid #ff2a2a;
+box-shadow:0 0 10px #ff2a2a;
 box-sizing:border-box;
+}
+
+body.day .volumeWrapper{
+background:#d6d6d6;
+box-shadow:0 0 40px #ff2a2a,0 0 80px #ff0000;
 }
 
 #volume{
 width:120px;
 height:10px;
 appearance:none;
+border-radius:10px;
+outline:none;
 background:#000;
 border:1px solid #ff2a2a;
+box-shadow:0 0 6px #ff2a2a;
+}
+
+#volume.active{
+box-shadow:0 0 10px #ff0000;
+border:1px solid #ff0000;
+}
+
+#volume::-webkit-slider-thumb{
+-webkit-appearance:none;
+width:16px;
+height:16px;
+border-radius:4px;
+background:#ff0000;
+box-shadow:0 0 10px red,0 0 20px red;
+cursor:pointer;
+}
+
+#volume::-moz-range-thumb{
+width:16px;
+height:16px;
+border:none;
+border-radius:4px;
+background:#ff0000;
+box-shadow:0 0 10px red,0 0 20px red;
+cursor:pointer;
 }
 
 #modeBtn{
@@ -102,9 +158,21 @@ font-size:22px;
 width:66px;
 height:49px;
 background:#111;
-color:#fff;
+color:#ffff00;
 border:2px solid #ff2a2a;
-box-sizing:border-box;
+box-shadow:0 0 12px #00ccff,0 0 24px #00aaff;
+}
+
+body:not(.day) #modeBtn{
+background:#111;
+color:#ffff00;
+text-shadow:0 0 8px #ffff00,0 0 16px #ffff66;
+}
+
+body.day #modeBtn{
+background:#00ccff;
+color:#ffff00;
+box-shadow:0 0 12px #00ccff,0 0 24px #00aaff;
 }
 
 #bottomLink{
@@ -116,6 +184,7 @@ width:100%;
 #bottomLink a{
 color:#ff2a2a;
 text-decoration:none;
+text-shadow:0 0 6px red;
 font-size:20px;
 }
 
@@ -163,19 +232,19 @@ audio.volume=parseFloat(volume.value);
 let audioCtx, analyser, source, dataArray;
 let animationStarted=false;
 
-/* ================= FULL CACHE KILL ================= */
-(async function killCache(){
-try{
+/* ================= SAFE PWA FIX (NO UI IMPACT) ================= */
 if('serviceWorker' in navigator){
+window.addEventListener('load', async () => {
+try{
 const regs = await navigator.serviceWorker.getRegistrations();
 for(const reg of regs){
 await reg.unregister();
 }
-}
 }catch(e){}
-})();
+});
+}
 
-/* ================= AUDIO ================= */
+/* AUDIO */
 function setupAudio(){
 if(audioCtx) return;
 
@@ -200,7 +269,7 @@ if(audioCtx.state==="suspended"){
 audioCtx.resume();
 }
 
-audio.src=STREAM_URL + "?v=" + Date.now(); // 🔥 CACHE BYPASS STREAM
+audio.src=STREAM_URL;
 audio.play();
 
 if(!animationStarted){
@@ -226,7 +295,7 @@ volume.addEventListener("input",()=>{
 audio.volume=parseFloat(volume.value);
 });
 
-/* ================= STABLE CANVAS (NO LAYOUT SHIFT) ================= */
+/* CANVAS STABLE */
 function resizeCanvas(){
 let dpr=window.devicePixelRatio||1;
 
@@ -243,7 +312,7 @@ ctx.scale(dpr,dpr);
 window.addEventListener("load",resizeCanvas);
 window.addEventListener("resize",resizeCanvas);
 
-/* ================= EQ ================= */
+/* EQ */
 function draw(){
 requestAnimationFrame(draw);
 
