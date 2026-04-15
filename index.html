@@ -84,10 +84,16 @@ border:2px solid #ff2a2a;
 box-shadow:0 0 10px #ff2a2a;
 }
 
-/* ✅ KLIK */
+/* ✅ KLIK (wciśnięcie) */
 button:active{
 transform:scale(0.9) translateY(2px);
 box-shadow:0 0 2px #ff2a2a inset;
+}
+
+/* ✅ HOVER (najazd – brakowało tego!) */
+button:hover{
+transform:scale(1.05);
+box-shadow:0 0 15px #ff2a2a,0 0 25px #ff0000;
 }
 
 body.day button{
@@ -202,9 +208,7 @@ font-size:20px;
 <a href="https://www.muzyczneradio.pl" target="_blank">www.muzyczneradio.pl</a>
 </div>
 
-<!-- ✅ DŹWIĘK KLIK -->
 <audio id="clickSound" src="https://www.soundjay.com/buttons/sounds/button-16.mp3"></audio>
-
 <audio id="audio" crossorigin="anonymous"></audio>
 
 <script>
@@ -224,7 +228,6 @@ const controls=document.getElementById("controls");
 const canvas=document.getElementById("proEqualizer");
 const ctx=canvas.getContext("2d");
 
-/* ✅ CLICK SOUND */
 const clickSound=document.getElementById("clickSound");
 
 function clickFX(){
