@@ -298,7 +298,7 @@ drawEQ();
 }
 
 /* =========================
-   FINAL: EXACT LOOK (vecteezy style)
+   FINAL FIX: VECTEEZY STYLE
 ========================= */
 function drawEQ(){
 
@@ -312,15 +312,6 @@ let bars = 64;
 let barWidth = width / bars;
 let step = Math.floor(dataArray.length / bars);
 
-/* KLUCZ: gradient PO X (jak na obrazku) */
-let grad = ctx.createLinearGradient(0,0,width,0);
-grad.addColorStop(0.0,"#ff2a2a");
-grad.addColorStop(0.2,"#ff7a18");
-grad.addColorStop(0.4,"#ffe600");
-grad.addColorStop(0.6,"#00e5ff");
-grad.addColorStop(0.8,"#2a6bff");
-grad.addColorStop(1.0,"#8a2cff");
-
 for(let i=0;i<bars;i++){
 
 let v = dataArray[i * step] || 0;
@@ -330,17 +321,20 @@ let h = percent * height * 0.92;
 let x = i * barWidth;
 let y = height - h;
 
-/* kolor zależny od X (NIE tęcza losowa) */
+/* KLUCZ: pionowy gradient jak na obrazku */
+let grad = ctx.createLinearGradient(0, height, 0, 0);
+grad.addColorStop(0.0, "#00ff00");  // zielony dół
+grad.addColorStop(0.5, "#ff9a00");  // pomarańcz środek
+grad.addColorStop(1.0, "#ff0000");  // czerwony góra
+
 ctx.fillStyle = grad;
 
-ctx.shadowBlur = 18;
+ctx.shadowBlur = 14;
 ctx.shadowColor = "#ff3b3b";
 
-/* słupek */
 ctx.fillRect(x+1, y, barWidth-2, h);
 
-/* highlight */
-ctx.fillStyle = "rgba(255,255,255,0.9)";
+ctx.fillStyle = "rgba(255,255,255,0.85)";
 ctx.fillRect(x+1, y, barWidth-2, 2);
 
 ctx.shadowBlur = 0;
