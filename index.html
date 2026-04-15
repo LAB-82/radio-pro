@@ -16,8 +16,9 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-<!-- 🌐 METAVERSE NEON FONT -->
+<!-- 🌌 METAVERSE FONTS -->
 <link href="https://fonts.googleapis.com/css2?family=Tilt+Neon&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Audiowide&display=swap" rel="stylesheet">
 
 <style>
 
@@ -29,65 +30,83 @@ height:100%;
 overflow:hidden;
 }
 
-/* ================= ONLY FONT CHANGE ================= */
+/* 🌐 METAVERSE BACKGROUND */
 body{
-background: radial-gradient(circle at center, #050000 0%, #000000 60%, #000000 100%);
+background:
+radial-gradient(circle at center, #0a0000 0%, #000 60%, #000 100%),
+repeating-linear-gradient(
+45deg,
+rgba(255,0,0,0.06),
+rgba(255,0,0,0.06) 2px,
+transparent 2px,
+transparent 8px
+);
+
 color:#ff2a2a;
 
-/* 🌐 METAVERSE FONT */
-font-family:"Tilt Neon","Orbitron",sans-serif;
+/* 🌌 METAVERSE FONT */
+font-family:"Tilt Neon","Audiowide",sans-serif;
 
 display:flex;
 flex-direction:column;
 align-items:center;
 height:100vh;
 transition:0.4s;
+
+/* glow ambience */
+box-shadow: inset 0 0 120px rgba(255,0,0,0.2);
 }
 
-/* ================= TITLE ================= */
+/* 🌌 TITLE = NEON HOLOGRAM */
 #title{
 font-size:92px;
 margin-top:50px;
 text-align:center;
 
 text-transform:uppercase;
-letter-spacing:8px;
+letter-spacing:10px;
 font-weight:800;
 
-color:#ff1e1e;
-background: linear-gradient(180deg, #ff4d4d, #b30000);
--webkit-background-clip:text;
--webkit-text-fill-color:transparent;
+color:#ff2a2a;
 
 text-shadow:
-0 0 5px #ff1e1e,
-0 0 15px #ff0000,
-0 0 30px #cc0000,
+0 0 10px #ff0000,
+0 0 30px #ff0000,
 0 0 60px #8b0000;
 
-position:relative;
+animation: flicker 2.8s infinite alternate;
 }
 
-/* ================= CANVAS ================= */
+/* flicker */
+@keyframes flicker{
+0%{opacity:1;}
+45%{opacity:0.85;}
+50%{opacity:1;}
+70%{opacity:0.7;}
+100%{opacity:1;}
+}
+
+/* 🌌 VISUALIZER */
 #proEqualizer{
 display:block;
 margin:0 auto;
 margin-top:30px;
 margin-bottom:30px;
-border-radius:10px;
+border-radius:12px;
 overflow:hidden;
+
 box-shadow:
-0 0 20px #ff0000,
-0 0 40px #aa0000;
+0 0 25px #ff0000,
+0 0 80px rgba(255,0,0,0.4);
 }
 
 canvas{
 display:block;
 height:260px;
-border-radius:10px;
+border-radius:12px;
 }
 
-/* ================= CONTROLS ================= */
+/* 🌌 CONTROLS */
 #controls{
 display:flex;
 gap:10px;
@@ -98,14 +117,16 @@ justify-content:space-between;
 flex-wrap:wrap;
 }
 
+/* 🔥 BUTTONS */
 button{
 width:160px;
 height:45px;
 
-background: linear-gradient(145deg, #0a0000, #120000);
+background: rgba(10,0,0,0.85);
+
 color:#ff2a2a;
 
-font-family:"Tilt Neon","Orbitron",sans-serif;
+font-family:"Tilt Neon","Audiowide",sans-serif;
 
 cursor:pointer;
 transition:0.2s;
@@ -113,31 +134,21 @@ transition:0.2s;
 border:1px solid #ff2a2a;
 
 box-shadow:
-0 0 10px #ff0000,
-inset 0 0 10px rgba(255,0,0,0.2);
+0 0 15px #ff0000,
+inset 0 0 15px rgba(255,0,0,0.25);
 
-display:flex;
-align-items:center;
-justify-content:center;
-
-letter-spacing:2px;
+letter-spacing:3px;
 text-transform:uppercase;
 }
 
 button:hover{
-transform:scale(1.05);
+transform:scale(1.08);
 box-shadow:
-0 0 20px #ff2a2a,
-0 0 40px #ff0000;
-border-color:#ff6666;
+0 0 30px #ff2a2a,
+0 0 80px #ff0000;
 }
 
-button:active{
-transform:scale(0.95);
-box-shadow:0 0 5px #ff0000;
-}
-
-/* ================= 🔥 FIXED VOLUME SLIDER ================= */
+/* 🌌 VOLUME (FIXED METAVERSE SLIDER) */
 .volumeWrapper{
 width:160px;
 height:45px;
@@ -145,74 +156,56 @@ display:flex;
 align-items:center;
 justify-content:center;
 
-background: linear-gradient(145deg, #0a0000, #120000);
-
-/* FIX: stronger neon frame */
+background: rgba(0,0,0,0.6);
 border:2px solid #ff2a2a;
 
 box-shadow:
-0 0 12px #ff0000,
-0 0 25px rgba(255,0,0,0.6),
+0 0 20px #ff0000,
 inset 0 0 10px rgba(255,0,0,0.2);
 
-border-radius:6px;
+backdrop-filter: blur(8px);
 }
 
-/* slider track */
 #volume{
 width:120px;
 height:6px;
 appearance:none;
 
-background:#0a0000;
-
-/* FIX: visible inner glow border */
+background:#000;
 border:1px solid #ff2a2a;
-
-box-shadow:
-0 0 10px #ff0000,
-inset 0 0 8px rgba(255,0,0,0.5);
-
+box-shadow:0 0 12px #ff0000;
 border-radius:10px;
 }
 
-/* slider thumb */
 #volume::-webkit-slider-thumb{
 -webkit-appearance:none;
 width:14px;
 height:14px;
 background:#ff2a2a;
-box-shadow:0 0 12px #ff0000;
+box-shadow:0 0 20px #ff0000;
 border-radius:3px;
 cursor:pointer;
 }
 
-/* ================= MODE BUTTON ================= */
+/* 🌌 MODE */
 #modeBtn{
 font-size:22px;
 width:66px;
 height:49px;
 background:#000;
 border:1px solid #ff2a2a;
-box-shadow:0 0 15px #ff0000;
+box-shadow:0 0 20px #ff0000;
 color:#ff2a2a;
-font-family:"Tilt Neon","Orbitron",sans-serif;
+font-family:"Tilt Neon","Audiowide",sans-serif;
 }
 
-/* ================= STATUS ================= */
-.playActive{
-color:#ff2a2a;
-text-shadow:0 0 10px #ff0000;
-}
-
-.stopActive{
-color:#ff0000;
-text-shadow:0 0 10px #aa0000;
-}
+/* 🌌 STATUS */
+.playActive{ text-shadow:0 0 25px #ff0000; }
+.stopActive{ text-shadow:0 0 25px #aa0000; }
 
 .muteActive{
 color:#ff8800;
-text-shadow:0 0 10px orange;
+text-shadow:0 0 25px orange;
 animation:pulseMute 0.8s infinite alternate;
 }
 
@@ -221,13 +214,12 @@ from{transform:scale(1);}
 to{transform:scale(1.1);}
 }
 
-/* ================= MOBILE ================= */
+/* 🌌 MOBILE */
 @media (max-width: 768px){
 
 #title{
 font-size:44px;
-margin-top:20px;
-letter-spacing:4px;
+letter-spacing:5px;
 }
 
 canvas{
@@ -254,8 +246,8 @@ width:100%;
 
 #bottomLink a{
 color:#ff2a2a;
+text-shadow:0 0 20px #ff0000;
 text-decoration:none;
-text-shadow:0 0 10px #ff0000;
 font-size:18px;
 }
 
@@ -291,7 +283,7 @@ font-size:18px;
 <script>
 const STREAM_URL="https://stream.rcs.revma.com/gzwc1xcq042vv";
 
-/* BEZ ZMIAN JS */
+/* JS BEZ ZMIAN */
 let audio=document.getElementById("audio");
 let volume=document.getElementById("volume");
 let playBtn=document.getElementById("playBtn");
