@@ -72,13 +72,9 @@ background:#d6d6d6;
 box-shadow:0 0 10px #ff2a2a;
 }
 
-/* 🔧 ALL BUTTONS MATCH PLAY EXACTLY */
 button{
 width:160px;
 height:45px;
-padding:0;
-margin:0;
-box-sizing:border-box;
 background:#111;
 color:white;
 cursor:pointer;
@@ -86,10 +82,6 @@ font-family:'Orbitron';
 transition:0.2s;
 border:2px solid #ff2a2a;
 box-shadow:0 0 6px #ff2a2a;
-display:flex;
-align-items:center;
-justify-content:center;
-line-height:45px;
 }
 
 body.day button{
@@ -344,7 +336,7 @@ let heightCanvas = canvas.height / dpr;
 
 ctx.clearRect(0,0,width,heightCanvas);
 
-/* ===== HUD GRID (LIGHT WHITE RESTORED) ===== */
+/* HUD */
 ctx.save();
 ctx.strokeStyle="rgba(255,255,255,0.08)";
 ctx.lineWidth=1;
@@ -364,10 +356,19 @@ ctx.stroke();
 }
 ctx.restore();
 
-/* EQ */
+/* ===== STEREO SPLIT ===== */
+let mid = Math.floor(dataArray.length / 2);
+
+let leftData = dataArray.slice(0, mid);
+let rightData = dataArray.slice(mid);
+
 let bars = Math.max(1, Math.floor(width / 4));
-let barWidth = width / bars;
-let step=Math.max(1, Math.floor(dataArray.length/bars));
+let halfWidth = width / 2;
+
+function drawSide(data, offsetX){
+
+let barWidth = halfWidth / bars;
+let step = Math.max(1, Math.floor(data.length / bars));
 
 let yOffset = 5;
 let maxHeight = heightCanvas * 0.9;
@@ -375,12 +376,12 @@ let maxHeight = heightCanvas * 0.9;
 for(let i=0;i<bars;i++){
 
 let index=i*step;
-let value = dataArray[index] || 0;
+let value = data[index] || 0;
 
 let percent=value/255;
 let h=Math.min(maxHeight, heightCanvas*percent);
 
-let x=i*barWidth;
+let x=offsetX + i*barWidth;
 let y=heightCanvas-h + yOffset;
 
 ctx.fillStyle="#ff2a2a";
@@ -405,6 +406,11 @@ let peakY=heightCanvas-peaks[i] + yOffset;
 
 ctx.fillRect(x,peakY,barWidth-1,3);
 }
+}
+
+drawSide(leftData, 0);
+drawSide(rightData, halfWidth);
+
 }
 </script>
 
