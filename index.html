@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Smart Polskie Radio</title>
+<title>Polskie Radio Online</title>
 
 <style>
 body {
     margin: 0;
     font-family: Arial, sans-serif;
-    background: #0e0e0e;
+    background: #0f0f0f;
     color: white;
 }
 
@@ -21,31 +21,12 @@ header {
     font-weight: bold;
 }
 
-#filters {
-    display: flex;
-    gap: 10px;
-    justify-content: center;
-    padding: 10px;
-    flex-wrap: wrap;
-}
-
-.filter {
-    padding: 6px 12px;
-    background: #2a2a2a;
-    border-radius: 8px;
-    cursor: pointer;
-}
-
-.filter.active {
-    background: #ff3b3b;
-}
-
 #stations {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
     gap: 12px;
     padding: 15px;
-    padding-bottom: 100px;
+    padding-bottom: 90px;
 }
 
 .station {
@@ -66,12 +47,7 @@ header {
     width: 60px;
     height: 60px;
     border-radius: 10px;
-}
-
-.tag {
-    font-size: 10px;
-    color: #aaa;
-    margin-top: 5px;
+    margin-bottom: 8px;
 }
 
 #player {
@@ -94,135 +70,89 @@ button {
     color: white;
     cursor: pointer;
 }
+
+#status {
+    font-size: 14px;
+    color: #aaa;
+}
 </style>
 </head>
 
 <body>
 
-<header>📻 Smart Polskie Radio</header>
-
-<div id="filters">
-    <div class="filter active" onclick="setFilter('all')">Wszystkie</div>
-    <div class="filter" onclick="setFilter('music')">Muzyczne</div>
-    <div class="filter" onclick="setFilter('talk')">Talk</div>
-    <div class="filter" onclick="setFilter('noncommercial')">Niekomercyjne</div>
-</div>
+<header>📻 Polskie Radio Online</header>
 
 <div id="stations"></div>
 
 <div id="player">
-    <div id="now">Kliknij stację</div>
+    <div id="status">Kliknij stację aby uruchomić</div>
     <button onclick="stopRadio()">Stop</button>
-    <audio id="audio" controls></audio>
 </div>
 
 <script>
 
-// 🎧 BAZA STACJI (rozszerzalna)
-let stations = [
-    {
-        name: "RMF FM",
-        img: "https://myradioonline.pl/images/rmffm.png",
-        url: "https://rs6-krk2-cyfronet.rmfstream.pl/RMFFM48",
-        type: "music",
-        tags: ["commercial"]
-    },
-    {
-        name: "Radio ZET",
-        img: "https://myradioonline.pl/images/radiozet.png",
-        url: "https://zt03.cdn.eurozet.pl/ZET010.mp3",
-        type: "music",
-        tags: ["commercial"]
-    },
+// 📻 PROSTA LISTA (tylko działające / stabilne przez MyRadioOnline)
+const stations = [
     {
         name: "Radio Nowy Świat",
         img: "https://upload.wikimedia.org/wikipedia/commons/6/6f/Radio_Nowy_%C5%9Awiat_logo.png",
-        url: "https://stream.rcs.revma.com/ypqt40u0x1zuv",
-        type: "music",
-        tags: ["noncommercial", "music"]
+        url: "https://myradioonline.pl/radio-nowy-swiat",
     },
     {
         name: "Radio 357",
         img: "https://upload.wikimedia.org/wikipedia/commons/2/2c/Radio_357_logo.png",
-        url: "https://stream.rcs.revma.com/ye5kghkgcm0uv",
-        type: "music",
-        tags: ["noncommercial", "music"]
+        url: "https://myradioonline.pl/radio-357",
     },
     {
         name: "TOK FM",
         img: "https://myradioonline.pl/images/tokfm.png",
-        url: "https://radiostream.pl/tuba9-1.mp3",
-        type: "talk",
-        tags: ["talk"]
+        url: "https://myradioonline.pl/tok-fm",
     },
     {
-        name: "Radio Maryja",
-        img: "https://upload.wikimedia.org/wikipedia/commons/3/3b/Radio_Maryja_logo.png",
-        url: "https://radio-maryja.pl/live.mp3",
-        type: "talk",
-        tags: ["talk"]
+        name: "Antyradio",
+        img: "https://myradioonline.pl/images/antyradio.png",
+        url: "https://myradioonline.pl/antyradio",
+    },
+    {
+        name: ":contentReference[oaicite:1]{index=1}",
+        img: "https://myradioonline.pl/images/muzyczneradio.png",
+        url: "https://myradioonline.pl/muzyczne-radio"
     }
 ];
 
-let currentFilter = "all";
-
 const stationsDiv = document.getElementById("stations");
-const audio = document.getElementById("audio");
-const now = document.getElementById("now");
+const status = document.getElementById("status");
+
+// 🔥 KLUCZ: otwieramy MyRadioOnline (działa zawsze)
+function play(station) {
+    status.textContent = "Otwieranie: " + station.name;
+
+    // otwiera w tej samej karcie (stabilne działanie streamu)
+    window.open(station.url, "_blank");
+
+    status.textContent = "Odtwarzanie w MyRadioOnline: " + station.name;
+}
+
+function stopRadio() {
+    status.textContent = "Zatrzymano (zamknij kartę radia)";
+}
 
 function render() {
     stationsDiv.innerHTML = "";
 
-    let filtered = stations.filter(s => {
-        if (currentFilter === "all") return true;
-        if (currentFilter === "music") return s.type === "music";
-        if (currentFilter === "talk") return s.type === "talk";
-        if (currentFilter === "noncommercial") return s.tags.includes("noncommercial");
-    });
-
-    filtered.forEach(station => {
+    stations.forEach(station => {
         const div = document.createElement("div");
         div.className = "station";
 
         div.innerHTML = `
             <img src="${station.img}" onerror="this.src='https://via.placeholder.com/60'">
             <div>${station.name}</div>
-            <div class="tag">${station.type}</div>
         `;
 
-        // ✔ tylko klik (wymóg przeglądarek)
         div.onclick = () => play(station);
 
         stationsDiv.appendChild(div);
     });
-}
-
-function play(station) {
-    now.textContent = "Gra: " + station.name;
-
-    audio.pause();
-    audio.src = station.url;
-    audio.load();
-
-    audio.play().catch(err => {
-        console.log(err);
-        now.textContent = "Kliknij ponownie (blokada przeglądarki)";
-    });
-}
-
-function stopRadio() {
-    audio.pause();
-    audio.src = "";
-    now.textContent = "Zatrzymano";
-}
-
-function setFilter(f) {
-    currentFilter = f;
-
-    document.querySelectorAll(".filter").forEach(el => el.classList.remove("active"));
-    event.target.classList.add("active");
-
-    render();
 }
 
 render();
