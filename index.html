@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="pl">
 <head>
 <meta charset="UTF-8" />
@@ -33,6 +33,12 @@ body {
 
 .station:hover {
     background: #222;
+}
+
+.station.active{
+    background:#2a2a2a;
+    color:#fff;
+    font-weight:bold;
 }
 
 /* PRAWA STRONA */
@@ -80,7 +86,7 @@ body {
     position: relative;
 }
 
-/* 🔥 PLAYER APP STYLE */
+/* PLAYER */
 #radioPlayer{
     width: 90%;
     height: 90%;
@@ -98,8 +104,9 @@ body {
 #logoBox img{
     width: 220px;
     height: auto;
-    border-radius: 8px;
+    border-radius: 10px;
     margin-bottom: 20px;
+    box-shadow: 0 0 15px rgba(255,255,255,0.05);
 }
 
 /* BIG PLAY */
@@ -153,6 +160,10 @@ body {
     font-size: 20px;
     user-select: none;
 }
+
+audio{
+    display:none;
+}
 </style>
 </head>
 
@@ -177,7 +188,6 @@ body {
 
     <div id="playerBox">
 
-        <!-- 🔥 APP PLAYER -->
         <div id="radioPlayer">
 
             <div id="logoBox">
@@ -204,11 +214,14 @@ body {
         <div class="btn" onclick="mute()">🔊</div>
     </div>
 
+    <audio id="audio" autoplay></audio>
+
 </div>
 
 <script>
 
-// 📻 STACJE
+const STREAM_URL = "https://stream.live.vc.bbcmedia.co.uk/bbc_radio_fourlw";
+
 const stations = [
     "Muzyczne Radio Jelenia Góra",
     "Polskie Radio Jedynka",
@@ -241,18 +254,32 @@ let index = 0;
 let playing = false;
 
 const sidebar = document.getElementById("sidebar");
+const audio = document.getElementById("audio");
 
 function updateLogo(name){
     document.getElementById("stationLogo").src =
         "https://via.placeholder.com/220x120?text=" + encodeURIComponent(name);
 }
 
+function setActive(){
+    document.querySelectorAll(".station").forEach((el,i)=>{
+        el.classList.toggle("active", i === index);
+    });
+}
+
 function load(i){
     index = i;
     updateLogo(stations[i]);
-    playing = false;
-    document.getElementById("bigPlay").innerText = "▶";
-    document.getElementById("playIcon").innerText = "▶";
+    setActive();
+
+    audio.src = STREAM_URL;
+
+    if(playing){
+        audio.play();
+    }
+
+    document.getElementById("bigPlay").innerText = playing ? "⏸" : "▶";
+    document.getElementById("playIcon").innerText = playing ? "⏸" : "▶";
 }
 
 stations.forEach((s, i) => {
@@ -265,6 +292,14 @@ stations.forEach((s, i) => {
 
 function togglePlay(){
     playing = !playing;
+
+    if(playing){
+        audio.src = STREAM_URL;
+        audio.play();
+    } else {
+        audio.pause();
+    }
+
     document.getElementById("bigPlay").innerText = playing ? "⏸" : "▶";
     document.getElementById("playIcon").innerText = playing ? "⏸" : "▶";
 }
@@ -280,7 +315,7 @@ function next(){
 }
 
 function mute(){
-    alert("Mute (do podpięcia streamu audio)");
+    audio.muted = !audio.muted;
 }
 
 load(0);
