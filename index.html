@@ -318,7 +318,7 @@ drawEQ();
 }
 
 /* =========================
-   🔥 ONLY FIXED EQ (optimized)
+   ONLY FIXED EQ (optimized)
 ========================= */
 function drawEQ(){
 
@@ -332,21 +332,26 @@ let bars = 64;
 let barWidth = width / bars;
 let step = Math.floor(dataArray.length / bars);
 
+/* smoothing buffer */
+if(!window._eqSmooth) window._eqSmooth = [];
+
 for(let i=0;i<bars;i++){
 
 let value = dataArray[i * step] || 0;
+
+/* bardziej naturalna reakcja */
 let target = (value / 255) * heightCanvas * 0.85;
 
-/* smooth motion */
-if(!peaks[i]) peaks[i]=0;
-peaks[i] += (target - peaks[i]) * 0.25;
+/* smoothing (wydajny i stabilny) */
+if(!window._eqSmooth[i]) window._eqSmooth[i]=0;
+window._eqSmooth[i] += (target - window._eqSmooth[i]) * 0.3;
 
-let h = peaks[i];
+let h = window._eqSmooth[i];
 
 let x = i * barWidth;
 let y = heightCanvas - h;
 
-/* gradient (UNCHANGED STYLE) */
+/* gradient EXACT z Twojej wersji */
 let gradient = ctx.createLinearGradient(0,heightCanvas,0,0);
 gradient.addColorStop(0,"#ff0000");
 gradient.addColorStop(0.6,"#ff5555");
@@ -354,7 +359,7 @@ gradient.addColorStop(1,"#ffffff");
 
 ctx.fillStyle = gradient;
 
-/* lighter shadow (performance fix) */
+/* lekkie cieniowanie (bez lagów) */
 ctx.shadowBlur = 3;
 ctx.shadowColor = "red";
 
@@ -362,7 +367,7 @@ ctx.fillRect(x, y, barWidth - 1, h);
 
 ctx.shadowBlur = 0;
 
-/* peak line */
+/* peak */
 ctx.fillStyle = "#ff2222";
 ctx.fillRect(x, heightCanvas - h, barWidth - 1, 2);
 
