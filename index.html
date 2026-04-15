@@ -298,7 +298,7 @@ drawEQ();
 }
 
 /* =======================
-   FINAL: SPECTRUM BARS (jak na obrazku)
+   FINAL SPECTRUM (zgodny z obrazkiem)
 ======================= */
 function drawEQ(){
 
@@ -312,6 +312,14 @@ let bars = 64;
 let barWidth = width / bars;
 let step = Math.floor(dataArray.length / bars);
 
+/* globalny gradient jak w referencji */
+let grad = ctx.createLinearGradient(0,0,width,0);
+grad.addColorStop(0.0,"#ff0000");
+grad.addColorStop(0.2,"#ff7a00");
+grad.addColorStop(0.4,"#ffe600");
+grad.addColorStop(0.6,"#00ffcc");
+grad.addColorStop(1.0,"#0066ff");
+
 for(let i=0;i<bars;i++){
 
 let v = dataArray[i * step] || 0;
@@ -321,24 +329,16 @@ let h = percent * height * 0.9;
 let x = i * barWidth;
 let y = height - h;
 
-let hue = i * 5;
-
-// neon gradient per bar
-let grad = ctx.createLinearGradient(0, y, 0, height);
-grad.addColorStop(0, `hsl(${hue},100%,60%)`);
-grad.addColorStop(1, `hsl(${hue},100%,30%)`);
-
+/* glow neon */
 ctx.fillStyle = grad;
+ctx.shadowBlur = 20;
+ctx.shadowColor = "#ff0033";
 
-// glow
-ctx.shadowBlur = 18;
-ctx.shadowColor = `hsl(${hue},100%,50%)`;
-
-// bar
+/* słupek */
 ctx.fillRect(x+1, y, barWidth-2, h);
 
-// peak cap (jak w equalizerach)
-ctx.fillStyle = "#fff";
+/* peak */
+ctx.fillStyle = "#ffffff";
 ctx.fillRect(x+1, y, barWidth-2, 2);
 
 ctx.shadowBlur = 0;
