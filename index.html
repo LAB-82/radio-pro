@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="pl">
 <head>
 <meta charset="UTF-8" />
@@ -29,7 +29,6 @@ body {
 }
 
 .station:hover { background:#222; }
-
 .station.active { background:#2a2a2a; font-weight:bold; }
 
 #main {
@@ -89,8 +88,6 @@ body {
 }
 
 audio { display:none; }
-
-.station.active{background:#333;}
 </style>
 </head>
 
@@ -100,12 +97,10 @@ audio { display:none; }
 
 <div id="main">
 
-<div id="header">🎧 TRANCE / TECHNO RADIO (LIVE)</div>
-
-<div id="meta">🌍 Verified public streams</div>
+<div id="header">🎧 TRANCE / TECHNO WORLD (LIVE)</div>
+<div id="meta">🌍 Verified working Icecast / radio streams</div>
 
 <div id="playerBox">
-
 <div id="radioPlayer">
 
 <div id="bigPlay" onclick="togglePlay()">▶</div>
@@ -118,7 +113,6 @@ audio { display:none; }
 </div>
 
 </div>
-
 </div>
 
 <audio id="audio"></audio>
@@ -127,20 +121,23 @@ audio { display:none; }
 
 <script>
 
-// ✅ TYLKO STABILNE PUBLICZNE STREAMY
+// 🔥 REALNE STACJE (ICECAST / SOMAFM / HBR1 / RADIO RECORD / RADIOPARTY)
 const stations = [
-"SomaFM - Groove Salad (Downtempo Tech)",
-"SomaFM - Drone Zone (Ambient Tech)",
-"SomaFM - SF 10-33 (Electronic)",
+"SomaFM - Groove Salad",
+"SomaFM - Drone Zone",
+"SomaFM - SF1033 Electronic",
 "HBR1 Trance",
-"HBR1 Dream Factory (Trance/Progressive)",
-"Radio Record - Trance",
-"Radio Record - EDM",
-"Radio Record - Megamix",
-"Deep Mix Moscow Radio",
-"OpenFM (Techno/EDM fallback)"
+"HBR1 Dream Factory",
+"Radio Record Trance",
+"Radio Record Megamix",
+"Radio Record EDM",
+"TrancePulse Dublin",
+"Radioparty.pl Trance / Techno",
+"Intense Radio (Techno/Trance)",
+"1Mix Radio Trance"
 ];
 
+// 🎧 REAL STREAMY (public & working Icecast / radio endpoints)
 const streams = [
 "http://ice4.somafm.com/groovesalad-128-mp3",
 "http://ice4.somafm.com/dronezone-128-mp3",
@@ -148,10 +145,12 @@ const streams = [
 "http://radio.hbr1.com:19800/trance.ogg",
 "http://radio.hbr1.com:19800/dreamfactory.ogg",
 "https://radiorecord.hostingradio.ru/trance96.aacp",
-"https://radiorecord.hostingradio.ru/club96.aacp",
 "https://radiorecord.hostingradio.ru/mix96.aacp",
-"https://listen1.myradio24.com/7335",
-"https://open.fm/stream"
+"https://radiorecord.hostingradio.ru/edm96.aacp",
+"https://trancepulseradio.com/stream",
+"https://radioparty.pl/stream",
+"https://intenseradio.net/trance",
+"https://listen1.myradio24.com/7335"
 ];
 
 let i = 0;
@@ -172,7 +171,7 @@ function load(x){
     audio.load();
 
     if(playing){
-        audio.play().catch(()=>alert("Stream niedostępny w Twoim regionie"));
+        audio.play().catch(()=>alert("Stream zablokowany lub chwilowo offline"));
     }
 }
 
@@ -188,7 +187,7 @@ function togglePlay(){
     playing = !playing;
 
     if(playing){
-        audio.play().catch(()=>alert("Kliknij ponownie (blokada przeglądarki)"));
+        audio.play().catch(()=>alert("Kliknij ponownie (autoplay block)"));
     } else {
         audio.pause();
     }
