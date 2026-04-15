@@ -1,76 +1,66 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
 <title>Muzyczne Radio PRO</title>
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
 
 <style>
 
-html, body{
-margin:0;
-padding:0;
-width:100%;
-height:100%;
-overflow:hidden;
-}
-
 body{
+margin:0;
 background:#000;
-color:#fff;
+color:#ff0000;
 font-family:'Orbitron',sans-serif;
 display:flex;
 flex-direction:column;
 align-items:center;
-height:100vh;
+overflow:hidden;
 }
 
 #title{
-font-size:88px;
-margin-top:50px;
-text-align:center;
-color:#ff0000;
-text-shadow:0 0 8px #ff0000,0 0 20px #ff0000,0 0 40px #ff0000;
+font-size:80px;
+margin-top:40px;
+text-shadow:0 0 10px #ff0000;
 }
 
 canvas{
-display:block;
+margin-top:20px;
 height:260px;
-margin:30px auto;
 }
 
-#nowPlaying, #djInfo{
+#infoPanel{
+margin-top:10px;
 text-align:center;
-color:#ff0000;
-text-shadow:0 0 10px #ff0000;
+width:100%;
+}
+
+.infoBox{
+margin:5px auto;
 font-size:18px;
-margin-top:5px;
+text-shadow:0 0 10px #ff0000;
 }
 
 #controls{
 display:flex;
-gap:8px;
-align-items:center;
-justify-content:space-between;
+gap:10px;
 flex-wrap:wrap;
-margin-top:15px;
+justify-content:center;
+margin-top:20px;
 }
 
 button{
 width:160px;
 height:45px;
 background:#111;
-color:#ff0000;
-cursor:pointer;
-font-family:'Orbitron';
 border:2px solid #ff0000;
+color:#ff0000;
 box-shadow:0 0 10px #ff0000;
-display:flex;
-align-items:center;
-justify-content:center;
+font-family:'Orbitron';
+cursor:pointer;
 }
 
 .volumeWrapper{
@@ -79,49 +69,11 @@ height:45px;
 display:flex;
 align-items:center;
 justify-content:center;
-background:#111;
 border:2px solid #ff0000;
-box-shadow:0 0 10px #ff0000;
 }
 
 #volume{
 width:120px;
-height:10px;
-appearance:none;
-background:#000;
-border:1px solid #ff0000;
-}
-
-#volume::-webkit-slider-thumb{
--webkit-appearance:none;
-width:16px;
-height:16px;
-background:#ff0000;
-box-shadow:0 0 12px #ff0000;
-cursor:pointer;
-}
-
-#modeBtn{
-font-size:22px;
-width:66px;
-height:49px;
-background:#111;
-color:#ff0000;
-border:2px solid #ff0000;
-box-shadow:0 0 15px #ff0000;
-}
-
-#bottomLink{
-margin-top:10px;
-text-align:center;
-width:100%;
-}
-
-#bottomLink a{
-color:#ff0000;
-text-decoration:none;
-text-shadow:0 0 10px #ff0000;
-font-size:20px;
 }
 
 </style>
@@ -131,27 +83,31 @@ font-size:20px;
 
 <div id="title">Muzyczne Radio</div>
 
-<canvas id="proEqualizer"></canvas>
+<canvas id="eq"></canvas>
 
-<div id="nowPlaying">Tytuł: ładowanie...</div>
-<div id="djInfo">Audycja: ładowanie...</div>
+<!-- 🔥 NOWY PANEL INFO -->
+<div id="infoPanel">
+
+<div class="infoBox" id="nowPlaying">
+🎵 Teraz gramy: ładowanie...
+</div>
+
+<div class="infoBox" id="djInfo">
+🎙️ Audycja: ładowanie...
+</div>
+
+</div>
 
 <div id="controls">
 
 <button onclick="playRadio()">PLAY</button>
 <button onclick="stopRadio()">STOP</button>
-<button onclick="muteRadio()">MUTE 🔊</button>
+<button onclick="muteRadio()">MUTE</button>
 
 <div class="volumeWrapper">
 <input id="volume" type="range" min="0" max="1" step="0.01" value="0.5">
 </div>
 
-<button id="modeBtn" onclick="toggleMode()">🌙</button>
-
-</div>
-
-<div id="bottomLink">
-<a href="https://www.muzyczneradio.pl" target="_blank">www.muzyczneradio.pl</a>
 </div>
 
 <audio id="audio" crossorigin="anonymous"></audio>
@@ -162,49 +118,17 @@ const STREAM_URL="https://stream.rcs.revma.com/gzwc1xcq042vv";
 
 const audio=document.getElementById("audio");
 const volume=document.getElementById("volume");
-const canvas=document.getElementById("proEqualizer");
-const ctx=canvas.getContext("2d");
 
 const nowPlaying=document.getElementById("nowPlaying");
 const djInfo=document.getElementById("djInfo");
 
-audio.volume=parseFloat(volume.value);
+audio.volume=0.5;
 
-let audioCtx, analyser, source, dataArray;
-let animationStarted=false;
-
-/* ================= AUDIO ================= */
-function setupAudio(){
-if(audioCtx) return;
-
-audioCtx=new (window.AudioContext||window.webkitAudioContext)();
-
-source=audioCtx.createMediaElementSource(audio);
-
-analyser=audioCtx.createAnalyser();
-analyser.fftSize=512;
-analyser.smoothingTimeConstant=0.5;
-
-source.connect(analyser);
-analyser.connect(audioCtx.destination);
-
-dataArray=new Uint8Array(analyser.frequencyBinCount);
-}
-
+/* RADIO */
 function playRadio(){
-setupAudio();
-
-if(audioCtx.state==="suspended"){
-audioCtx.resume();
-}
-
 audio.src=STREAM_URL;
 audio.play();
-
-if(!animationStarted){
-animationStarted=true;
 draw();
-}
 }
 
 function stopRadio(){
@@ -215,84 +139,64 @@ function muteRadio(){
 audio.muted=!audio.muted;
 }
 
-function toggleMode(){
-document.body.classList.toggle("day");
-modeBtn.innerText=document.body.classList.contains("day")?"☀️":"🌙";
-}
-
 volume.addEventListener("input",()=>{
-audio.volume=parseFloat(volume.value);
+audio.volume=volume.value;
 });
 
-/* ================= EQ ================= */
-function resizeCanvas(){
-let dpr=window.devicePixelRatio||1;
+/* EQ */
+const canvas=document.getElementById("eq");
+const ctx=canvas.getContext("2d");
 
-canvas.width=800*dpr;
-canvas.height=260*dpr;
+canvas.width=800;
+canvas.height=260;
 
-canvas.style.width="800px";
-canvas.style.height="260px";
+let audioCtx, analyser, source, dataArray;
 
-ctx.setTransform(1,0,0,1,0,0);
-ctx.scale(dpr,dpr);
+function setupAudio(){
+if(audioCtx) return;
+
+audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+source=audioCtx.createMediaElementSource(audio);
+
+analyser=audioCtx.createAnalyser();
+analyser.fftSize=256;
+
+source.connect(analyser);
+analyser.connect(audioCtx.destination);
+
+dataArray=new Uint8Array(analyser.frequencyBinCount);
 }
-
-window.addEventListener("load",resizeCanvas);
-window.addEventListener("resize",resizeCanvas);
 
 function draw(){
 requestAnimationFrame(draw);
 
-if(!analyser)return;
+if(!analyser) return;
 
 analyser.getByteFrequencyData(dataArray);
 
 ctx.clearRect(0,0,canvas.width,canvas.height);
 
-let width=800;
-let height=260;
-
-let bars=80;
-let barWidth=width/bars;
-let step=Math.floor(dataArray.length/bars);
+for(let i=0;i<60;i++){
+let v=dataArray[i]||0;
+let h=(v/255)*canvas.height;
 
 ctx.fillStyle="#ff0000";
-
-for(let i=0;i<bars;i++){
-let value=dataArray[i*step]||0;
-let h=(value/255)*height;
-
-ctx.fillRect(i*barWidth,height-h,barWidth-2,h);
+ctx.fillRect(i*13,canvas.height-h,10,h);
 }
 }
 
-/* ================= NOW PLAYING (STABILNE SCRAPE) ================= */
-async function fetchNowPlaying(){
+/* ================= PRO DISPLAY API (READY HOOK) ================= */
 
-try{
+/* TU MOŻESZ PODPIĄĆ PRAWDZIWE API W PRZYSZŁOŚCI */
+async function updateInfo(){
 
-/* PROXY-FREE METHOD:
-   próbujemy pobrać stronę radia i wyciągnąć "teraz gramy"
-*/
-const res = await fetch("https://www.muzyczneradio.pl/",{
-mode:"no-cors"
-});
-
-/* fallback, bo no-cors blokuje reading body */
-nowPlaying.innerText="Tytuł: aktualizacja niedostępna w trybie przeglądarki";
-djInfo.innerText="Audycja: sprawdzanie automatyczne";
-
-}catch(e){
-nowPlaying.innerText="Tytuł: brak danych";
-djInfo.innerText="Audycja: brak danych";
+/* teraz demo / fallback */
+nowPlaying.innerText="🎵 Teraz gramy: (brak API)";
+djInfo.innerText="🎙️ Audycja: (brak danych)";
 }
 
-}
-
-/* AUTO REFRESH */
-setInterval(fetchNowPlaying,10000);
-fetchNowPlaying();
+setInterval(updateInfo,5000);
+updateInfo();
 
 </script>
 
