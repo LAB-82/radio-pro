@@ -1,158 +1,116 @@
+const express = require("express");
+const fetch = require("node-fetch");
+
+const app = express();
+
+/* =========================
+   TYLKO PEWNE STREAMY (MP3/AAC DIRECT)
+========================= */
+const FIXED = [
+  { name: "SomaFM Groove Salad", url: "http://ice4.somafm.com/groovesalad-128-mp3" },
+  { name: "SomaFM Drone Zone", url: "http://ice4.somafm.com/dronezone-128-mp3" },
+  { name: "HBR1 Trance (DE)", url: "http://radio.hbr1.com:19800/trance.ogg" },
+  { name: "HBR1 Dream Factory", url: "http://radio.hbr1.com:19800/dreamfactory.ogg" }
+];
+
+/* =========================
+   API (tylko filtr MP3/AAC)
+========================= */
+app.get("/stations", async (req, res) => {
+  try {
+    const r = await fetch(
+      "https://de1.api.radio-browser.info/json/stations/search?tagList=trance;techno;electronic&limit=80"
+    );
+
+    const data = await r.json();
+
+    const dynamic = data
+      .filter(s =>
+        s.url_resolved &&
+        (
+          s.codec === "MP3" ||
+          s.codec === "AAC" ||
+          s.codec === "AAC+"
+        )
+      )
+      .map(s => ({
+        name: s.name,
+        url: s.url_resolved
+      }));
+
+    res.json([...FIXED, ...dynamic]);
+
+  } catch {
+    res.json(FIXED);
+  }
+});
+
+/* =========================
+   FRONTEND (bez dolnego paska)
+========================= */
+app.get("/", (req, res) => {
+  res.send(`
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Radio App UI</title>
+<meta charset="UTF-8">
+<title>RADIO FIX PRO</title>
 
 <style>
-body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #0b0b0b;
-    color: white;
-    display: flex;
-    height: 100vh;
+body{
+  margin:0;
+  font-family:Arial;
+  background:#0b0b0b;
+  color:white;
+  display:flex;
+  height:100vh;
 }
 
-/* LEWA LISTA */
-#sidebar {
-    width: 300px;
-    background: #141414;
-    overflow-y: auto;
-    border-right: 1px solid #222;
+#sidebar{
+  width:340px;
+  background:#141414;
+  overflow:auto;
+  border-right:1px solid #222;
 }
 
-.station {
-    padding: 10px;
-    border-bottom: 1px solid #222;
-    cursor: pointer;
-    transition: 0.2s;
-    font-size: 14px;
+.station{
+  padding:10px;
+  border-bottom:1px solid #222;
+  cursor:pointer;
 }
 
-.station:hover {
-    background: #222;
+.station:hover{background:#222;}
+.station.active{background:#333;font-weight:bold;}
+
+#main{
+  flex:1;
+  display:flex;
+  flex-direction:column;
 }
 
-/* PRAWA STRONA */
-#main {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
+#top{
+  padding:10px;
+  background:#1a1a1a;
+  display:flex;
+  justify-content:space-between;
 }
 
-/* HEADER */
-#header {
-    padding: 12px;
-    background: #1a1a1a;
-    font-size: 18px;
-    font-weight: bold;
+#player{
+  flex:1;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:black;
+  flex-direction:column;
 }
 
-/* META */
-#meta {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 8px 12px;
-    background: #151515;
-    color: #ccc;
-    font-size: 13px;
+#play{
+  font-size:100px;
+  cursor:pointer;
+  user-select:none;
 }
 
-.star {
-    color: gold;
-}
-
-.icon {
-    cursor: pointer;
-    font-size: 16px;
-}
-
-/* PLAYER AREA */
-#playerBox {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: #000;
-    position: relative;
-}
-
-/* 🔥 PLAYER APP STYLE */
-#radioPlayer{
-    width: 90%;
-    height: 90%;
-    background: #111;
-    border-radius: 14px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    box-shadow: 0 0 25px rgba(0,0,0,0.7);
-}
-
-/* LOGO */
-#logoBox img{
-    width: 220px;
-    height: auto;
-    border-radius: 8px;
-    margin-bottom: 20px;
-}
-
-/* BIG PLAY */
-#bigPlay{
-    font-size: 70px;
-    cursor: pointer;
-    user-select: none;
-    transition: 0.2s;
-}
-
-#bigPlay:hover{
-    transform: scale(1.1);
-}
-
-/* BOTTOM BAR */
-#bottomBar{
-    position: absolute;
-    bottom: 12px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: #222;
-    padding: 10px 18px;
-    border-radius: 30px;
-    display: flex;
-    gap: 18px;
-    font-size: 18px;
-    cursor: pointer;
-}
-
-#bottomBar div{
-    transition: 0.2s;
-}
-
-#bottomBar div:hover{
-    transform: scale(1.2);
-}
-
-/* CONTROLS */
-#controls {
-    height: 70px;
-    background: #111;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 20px;
-    border-top: 1px solid #222;
-}
-
-.btn {
-    cursor: pointer;
-    font-size: 20px;
-    user-select: none;
-}
+audio{display:none;}
 </style>
 </head>
 
@@ -162,130 +120,103 @@ body {
 
 <div id="main">
 
-    <div id="header">🎧 Radio Player</div>
+<div id="top">🎧 RADIO FIX PRO (ONLY PLAYABLE STREAMS)</div>
 
-    <div id="meta">
-        <div class="star">⭐⭐⭐⭐☆</div>
-        <div>Głosy: 1070 • Średnia: 4.8</div>
-
-        <div style="margin-left:auto; display:flex; gap:10px;">
-            <div class="icon">❤️</div>
-            <div class="icon">🔔</div>
-            <div class="icon">📤 Udostępnij</div>
-        </div>
-    </div>
-
-    <div id="playerBox">
-
-        <!-- 🔥 APP PLAYER -->
-        <div id="radioPlayer">
-
-            <div id="logoBox">
-                <img id="stationLogo" src="https://via.placeholder.com/220x120?text=RADIO" />
-            </div>
-
-            <div id="bigPlay" onclick="togglePlay()">▶</div>
-
-            <div id="bottomBar">
-                <div onclick="prev()">⏮</div>
-                <div onclick="togglePlay()" id="playIcon">▶</div>
-                <div onclick="next()">⏭</div>
-                <div onclick="mute()">🔊</div>
-            </div>
-
-        </div>
-
-    </div>
-
-    <div id="controls">
-        <div class="btn" onclick="prev()">⏮</div>
-        <div class="btn" onclick="togglePlay()">⏯</div>
-        <div class="btn" onclick="next()">⏭</div>
-        <div class="btn" onclick="mute()">🔊</div>
-    </div>
+<div id="player">
+  <div id="play">▶</div>
+</div>
 
 </div>
 
+<audio id="audio"></audio>
+
 <script>
 
-// 📻 STACJE
-const stations = [
-    "Muzyczne Radio Jelenia Góra",
-    "Polskie Radio Jedynka",
-    "Polskie Radio Dwójka",
-    "Polskie Radio Trójka",
-    "Polskie Radio Czwórka",
-    "Radio Plus",
-    "RMF FM",
-    "Radio Zet",
-    "Radio Eska",
-    "Radio Wrocław",
-    "Radio Wnet",
-    "Tok FM",
-    "Antyradio",
-    "Radio Kolor",
-    "Open FM",
-    "Open FM Disco Polo",
-    "Disco Radio",
-    "Polish Radio London 24",
-    "Polskie Radio Dzieciom",
-    "Polskie Radio Chopin",
-    "Radio Yanosik",
-    "Radio Republika",
-    "Radio dla Ciebie",
-    "Radio Maryja",
-    "Radio Jasna Góra"
-];
-
+let stations = [];
 let index = 0;
 let playing = false;
 
+const audio = document.getElementById("audio");
 const sidebar = document.getElementById("sidebar");
+const playBtn = document.getElementById("play");
 
-function updateLogo(name){
-    document.getElementById("stationLogo").src =
-        "https://via.placeholder.com/220x120?text=" + encodeURIComponent(name);
+/* LOAD */
+async function loadStations(){
+  const r = await fetch("/stations");
+  stations = await r.json();
+
+  render();
+  load(0);
 }
 
-function load(i){
-    index = i;
-    updateLogo(stations[i]);
-    playing = false;
-    document.getElementById("bigPlay").innerText = "▶";
-    document.getElementById("playIcon").innerText = "▶";
-}
+/* RENDER */
+function render(){
+  sidebar.innerHTML = "";
 
-stations.forEach((s, i) => {
+  stations.forEach((s,i)=>{
     const div = document.createElement("div");
-    div.className = "station";
-    div.innerText = s;
-    div.onclick = () => load(i);
+    div.className="station";
+    div.innerText=s.name;
+    div.onclick=()=>load(i);
     sidebar.appendChild(div);
-});
-
-function togglePlay(){
-    playing = !playing;
-    document.getElementById("bigPlay").innerText = playing ? "⏸" : "▶";
-    document.getElementById("playIcon").innerText = playing ? "⏸" : "▶";
+  });
 }
 
-function prev(){
-    index = (index - 1 + stations.length) % stations.length;
-    load(index);
+/* LOAD + VALIDATION */
+function load(i){
+  index = i;
+
+  const station = stations[index];
+  if(!station) return;
+
+  document.querySelectorAll(".station").forEach((el,idx)=>{
+    el.classList.toggle("active", idx===i);
+  });
+
+  audio.src = station.url;
+  audio.load();
+
+  if(playing){
+    audio.play().catch(()=>next());
+  }
 }
 
+/* PLAY */
+function toggle(){
+  playing = !playing;
+
+  if(playing){
+    audio.play().catch(()=>next());
+    playBtn.innerText="⏸";
+  } else {
+    audio.pause();
+    playBtn.innerText="▶";
+  }
+}
+
+/* AUTO SKIP (KLUCZ) */
+audio.onerror = () => next();
+audio.onstalled = () => next();
+
+/* NEXT */
 function next(){
-    index = (index + 1) % stations.length;
-    load(index);
+  index = (index + 1) % stations.length;
+  load(index);
 }
 
-function mute(){
-    alert("Mute (do podpięcia streamu audio)");
-}
+/* CLICK */
+playBtn.onclick = toggle;
 
-load(0);
+loadStations();
 
 </script>
 
 </body>
 </html>
+  `);
+});
+
+/* ========================= */
+app.listen(3000, () => {
+  console.log("RADIO FIX RUNNING http://localhost:3000");
+});
