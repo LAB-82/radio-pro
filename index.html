@@ -36,7 +36,6 @@ display:flex;
 flex-direction:column;
 align-items:center;
 height:100vh;
-transition:0.4s;
 }
 
 body.day{
@@ -57,7 +56,6 @@ margin:0 auto;
 margin-top:30px;
 margin-bottom:30px;
 border-radius:8px;
-overflow:hidden;
 }
 
 canvas{
@@ -80,19 +78,6 @@ height:44px !important;
 min-height:44px !important;
 }
 
-.volumeWrapper{
-display:flex;
-align-items:center;
-justify-content:center;
-padding:0;
-box-sizing:border-box;
-}
-
-#volume{
-height:6px;
-margin:0;
-}
-
 #modeBtn{
 display:block;
 margin-left:auto;
@@ -107,7 +92,6 @@ height:200px;
 #controls{
 flex-wrap:wrap;
 justify-content:center;
-align-items:center;
 gap:10px;
 }
 }
@@ -129,7 +113,6 @@ background:#111;
 color:white;
 cursor:pointer;
 font-family:'Orbitron';
-transition:0.2s;
 border:2px solid #ff2a2a;
 display:flex;
 align-items:center;
@@ -152,8 +135,6 @@ box-sizing:border-box;
 width:120px;
 height:10px;
 appearance:none;
-border-radius:10px;
-outline:none;
 background:#000;
 border:1px solid #ff2a2a;
 }
@@ -162,17 +143,7 @@ border:1px solid #ff2a2a;
 -webkit-appearance:none;
 width:16px;
 height:16px;
-border-radius:4px;
-background:#ff0000;
-cursor:pointer;
-}
-
-#volume::-moz-range-thumb{
-width:16px;
-height:16px;
-border:none;
-border-radius:4px;
-background:#ff0000;
+background:#ff2a2a;
 cursor:pointer;
 }
 
@@ -209,9 +180,9 @@ font-size:20px;
 
 <div id="controls">
 
-<button id="playBtn" onclick="playRadio()">PLAY</button>
-<button id="stopBtn" onclick="stopRadio()">STOP</button>
-<button id="muteBtn" onclick="muteRadio()">MUTE 🔊</button>
+<button onclick="playRadio()">PLAY</button>
+<button onclick="stopRadio()">STOP</button>
+<button onclick="muteRadio()">MUTE 🔊</button>
 
 <div class="volumeWrapper">
 <input id="volume" type="range" min="0" max="1" step="0.01" value="0.5">
@@ -232,28 +203,23 @@ const STREAM_URL="https://stream.rcs.revma.com/gzwc1xcq042vv";
 
 const audio=document.getElementById("audio");
 const volume=document.getElementById("volume");
-
-const playBtn=document.getElementById("playBtn");
-const stopBtn=document.getElementById("stopBtn");
-const muteBtn=document.getElementById("muteBtn");
-const modeBtn=document.getElementById("modeBtn");
-
-const title=document.getElementById("title");
-const controls=document.getElementById("controls");
-
 const canvas=document.getElementById("proEqualizer");
 const ctx=canvas.getContext("2d");
+const controls=document.getElementById("controls");
+const title=document.getElementById("title");
 
 audio.volume=parseFloat(volume.value);
 
 let audioCtx, analyser, source, dataArray;
-let peaks=[];
 let animationStarted=false;
 
-/* ================= PWA SERVICE WORKER ================= */
+/* ================= PWA FIX (KLUCZOWE) ================= */
 if('serviceWorker' in navigator){
-window.addEventListener('load',()=>{
-navigator.serviceWorker.register('sw.js');
+window.addEventListener('load', async () => {
+try {
+const reg = await navigator.serviceWorker.register('sw.js');
+await reg.update(); // wymusza aktualizację
+} catch(e){}
 });
 }
 
@@ -262,7 +228,6 @@ function setupAudio(){
 if(audioCtx) return;
 
 audioCtx=new (window.AudioContext||window.webkitAudioContext)();
-
 source=audioCtx.createMediaElementSource(audio);
 
 analyser=audioCtx.createAnalyser();
@@ -273,22 +238,18 @@ source.connect(analyser);
 analyser.connect(audioCtx.destination);
 
 dataArray=new Uint8Array(analyser.frequencyBinCount);
-
-for(let i=0;i<300;i++) peaks[i]=0;
 }
 
+/* PLAY */
 function playRadio(){
 setupAudio();
 
-if(audioCtx.state === "suspended"){
+if(audioCtx.state==="suspended"){
 audioCtx.resume();
 }
 
 audio.src=STREAM_URL;
 audio.play();
-
-playBtn.classList.add("playActive");
-stopBtn.classList.remove("stopActive");
 
 if(!animationStarted){
 animationStarted=true;
@@ -296,23 +257,23 @@ draw();
 }
 }
 
+/* STOP */
 function stopRadio(){
 audio.pause();
-
-for(let i=0;i<peaks.length;i++){
-peaks[i]=0;
-}
 }
 
+/* MUTE */
 function muteRadio(){
 audio.muted=!audio.muted;
 }
 
+/* MODE */
 function toggleMode(){
 document.body.classList.toggle("day");
 modeBtn.innerText=document.body.classList.contains("day")?"☀️":"🌙";
 }
 
+/* VOLUME */
 volume.addEventListener("input",()=>{
 audio.volume=parseFloat(volume.value);
 });
@@ -360,46 +321,9 @@ for(let i=0;i<bars;i++){
 let value=dataArray[i*step]||0;
 let h=(value/255)*height;
 
-let x=i*barWidth;
-let y=height-h;
-
-ctx.fillRect(x,y,barWidth-1,h);
+ctx.fillRect(i*barWidth,height-h,barWidth-1,h);
 }
 }
-</script>
-
-<!-- ================= SERVICE WORKER FILE ================= -->
-<script id="sw-code" type="text/plain">
-const CACHE_NAME="radio-pro-v1";
-const FILES=[
-"./",
-"./index.html",
-"./manifest.json",
-"./icon-192.png",
-"./icon-512.png"
-];
-
-self.addEventListener("install",e=>{
-e.waitUntil(
-caches.open(CACHE_NAME).then(cache=>{
-return cache.addAll(FILES);
-})
-);
-});
-
-self.addEventListener("fetch",e=>{
-e.respondWith(
-caches.match(e.request).then(r=>{
-return r||fetch(e.request);
-})
-);
-});
-</script>
-
-<script>
-const swBlob=new Blob([document.getElementById("sw-code").textContent],{type:"text/javascript"});
-const swURL=URL.createObjectURL(swBlob);
-navigator.serviceWorker.register(swURL);
 </script>
 
 </body>
