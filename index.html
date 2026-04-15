@@ -16,6 +16,12 @@ display:flex;
 flex-direction:column;
 align-items:center;
 height:100vh;
+transition:0.4s;
+}
+
+body.day{
+background:#eaeaea;
+color:#000;
 }
 
 #title{
@@ -23,7 +29,16 @@ font-size:88px;
 margin-top:50px;
 text-align:center;
 color:#ff2a2a;
-text-shadow:0 0 6px #ff2a2a;
+text-shadow:0 0 6px #ff2a2a,0 0 12px #ff0000;
+}
+
+#proEqualizer{
+display:block;
+margin:0 auto;
+margin-top:30px;
+margin-bottom:30px;
+border-radius:8px;
+overflow:hidden;
 }
 
 canvas{
@@ -35,20 +50,41 @@ height:260px;
 display:flex;
 gap:8px;
 margin-top:20px;
+margin-bottom:20px;
+align-items:center;
 justify-content:space-between;
 }
 
 .volumeWrapper{
-width:160px;height:45px;
-display:flex;align-items:center;justify-content:center;
+width:160px;
+height:45px;
+display:flex;
+align-items:center;
+justify-content:center;
 background:#111;
 border:2px solid #ff2a2a;
+box-shadow:0 0 6px #ff2a2a;
+}
+
+body.day .volumeWrapper{
+background:#d6d6d6;
+box-shadow:0 0 10px #ff2a2a;
 }
 
 button{
-width:160px;height:45px;
-background:#111;color:white;
+width:160px;
+height:45px;
+background:#111;
+color:white;
 border:2px solid #ff2a2a;
+box-shadow:0 0 6px #ff2a2a;
+}
+
+#volume{
+width:120px;
+height:10px;
+background:#000;
+border:1px solid #ff2a2a;
 }
 </style>
 </head>
@@ -59,15 +95,15 @@ border:2px solid #ff2a2a;
 <canvas id="proEqualizer"></canvas>
 
 <div id="controls">
-<button onclick="playRadio()">PLAY</button>
-<button onclick="stopRadio()">STOP</button>
-<button onclick="muteRadio()">MUTE</button>
+<button id="playBtn" onclick="playRadio()">PLAY</button>
+<button id="stopBtn" onclick="stopRadio()">STOP</button>
+<button id="muteBtn" onclick="muteRadio()">MUTE 🔊</button>
 
 <div class="volumeWrapper">
 <input id="volume" type="range" min="0" max="1" step="0.01" value="0.5">
 </div>
 
-<button>🌙</button>
+<button id="modeBtn" onclick="toggleMode()">🌙</button>
 </div>
 
 <audio id="audio" crossorigin="anonymous"></audio>
@@ -76,11 +112,11 @@ border:2px solid #ff2a2a;
 const STREAM_URL="https://stream.rcs.revma.com/gzwc1xcq042vv";
 
 const audio=document.getElementById("audio");
+const volume=document.getElementById("volume");
 const canvas=document.getElementById("proEqualizer");
 const ctx=canvas.getContext("2d");
 
 let audioCtx, analyser, source, dataArray;
-let gradient;
 
 function setupAudio(){
 if(audioCtx) return;
@@ -124,14 +160,6 @@ canvas.style.height="260px";
 
 ctx.setTransform(1,0,0,1,0,0);
 ctx.scale(dpr,dpr);
-
-/* CACHE GRADIENT (KLUCZ DO FPS) */
-gradient=ctx.createLinearGradient(0,0,w,0);
-gradient.addColorStop(0,"#ff0000");
-gradient.addColorStop(0.25,"#ff9900");
-gradient.addColorStop(0.5,"#ffee00");
-gradient.addColorStop(0.75,"#00ff66");
-gradient.addColorStop(1,"#0066ff");
 }
 
 window.addEventListener("load",resizeCanvas);
@@ -148,25 +176,26 @@ let h=canvas.height/window.devicePixelRatio;
 
 ctx.clearRect(0,0,w,h);
 
-/* minimal HUD */
-ctx.fillStyle="rgba(255,255,255,0.05)";
-for(let y=0;y<h;y+=25){
-ctx.fillRect(0,y,w,1);
-}
-
-/* FAST SPECTRUM */
-let bars=90;
+/* ===== VECTEEZY STYLE EQ ===== */
+let bars=70;
 let step=Math.floor(dataArray.length/bars);
 let barW=w/bars;
-
-ctx.fillStyle=gradient;
+let mid=h/2;
 
 for(let i=0;i<bars;i++){
 
 let v=dataArray[i*step]||0;
-let barH=(v/255)*h*0.9;
+let amp=(v/255)*(h*0.45);
 
-ctx.fillRect(i*barW,h-barH,barW-1,barH);
+/* gradient by position */
+let hue=200 + (i/bars)*160;
+ctx.fillStyle=`hsl(${hue},100%,55%)`;
+
+/* TOP */
+ctx.fillRect(i*barW,mid-amp,barW-1,amp);
+
+/* BOTTOM (mirror) */
+ctx.fillRect(i*barW,mid,barW-1,amp);
 }
 }
 </script>
