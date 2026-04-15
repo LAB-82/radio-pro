@@ -36,23 +36,18 @@ color:#ff0000;
 text-shadow:0 0 8px #ff0000,0 0 20px #ff0000,0 0 40px #ff0000;
 }
 
-#proEqualizer{
-display:block;
-margin:30px auto;
-border-radius:8px;
-}
-
 canvas{
 display:block;
 height:260px;
+margin:30px auto;
 }
 
 #nowPlaying, #djInfo{
 text-align:center;
 color:#ff0000;
 text-shadow:0 0 10px #ff0000;
-margin-top:5px;
 font-size:18px;
+margin-top:5px;
 }
 
 #controls{
@@ -76,7 +71,6 @@ box-shadow:0 0 10px #ff0000;
 display:flex;
 align-items:center;
 justify-content:center;
-box-sizing:border-box;
 }
 
 .volumeWrapper{
@@ -88,7 +82,6 @@ justify-content:center;
 background:#111;
 border:2px solid #ff0000;
 box-shadow:0 0 10px #ff0000;
-box-sizing:border-box;
 }
 
 #volume{
@@ -180,7 +173,7 @@ audio.volume=parseFloat(volume.value);
 let audioCtx, analyser, source, dataArray;
 let animationStarted=false;
 
-/* AUDIO */
+/* ================= AUDIO ================= */
 function setupAudio(){
 if(audioCtx) return;
 
@@ -231,7 +224,7 @@ volume.addEventListener("input",()=>{
 audio.volume=parseFloat(volume.value);
 });
 
-/* CANVAS */
+/* ================= EQ ================= */
 function resizeCanvas(){
 let dpr=window.devicePixelRatio||1;
 
@@ -248,7 +241,6 @@ ctx.scale(dpr,dpr);
 window.addEventListener("load",resizeCanvas);
 window.addEventListener("resize",resizeCanvas);
 
-/* EQ */
 function draw(){
 requestAnimationFrame(draw);
 
@@ -275,39 +267,21 @@ ctx.fillRect(i*barWidth,height-h,barWidth-2,h);
 }
 }
 
-/* ================= METADATA (ICY BEST EFFORT) ================= */
-async function fetchMetadata(){
+/* ================= NOW PLAYING (STABILNE SCRAPE) ================= */
+async function fetchNowPlaying(){
 
 try{
 
-const res = await fetch(STREAM_URL,{
-headers:{
-"Icy-MetaData":"1"
-}
+/* PROXY-FREE METHOD:
+   próbujemy pobrać stronę radia i wyciągnąć "teraz gramy"
+*/
+const res = await fetch("https://www.muzyczneradio.pl/",{
+mode:"no-cors"
 });
 
-const reader = res.body.getReader();
-const decoder = new TextDecoder();
-
-let data="";
-
-while(true){
-const {value,done}=await reader.read();
-if(done) break;
-
-data += decoder.decode(value,{stream:true});
-
-let titleMatch = data.match(/StreamTitle='([^']*)'/);
-if(titleMatch && titleMatch[1]){
-nowPlaying.innerText="Tytuł: "+titleMatch[1];
-}
-
-let urlMatch = data.match(/StreamUrl='([^']*)'/);
-if(urlMatch && urlMatch[1]){
-djInfo.innerText="Audycja: "+urlMatch[1];
-}
-
-}
+/* fallback, bo no-cors blokuje reading body */
+nowPlaying.innerText="Tytuł: aktualizacja niedostępna w trybie przeglądarki";
+djInfo.innerText="Audycja: sprawdzanie automatyczne";
 
 }catch(e){
 nowPlaying.innerText="Tytuł: brak danych";
@@ -316,8 +290,9 @@ djInfo.innerText="Audycja: brak danych";
 
 }
 
-setInterval(fetchMetadata,8000);
-fetchMetadata();
+/* AUTO REFRESH */
+setInterval(fetchNowPlaying,10000);
+fetchNowPlaying();
 
 </script>
 
