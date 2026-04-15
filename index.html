@@ -29,7 +29,7 @@ font-size:88px;
 margin-top:50px;
 text-align:center;
 color:#ff2a2a;
-text-shadow:0 0 6px #ff2a2a,0 0 12px #ff0000;
+text-shadow:0 0 5px #ff2a2a,0 0 15px #ff0000,0 0 30px #ff0000,0 0 60px #ff0000;
 }
 
 #proEqualizer{
@@ -64,12 +64,12 @@ align-items:center;
 justify-content:center;
 background:#111;
 border:2px solid #ff2a2a;
-box-shadow:0 0 6px #ff2a2a;
+box-shadow:0 0 10px #ff2a2a;
 }
 
 body.day .volumeWrapper{
 background:#d6d6d6;
-box-shadow:0 0 10px #ff2a2a;
+box-shadow:0 0 40px #ff2a2a,0 0 80px #ff0000;
 }
 
 button{
@@ -81,13 +81,13 @@ cursor:pointer;
 font-family:'Orbitron';
 transition:0.2s;
 border:2px solid #ff2a2a;
-box-shadow:0 0 6px #ff2a2a;
+box-shadow:0 0 10px #ff2a2a;
 }
 
 body.day button{
 background:#d6d6d6;
 color:#000;
-box-shadow:0 0 10px #ff2a2a;
+box-shadow:0 0 40px #ff2a2a,0 0 80px #ff0000;
 }
 
 #volume{
@@ -98,11 +98,11 @@ border-radius:10px;
 outline:none;
 background:#000;
 border:1px solid #ff2a2a;
-box-shadow:0 0 4px #ff2a2a;
+box-shadow:0 0 6px #ff2a2a;
 }
 
 #volume.active{
-box-shadow:0 0 8px #ff0000;
+box-shadow:0 0 10px #ff0000;
 border:1px solid #ff0000;
 }
 
@@ -112,7 +112,7 @@ width:16px;
 height:16px;
 border-radius:4px;
 background:#ff0000;
-box-shadow:0 0 8px #ff0000;
+box-shadow:0 0 10px red,0 0 20px red;
 cursor:pointer;
 }
 
@@ -122,22 +122,22 @@ height:16px;
 border:none;
 border-radius:4px;
 background:#ff0000;
-box-shadow:0 0 8px #ff0000;
+box-shadow:0 0 10px red,0 0 20px red;
 cursor:pointer;
 }
 
-.playActive{ color:#ff2a2a; text-shadow:0 0 8px #ff0000; }
-.stopActive{ color:#ff2a2a; text-shadow:0 0 8px #ff0000; }
+.playActive{ color:#00ff00; text-shadow:0 0 10px #00ff00; }
+.stopActive{ color:#ff4444; text-shadow:0 0 10px red; }
 
 .muteActive{
-color:#ff2a2a;
-text-shadow:0 0 8px #ff0000;
+color:#ffaa00;
+text-shadow:0 0 10px orange;
 animation:pulseMute 0.8s infinite alternate;
 }
 
 @keyframes pulseMute{
 from{ transform:scale(1); }
-to{ transform:scale(1.05); }
+to{ transform:scale(1.1); }
 }
 
 #modeBtn{
@@ -147,17 +147,16 @@ height:49px;
 }
 
 body:not(.day) #modeBtn{
-color:#ff2a2a;
-text-shadow:0 0 6px #ff0000;
+color:#ffff00;
+text-shadow:0 0 8px #ffff00,0 0 16px #ffff66;
 background:#111;
-box-shadow:0 0 6px #ff0000;
 }
 
 body.day #modeBtn{
-color:#ff2a2a;
-text-shadow:0 0 6px #ff0000;
-background:#d6d6d6;
-box-shadow:0 0 6px #ff0000;
+color:#ffff00;
+text-shadow:0 0 8px #ffff00,0 0 16px #ffff66;
+background:#00ccff;
+box-shadow:0 0 12px #00ccff,0 0 24px #00aaff;
 }
 
 #bottomLink{
@@ -169,7 +168,7 @@ width:100%;
 #bottomLink a{
 color:#ff2a2a;
 text-decoration:none;
-text-shadow:0 0 4px #ff0000;
+text-shadow:0 0 6px red;
 font-size:20px;
 }
 </style>
@@ -229,15 +228,15 @@ audioCtx=new (window.AudioContext||window.webkitAudioContext)();
 source=audioCtx.createMediaElementSource(audio);
 
 analyser=audioCtx.createAnalyser();
-analyser.fftSize=256; // 🔥 mniej danych = większa płynność
-analyser.smoothingTimeConstant=0.75; // 🔥 stabilniejszy rytm
+analyser.fftSize=512;
+analyser.smoothingTimeConstant=0.5;
 
 source.connect(analyser);
 analyser.connect(audioCtx.destination);
 
 dataArray=new Uint8Array(analyser.frequencyBinCount);
 
-for(let i=0;i<200;i++) peaks[i]=0;
+for(let i=0;i<300;i++) peaks[i]=0;
 }
 
 function playRadio(){
@@ -291,7 +290,6 @@ audio.volume=parseFloat(volume.value);
 });
 
 function resizeCanvas(){
-
 let dpr = window.devicePixelRatio || 1;
 let width = title.offsetWidth;
 
@@ -319,6 +317,9 @@ analyser.getByteFrequencyData(dataArray);
 drawEQ();
 }
 
+/* =======================
+   🔥 FIX: płynny EQ + wydajność
+======================= */
 function drawEQ(){
 
 let dpr = window.devicePixelRatio || 1;
@@ -327,38 +328,46 @@ let height = canvas.height / dpr;
 
 ctx.clearRect(0,0,width,height);
 
-/* 🔥 mniej słupków = więcej FPS */
-let bars = 48;
+/* stabilna liczba słupków */
+let bars = 64;
 let barWidth = width / bars;
-
 let step = Math.floor(dataArray.length / bars);
 
 for(let i=0;i<bars;i++){
 
 let value = dataArray[i * step] || 0;
 
-/* 🔥 stabilniejsza dynamika */
-let h = (value / 255) * height * 0.85;
+/* stabilniejsza reakcja */
+let target = (value / 255) * height * 0.85;
 
-/* smoothing bez tablicy peaks (oszczędność CPU) */
-let smooth = (peaks[i] || 0) * 0.7 + h * 0.3;
-peaks[i] = smooth;
+/* smoothing (klucz do płynności) */
+if(!peaks[i]) peaks[i] = 0;
+peaks[i] = peaks[i] * 0.65 + target * 0.35;
+
+let h = peaks[i];
 
 let x = i * barWidth;
-let y = height - smooth;
+let y = height - h;
 
-/* 🔥 1 draw zamiast segmentów */
-ctx.fillStyle="#ff2a2a";
-ctx.shadowBlur=3;
-ctx.shadowColor="#ff0000";
+/* gradient z Twojej wersji */
+let gradient = ctx.createLinearGradient(0,height,0,0);
+gradient.addColorStop(0,"#ff0000");
+gradient.addColorStop(0.6,"#ff5555");
+gradient.addColorStop(1,"#ffffff");
 
-ctx.fillRect(x, y, barWidth-2, smooth);
+ctx.fillStyle = gradient;
 
-ctx.shadowBlur=0;
+/* lekki glow (bez ciężkiego shadow per bar) */
+ctx.shadowBlur = 3;
+ctx.shadowColor = "red";
 
-/* peak line */
-ctx.fillStyle="#ff2a2a";
-ctx.fillRect(x, height - smooth - 2, barWidth-2, 2);
+ctx.fillRect(x, y, barWidth - 1, h);
+
+ctx.shadowBlur = 0;
+
+/* peak */
+ctx.fillStyle = "#ff2222";
+ctx.fillRect(x, height - h, barWidth - 1, 2);
 
 }
 }
