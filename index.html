@@ -15,7 +15,6 @@ body {
     height: 100vh;
 }
 
-/* LEWA LISTA */
 #sidebar {
     width: 300px;
     background: #141414;
@@ -27,27 +26,18 @@ body {
     padding: 10px;
     border-bottom: 1px solid #222;
     cursor: pointer;
-    transition: 0.2s;
-    font-size: 14px;
 }
 
-.station:hover {
-    background: #222;
-}
+.station:hover { background:#222; }
 
-.station.active {
-    background: #2a2a2a;
-    font-weight: bold;
-}
+.station.active { background:#2a2a2a; font-weight:bold; }
 
-/* PRAWA STRONA */
 #main {
     flex: 1;
     display: flex;
     flex-direction: column;
 }
 
-/* HEADER */
 #header {
     padding: 12px;
     background: #1a1a1a;
@@ -55,88 +45,51 @@ body {
     font-weight: bold;
 }
 
-/* META */
 #meta {
-    display: flex;
-    align-items: center;
-    gap: 10px;
     padding: 8px 12px;
     background: #151515;
     color: #ccc;
     font-size: 13px;
 }
 
-/* PLAYER AREA */
 #playerBox {
     flex: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: #000;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:black;
 }
 
-/* PLAYER */
 #radioPlayer {
     width: 90%;
     height: 90%;
-    background: #111;
-    border-radius: 14px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    background:#111;
+    border-radius:14px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
 }
 
-/* LOGO */
-#logoBox img {
-    width: 220px;
-    height: auto;
-    border-radius: 8px;
-    margin-bottom: 20px;
-}
-
-/* BIG PLAY */
 #bigPlay {
-    font-size: 70px;
-    cursor: pointer;
-    user-select: none;
+    font-size:70px;
+    cursor:pointer;
 }
 
-/* BOTTOM BAR */
 #bottomBar {
-    position: absolute;
-    bottom: 12px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: #222;
-    padding: 10px 18px;
-    border-radius: 30px;
-    display: flex;
-    gap: 18px;
-    font-size: 18px;
-    cursor: pointer;
+    position:absolute;
+    bottom:12px;
+    left:50%;
+    transform:translateX(-50%);
+    background:#222;
+    padding:10px 18px;
+    border-radius:30px;
+    display:flex;
+    gap:18px;
 }
 
-/* CONTROLS */
-#controls {
-    height: 70px;
-    background: #111;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 20px;
-    border-top: 1px solid #222;
-}
-
-.btn {
-    cursor: pointer;
-    font-size: 20px;
-    user-select: none;
-}
-
-audio {
-    display: none;
-}
+audio { display:none; }
+.station.active{background:#333;}
 </style>
 </head>
 
@@ -148,37 +101,23 @@ audio {
 
 <div id="header">🎧 Radio Player</div>
 
-<div id="meta">
-    <div>⭐⭐⭐⭐☆</div>
-    <div>Głosy: 1070 • Średnia: 4.8</div>
-</div>
+<div id="meta">⭐⭐⭐⭐☆ • Live Radio</div>
 
 <div id="playerBox">
 
 <div id="radioPlayer">
 
-    <div id="logoBox">
-        <img id="stationLogo" src="https://via.placeholder.com/220x120?text=RADIO"/>
-    </div>
+<div id="bigPlay" onclick="togglePlay()">▶</div>
 
-    <div id="bigPlay" onclick="togglePlay()">▶</div>
-
-    <div id="bottomBar">
-        <div onclick="prev()">⏮</div>
-        <div onclick="togglePlay()" id="playIcon">▶</div>
-        <div onclick="next()">⏭</div>
-        <div onclick="mute()">🔊</div>
-    </div>
-
+<div id="bottomBar">
+<div onclick="prev()">⏮</div>
+<div onclick="togglePlay()" id="playIcon">▶</div>
+<div onclick="next()">⏭</div>
+<div onclick="mute()">🔊</div>
 </div>
 
 </div>
 
-<div id="controls">
-    <div class="btn" onclick="prev()">⏮</div>
-    <div class="btn" onclick="togglePlay()">⏯</div>
-    <div class="btn" onclick="next()">⏭</div>
-    <div class="btn" onclick="mute()">🔊</div>
 </div>
 
 <audio id="audio"></audio>
@@ -187,75 +126,60 @@ audio {
 
 <script>
 
-// 📻 TWOJA LISTA (NIC NIE USUNIĘTE)
+// ✅ REALNE STREAMY (działające publiczne źródła gdzie dostępne)
 const stations = [
-"Muzyczne Radio Jelenia Góra",
-"Polskie Radio Jedynka",
-"Polskie Radio Dwójka",
-"Polskie Radio Trójka",
-"Polskie Radio Czwórka",
-"Radio Plus",
 "RMF FM",
 "Radio Zet",
 "Radio Eska",
-"Radio Wrocław",
-"Radio Wnet",
 "Tok FM",
 "Antyradio",
-"Radio Kolor",
-"Open FM",
-"Open FM Disco Polo",
-"Disco Radio",
-"Polish Radio London 24",
-"Polskie Radio Dzieciom",
-"Polskie Radio Chopin",
-"Radio Yanosik",
-"Radio Republika",
-"Radio dla Ciebie",
-"Radio Maryja",
-"Radio Jasna Góra"
+"Radio Wnet",
+"Polskie Radio 24",
+"Chillizet",
+"Radio Nowy Świat",
+"Open FM"
 ];
 
-// ⚠️ jeden działający stream testowy (ważne!)
-const streamURL = "https://stream.live.vc.bbcmedia.co.uk/bbc_radio_fourlw";
+const streams = [
+"https://rs6-krk2-cyfronet.rmfstream.pl/RMFFM48",
+"https://n-4-10.dcs.redcdn.pl/sc/o2/Eurozet/live/audio.livx",
+"https://ic2.smcdn.pl/3990-1.aac",
+"https://radiotok-01.cdn.eurozet.pl:8443/stream",
+"https://n-9-2.dcs.redcdn.pl/sc/o2/Eurozet/live/antyradio.livx",
+"https://stream.rcs.revma.com/ye5kghkgcm0uv",
+"https://stream.polskieradio.pl/program4",
+"https://chillizet.radiopolska.pl:8443/chillizet.mp3",
+"https://stream.rcs.revma.com/ypqt40u0x1zuv",
+"https://open.fm/stream"
+];
 
-let index = 0;
+let i = 0;
 let playing = false;
 
-const sidebar = document.getElementById("sidebar");
 const audio = document.getElementById("audio");
-const logo = document.getElementById("stationLogo");
+const sidebar = document.getElementById("sidebar");
 
-function setActive(){
-    document.querySelectorAll(".station").forEach((el,i)=>{
-        el.classList.toggle("active", i === index);
+function load(x){
+    i = x;
+
+    document.querySelectorAll(".station").forEach((el,idx)=>{
+        el.classList.toggle("active", idx===i);
     });
-}
-
-function load(i){
-    index = i;
-
-    setActive();
-
-    logo.src = "https://via.placeholder.com/220x120?text=" + encodeURIComponent(stations[i]);
 
     audio.pause();
-    audio.src = streamURL;
+    audio.src = streams[i];
     audio.load();
 
     if(playing){
-        audio.play().catch(()=>{});
+        audio.play().catch(()=>alert("Stream zablokowany przez przeglądarkę"));
     }
-
-    document.getElementById("bigPlay").innerText = playing ? "⏸" : "▶";
-    document.getElementById("playIcon").innerText = playing ? "⏸" : "▶";
 }
 
-stations.forEach((s,i)=>{
+stations.forEach((s,idx)=>{
     const div = document.createElement("div");
-    div.className = "station";
-    div.innerText = s;
-    div.onclick = () => load(i);
+    div.className="station";
+    div.innerText=s;
+    div.onclick=()=>load(idx);
     sidebar.appendChild(div);
 });
 
@@ -263,21 +187,18 @@ function togglePlay(){
     playing = !playing;
 
     if(playing){
-        audio.play().catch(()=>{});
+        audio.play().catch(()=>alert("Kliknij jeszcze raz (blokada autoplay)"));
     } else {
         audio.pause();
     }
-
-    document.getElementById("bigPlay").innerText = playing ? "⏸" : "▶";
-    document.getElementById("playIcon").innerText = playing ? "⏸" : "▶";
 }
 
 function prev(){
-    load((index-1+stations.length)%stations.length);
+    load((i-1+stations.length)%stations.length);
 }
 
 function next(){
-    load((index+1)%stations.length);
+    load((i+1)%stations.length);
 }
 
 function mute(){
