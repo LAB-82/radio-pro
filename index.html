@@ -21,24 +21,12 @@ header {
     font-weight: bold;
 }
 
-#player {
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-    background: #111;
-    padding: 10px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    border-top: 1px solid #333;
-}
-
 #stations {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
     gap: 12px;
     padding: 15px;
-    padding-bottom: 80px;
+    padding-bottom: 100px;
 }
 
 .station {
@@ -62,8 +50,16 @@ header {
     margin-bottom: 8px;
 }
 
-.station-name {
-    font-size: 14px;
+#player {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background: #111;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-top: 1px solid #333;
 }
 
 button {
@@ -84,21 +80,19 @@ button {
 <div id="stations"></div>
 
 <div id="player">
-    <div id="now">Nie gra nic</div>
+    <div id="now">Kliknij stację aby rozpocząć</div>
     <button onclick="stopRadio()">Stop</button>
-    <audio id="audio" controls autoplay></audio>
+    <audio id="audio" controls></audio>
 </div>
 
 <script>
-// POLSKIE STACJE (z MyRadioOnline – najpopularniejsze)
+
 const stations = [
     { name: "RMF FM", img: "https://myradioonline.pl/images/rmffm.png", url: "https://rs6-krk2-cyfronet.rmfstream.pl/RMFFM48" },
     { name: "Radio ZET", img: "https://myradioonline.pl/images/radiozet.png", url: "https://zt03.cdn.eurozet.pl/ZET010.mp3" },
     { name: "Radio ESKA", img: "https://myradioonline.pl/images/eska.png", url: "https://waw02-01.cdn.eurozet.pl/eska.mp3" },
     { name: "VOX FM", img: "https://myradioonline.pl/images/voxfm.png", url: "https://stream.voxfm.pl/vox.mp3" },
-    { name: "Antyradio", img: "https://myradioonline.pl/images/antyradio.png", url: "https://n-4-1.dcs.redcdn.pl/sc/o2/Eurozet/live/antyradio.livx" },
-    { name: "Radio TOK FM", img: "https://myradioonline.pl/images/tokfm.png", url: "https://radiostream.pl/tuba9-1.mp3" },
-    { name: "Radio Plus", img: "https://myradioonline.pl/images/radioplus.png", url: "https://pldm.ml/radio?url=http://stream.radioplus.pl" }
+    { name: "Antyradio", img: "https://myradioonline.pl/images/antyradio.png", url: "https://n-4-1.dcs.redcdn.pl/sc/o2/Eurozet/live/antyradio.livx" }
 ];
 
 const stationsDiv = document.getElementById("stations");
@@ -106,25 +100,42 @@ const audio = document.getElementById("audio");
 const now = document.getElementById("now");
 
 function playRadio(station) {
-    now.textContent = "Gra: " + station.name;
-    audio.src = station.url;
-    audio.play();
+    try {
+        now.textContent = "Ładowanie: " + station.name;
+
+        audio.pause();
+        audio.src = station.url;
+        audio.load();
+
+        const playPromise = audio.play();
+
+        if (playPromise !== undefined) {
+            playPromise
+                .then(() => {
+                    now.textContent = "Gra: " + station.name;
+                })
+                .catch(err => {
+                    now.textContent = "Błąd odtwarzania (blokada przeglądarki)";
+                    console.error(err);
+                });
+        }
+
+    } catch (e) {
+        console.error(e);
+        now.textContent = "Błąd odtwarzania";
+    }
 }
 
-// hover = start (jak na myradioonline.pl)
 function createStation(station) {
     const div = document.createElement("div");
     div.className = "station";
 
     div.innerHTML = `
         <img src="${station.img}" onerror="this.src='https://via.placeholder.com/60'">
-        <div class="station-name">${station.name}</div>
+        <div>${station.name}</div>
     `;
 
-    div.addEventListener("mouseenter", () => {
-        playRadio(station);
-    });
-
+    // 🔥 TYLKO KLIK — to działa zawsze
     div.addEventListener("click", () => {
         playRadio(station);
     });
@@ -139,6 +150,7 @@ function stopRadio() {
     audio.src = "";
     now.textContent = "Zatrzymano";
 }
+
 </script>
 
 </body>
