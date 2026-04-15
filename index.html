@@ -2,7 +2,7 @@
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
-<title>MUZYCZNE RADIO // ARASAKA SYSTEM</title>
+<title>Muzyczne Radio PRO</title>
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -22,57 +22,51 @@ font-family:"Orbitron",sans-serif;
 color:#ff2a2a;
 }
 
-/* ================= ARASAKA BACKGROUND ================= */
+/* ================= ARASAKA BACKGROUND (subtelny, nie chaos) ================= */
 body{
 background:
-radial-gradient(circle at center, #120000 0%, #000 55%, #000 100%),
+radial-gradient(circle at center, #0b0000 0%, #000 60%, #000 100%),
 repeating-linear-gradient(
 90deg,
-rgba(255,0,0,0.04),
-rgba(255,0,0,0.04) 1px,
+rgba(255,0,0,0.03),
+rgba(255,0,0,0.03) 1px,
 transparent 1px,
-transparent 6px
+transparent 8px
 );
-box-shadow: inset 0 0 200px rgba(255,0,0,0.15);
 }
 
-/* ================= TITLE ARASAKA ================= */
+/* ================= TITLE (NIE PRZESUNIĘTE) ================= */
 #title{
-font-size:76px;
+font-size:78px;
 margin-top:35px;
 text-align:center;
-letter-spacing:10px;
-text-transform:uppercase;
-
+letter-spacing:8px;
 color:#ff2a2a;
-
-text-shadow:
-0 0 10px #ff0000,
-0 0 30px #ff0000,
-0 0 80px rgba(255,0,0,0.6);
-
-position:relative;
+text-shadow:0 0 12px #ff0000;
 }
 
-/* ================= HUD FRAME ================= */
+/* ================= CANVAS FIX (KLUCZOWE – BRAK ROZJEŻDŻANIA) ================= */
 #proEqualizer{
 display:block;
 margin:20px auto;
-width:90vw;        /* 🔧 FIX: stabilna szerokość */
-max-width:1100px;
+width:90vw;
+max-width:1000px;
 height:260px;
 
-border:1px solid rgba(255,0,0,0.4);
+border:1px solid rgba(255,0,0,0.25);
 border-radius:8px;
 
-box-shadow:
-0 0 20px #ff0000,
-0 0 60px rgba(255,0,0,0.3);
-
-background:rgba(0,0,0,0.4);
+box-shadow:0 0 20px #ff0000;
+background:rgba(0,0,0,0.3);
 }
 
-/* ================= CONTROLS ================= */
+canvas{
+display:block;
+width:100%;
+height:260px;
+}
+
+/* ================= CONTROLS (UKŁAD BEZ ZMIAN) ================= */
 #controls{
 display:flex;
 gap:10px;
@@ -82,36 +76,31 @@ flex-wrap:wrap;
 margin-top:15px;
 }
 
-/* ================= ARASAKA BUTTONS ================= */
+/* ================= BUTTONS (ARASAKA CLEAN STYLE) ================= */
 button{
 width:150px;
 height:44px;
 
-background:linear-gradient(180deg,#0a0000,#1a0000);
+background:#0a0000;
 color:#ff2a2a;
 
 border:1px solid #ff2a2a;
 
 font-family:"Orbitron",sans-serif;
 letter-spacing:2px;
-text-transform:uppercase;
 
-box-shadow:
-0 0 12px #ff0000,
-inset 0 0 10px rgba(255,0,0,0.25);
+box-shadow:0 0 12px #ff0000;
 
 cursor:pointer;
 transition:0.2s;
 }
 
 button:hover{
-transform:scale(1.06);
-box-shadow:
-0 0 30px #ff0000,
-0 0 70px rgba(255,0,0,0.5);
+transform:scale(1.05);
+box-shadow:0 0 25px #ff0000;
 }
 
-/* ================= VOLUME ================= */
+/* ================= VOLUME (STABILNY) ================= */
 .volumeWrapper{
 width:150px;
 height:44px;
@@ -119,10 +108,9 @@ display:flex;
 align-items:center;
 justify-content:center;
 
-background:rgba(0,0,0,0.6);
+background:#000;
 border:1px solid #ff2a2a;
-
-box-shadow:0 0 15px #ff0000;
+box-shadow:0 0 12px #ff0000;
 }
 
 #volume{
@@ -131,8 +119,6 @@ height:6px;
 appearance:none;
 background:#000;
 border:1px solid #ff2a2a;
-box-shadow:0 0 10px #ff0000;
-border-radius:10px;
 }
 
 #volume::-webkit-slider-thumb{
@@ -140,9 +126,8 @@ border-radius:10px;
 width:14px;
 height:14px;
 background:#ff2a2a;
-box-shadow:0 0 15px #ff0000;
+box-shadow:0 0 10px #ff0000;
 cursor:pointer;
-border-radius:2px;
 }
 
 /* ================= MODE ================= */
@@ -152,8 +137,13 @@ height:44px;
 background:#000;
 border:1px solid #ff2a2a;
 color:#ff2a2a;
-box-shadow:0 0 15px #ff0000;
+box-shadow:0 0 10px #ff0000;
 }
+
+/* ================= STATUS ================= */
+.playActive{ text-shadow:0 0 15px #ff0000; }
+.stopActive{ text-shadow:0 0 15px #aa0000; }
+.muteActive{ text-shadow:0 0 15px orange; }
 
 /* ================= MOBILE ================= */
 @media (max-width: 768px){
@@ -175,24 +165,17 @@ height:40px;
 
 }
 
-/* ================= CANVAS STABILIZATION FIX ================= */
+/* ================= FIX KLUCZOWY: BRAK ROZJEŻDŻANIA EQ ================= */
 canvas{
-display:block;
-width:100%;
-height:260px;
+image-rendering: crisp-edges;
 }
-
-/* ================= STATUS ================= */
-.playActive{ text-shadow:0 0 20px #ff0000; }
-.stopActive{ text-shadow:0 0 20px #aa0000; }
-.muteActive{ text-shadow:0 0 20px orange; }
 
 </style>
 </head>
 
 <body>
 
-<div id="title">ARASAKA AUDIO SYSTEM</div>
+<div id="title">Muzyczne Radio</div>
 
 <canvas id="proEqualizer"></canvas>
 
@@ -208,6 +191,10 @@ height:260px;
 
 <button id="modeBtn">🌙</button>
 
+</div>
+
+<div id="bottomLink">
+<a href="https://www.muzyczneradio.pl" target="_blank">www.muzyczneradio.pl</a>
 </div>
 
 <audio id="audio" crossorigin="anonymous"></audio>
@@ -284,7 +271,7 @@ volume.addEventListener("input",()=>{
 audio.volume=parseFloat(volume.value);
 });
 
-/* ================= STABLE ARASAKA EQ ================= */
+/* ================= FIXED EQ (NIE ROZJEŻDŻA SIĘ) ================= */
 function draw(){
 requestAnimationFrame(draw);
 
@@ -297,8 +284,8 @@ let h=canvas.height=canvas.offsetHeight;
 
 ctx.clearRect(0,0,w,h);
 
-/* FIX: stała siatka – brak rozjeżdżania */
-let bars=80;
+/* STABILNA SIATKA ARASAKA */
+let bars=70;
 let barWidth=w/bars;
 
 for(let i=0;i<bars;i++){
@@ -307,9 +294,7 @@ let v=dataArray[i]||0;
 let bh=(v/255)*h;
 
 ctx.fillStyle="#ff2a2a";
-
-/* FIX: stały grid */
-ctx.fillRect(i*barWidth,h-bh,barWidth*0.7,bh);
+ctx.fillRect(i*barWidth,h-bh,barWidth*0.6,bh);
 }
 }
 
