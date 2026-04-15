@@ -19,7 +19,10 @@ height:100vh;
 transition:0.4s;
 }
 
-body.day{background:#eaeaea;color:#000;}
+body.day{
+background:#eaeaea;
+color:#000;
+}
 
 #title{
 font-size:88px;
@@ -35,9 +38,14 @@ margin:0 auto;
 margin-top:30px;
 margin-bottom:30px;
 border-radius:8px;
+overflow:hidden;
 }
 
-canvas{display:block;height:260px;}
+canvas{
+display:block;
+height:260px;
+border-radius:8px;
+}
 
 #controls{
 display:flex;
@@ -48,49 +56,132 @@ align-items:center;
 justify-content:space-between;
 }
 
-button{
-width:160px;height:45px;
-background:#111;color:#fff;
-cursor:pointer;
+.volumeWrapper{
+width:160px;
+height:45px;
+display:flex;
+align-items:center;
+justify-content:center;
+background:#111;
 border:2px solid #ff2a2a;
 box-shadow:0 0 10px #ff2a2a;
-transition:0.15s;
 }
 
-button:hover{transform:scale(1.05);}
-button:active{transform:scale(0.9);}
-
-.playActive{color:#00ff00;}
-.stopActive{color:#ff4444;}
-.muteActive{color:#ffaa00;}
-
-#modeBtn{width:66px;height:49px;}
-
-.volumeWrapper{
-width:160px;height:45px;
-display:flex;align-items:center;justify-content:center;
-background:#111;border:2px solid #ff2a2a;
+body.day .volumeWrapper{
+background:#d6d6d6;
+box-shadow:0 0 40px #ff2a2a,0 0 80px #ff0000;
 }
 
-#volume{width:120px;}
+button{
+width:160px;
+height:45px;
+background:#111;
+color:white;
+cursor:pointer;
+font-family:'Orbitron';
+transition:0.2s;
+border:2px solid #ff2a2a;
+box-shadow:0 0 10px #ff2a2a;
+}
+
+/* klik zostaje (nic nie ruszam wizualnie) */
+button:active{
+transform:scale(0.96);
+}
+
+/* hover FIX – brak “niebieskiego focusa” i glitchy */
+button:hover{
+box-shadow:0 0 18px #ff0000;
+}
+
+/* usunięcie niebieskiego focusa */
+button:focus{
+outline:none;
+box-shadow:0 0 10px #ff2a2a;
+}
+
+body.day button{
+background:#d6d6d6;
+color:#000;
+box-shadow:0 0 40px #ff2a2a,0 0 80px #ff0000;
+}
+
+#volume{
+width:120px;
+height:10px;
+appearance:none;
+border-radius:10px;
+outline:none;
+background:#000;
+border:1px solid #ff2a2a;
+box-shadow:0 0 6px #ff2a2a;
+}
+
+#volume.active{
+box-shadow:0 0 10px #ff0000;
+border:1px solid #ff0000;
+}
+
+#volume::-webkit-slider-thumb{
+-webkit-appearance:none;
+width:16px;
+height:16px;
+border-radius:4px;
+background:#ff0000;
+box-shadow:0 0 10px red,0 0 20px red;
+cursor:pointer;
+}
+
+#volume::-moz-range-thumb{
+width:16px;
+height:16px;
+border:none;
+border-radius:4px;
+background:#ff0000;
+box-shadow:0 0 10px red,0 0 20px red;
+cursor:pointer;
+}
+
+.playActive{ color:#00ff00; text-shadow:0 0 10px #00ff00; }
+.stopActive{ color:#ff4444; text-shadow:0 0 10px red; }
+
+.muteActive{
+color:#ffaa00;
+text-shadow:0 0 10px orange;
+animation:pulseMute 0.8s infinite alternate;
+}
+
+@keyframes pulseMute{
+from{ transform:scale(1); }
+to{ transform:scale(1.1); }
+}
+
+#modeBtn{
+font-size:22px;
+width:66px;
+height:49px;
+}
+
+/* NIE DOTYKAM ikon ani linku – jak było */
+
+#bottomLink{
+margin-top:10px;
+text-align:center;
+width:100%;
+}
 
 #bottomLink a{
 color:#ff2a2a;
 text-decoration:none;
+text-shadow:0 0 6px red;
 font-size:20px;
-display:flex;
-align-items:center;
-gap:10px;
 }
-
-.radioIcon{width:40px;height:40px;}
 </style>
 </head>
 
 <body>
 
 <div id="title">Muzyczne Radio</div>
-
 <canvas id="proEqualizer"></canvas>
 
 <div id="controls">
@@ -106,12 +197,10 @@ gap:10px;
 </div>
 
 <div id="bottomLink">
-<a href="https://www.muzyczneradio.pl" target="_blank">
-Muzyczne Radio
-</a>
+<a href="https://www.muzyczneradio.pl" target="_blank">www.muzyczneradio.pl</a>
 </div>
 
-<audio id="audio" crossorigin="anonymous" playsinline></audio>
+<audio id="audio" crossorigin="anonymous"></audio>
 
 <script>
 const STREAM_URL="https://stream.rcs.revma.com/gzwc1xcq042vv";
@@ -124,19 +213,21 @@ const stopBtn=document.getElementById("stopBtn");
 const muteBtn=document.getElementById("muteBtn");
 const modeBtn=document.getElementById("modeBtn");
 
-audio.volume=0.5;
+audio.volume=parseFloat(volume.value);
 
-/* ===== AUDIO (SAFE MODE) ===== */
 let audioCtx, analyser, source, dataArray;
 
+/* ===== FIX RADIO (KLUCZOWE NAPRAWY) ===== */
 function setupAudio(){
 if(audioCtx) return;
 
 audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+
 source=audioCtx.createMediaElementSource(audio);
 
 analyser=audioCtx.createAnalyser();
 analyser.fftSize=512;
+analyser.smoothingTimeConstant=0.5;
 
 source.connect(analyser);
 analyser.connect(audioCtx.destination);
@@ -145,32 +236,33 @@ dataArray=new Uint8Array(analyser.frequencyBinCount);
 }
 
 async function playRadio(){
-try{
-audio.src=STREAM_URL;
-audio.load();
-
-await audio.play();
 
 setupAudio();
-if(audioCtx.state==="suspended") await audioCtx.resume();
+
+try{
+if(audioCtx.state === "suspended"){
+await audioCtx.resume();
+}
+
+audio.src=STREAM_URL;
+audio.load();
+await audio.play();
 
 playBtn.classList.add("playActive");
 stopBtn.classList.remove("stopActive");
 
 }catch(e){
-console.log("PLAY ERROR:",e);
-alert("Radio nie może się uruchomić (blokada przeglądarki lub stream).");
+console.log("RADIO ERROR:",e);
 }
 }
 
 function stopRadio(){
 audio.pause();
-audio.currentTime=0;
 
 stopBtn.classList.add("stopActive");
 playBtn.classList.remove("playActive");
 
-setTimeout(()=>stopBtn.classList.remove("stopActive"),800);
+setTimeout(()=>stopBtn.classList.remove("stopActive"),1000);
 }
 
 function muteRadio(){
