@@ -289,6 +289,9 @@ volume.addEventListener("input",()=>{
 audio.volume=parseFloat(volume.value);
 });
 
+window.addEventListener("load", resizeCanvas);
+window.addEventListener("resize", resizeCanvas);
+
 function resizeCanvas(){
 let dpr = window.devicePixelRatio || 1;
 let width = title.offsetWidth;
@@ -305,9 +308,6 @@ ctx.scale(dpr, dpr);
 controls.style.width = width + "px";
 }
 
-window.addEventListener("load", resizeCanvas);
-window.addEventListener("resize", resizeCanvas);
-
 function draw(){
 requestAnimationFrame(draw);
 
@@ -317,18 +317,17 @@ analyser.getByteFrequencyData(dataArray);
 drawEQ();
 }
 
-/* =======================
-   🔥 FIX: płynny EQ + wydajność
-======================= */
+/* =========================
+   🔥 ONLY FIXED EQ (optimized)
+========================= */
 function drawEQ(){
 
 let dpr = window.devicePixelRatio || 1;
 let width = canvas.width / dpr;
-let height = canvas.height / dpr;
+let heightCanvas = canvas.height / dpr;
 
-ctx.clearRect(0,0,width,height);
+ctx.clearRect(0,0,width,heightCanvas);
 
-/* stabilna liczba słupków */
 let bars = 64;
 let barWidth = width / bars;
 let step = Math.floor(dataArray.length / bars);
@@ -336,28 +335,26 @@ let step = Math.floor(dataArray.length / bars);
 for(let i=0;i<bars;i++){
 
 let value = dataArray[i * step] || 0;
+let target = (value / 255) * heightCanvas * 0.85;
 
-/* stabilniejsza reakcja */
-let target = (value / 255) * height * 0.85;
-
-/* smoothing (klucz do płynności) */
-if(!peaks[i]) peaks[i] = 0;
-peaks[i] = peaks[i] * 0.65 + target * 0.35;
+/* smooth motion */
+if(!peaks[i]) peaks[i]=0;
+peaks[i] += (target - peaks[i]) * 0.25;
 
 let h = peaks[i];
 
 let x = i * barWidth;
-let y = height - h;
+let y = heightCanvas - h;
 
-/* gradient z Twojej wersji */
-let gradient = ctx.createLinearGradient(0,height,0,0);
+/* gradient (UNCHANGED STYLE) */
+let gradient = ctx.createLinearGradient(0,heightCanvas,0,0);
 gradient.addColorStop(0,"#ff0000");
 gradient.addColorStop(0.6,"#ff5555");
 gradient.addColorStop(1,"#ffffff");
 
 ctx.fillStyle = gradient;
 
-/* lekki glow (bez ciężkiego shadow per bar) */
+/* lighter shadow (performance fix) */
 ctx.shadowBlur = 3;
 ctx.shadowColor = "red";
 
@@ -365,9 +362,9 @@ ctx.fillRect(x, y, barWidth - 1, h);
 
 ctx.shadowBlur = 0;
 
-/* peak */
+/* peak line */
 ctx.fillStyle = "#ff2222";
-ctx.fillRect(x, height - h, barWidth - 1, 2);
+ctx.fillRect(x, heightCanvas - h, barWidth - 1, 2);
 
 }
 }
