@@ -1,4 +1,262 @@
+<!DOCTYPE html>  
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<title>Muzyczne Radio PRO</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+body{
+margin:0;
+background:#000;
+color:#fff;
+font-family:'Orbitron',sans-serif;
+display:flex;
+flex-direction:column;
+align-items:center;
+height:100vh;
+transition:0.4s;
+}
+
+body.day{
+background:#eaeaea;
+color:#000;
+}
+
+#title{
+font-size:88px;
+margin-top:50px;
+text-align:center;
+color:#ff2a2a;
+text-shadow:0 0 6px #ff2a2a,0 0 12px #ff0000;
+}
+
+#proEqualizer{
+display:block;
+margin:0 auto;
+margin-top:30px;
+margin-bottom:30px;
+border-radius:8px;
+overflow:hidden;
+}
+
+canvas{
+display:block;
+height:260px;
+}
+
+#controls{
+display:flex;
+gap:8px;
+margin-top:20px;
+margin-bottom:20px;
+align-items:center;
+justify-content:space-between;
+}
+
+.volumeWrapper{
+width:160px;
+height:45px;
+display:flex;
+align-items:center;
+justify-content:center;
+background:#111;
+border:2px solid #ff2a2a;
+box-shadow:0 0 6px #ff2a2a;
+}
+
+body.day .volumeWrapper{
+background:#d6d6d6;
+box-shadow:0 0 10px #ff2a2a;
+}
+
+button{
+width:160px;
+height:45px;
+background:#111;
+color:white;
+cursor:pointer;
+font-family:'Orbitron';
+transition:0.2s;
+border:2px solid #ff2a2a;
+box-shadow:0 0 6px #ff2a2a;
+}
+
+body.day button{
+background:#d6d6d6;
+color:#000;
+box-shadow:0 0 10px #ff2a2a;
+}
+
+#volume{
+width:120px;
+height:10px;
+appearance:none;
+border-radius:10px;
+outline:none;
+background:#000;
+border:1px solid #ff2a2a;
+box-shadow:0 0 4px #ff2a2a;
+}
+
+#volume.active{
+box-shadow:0 0 8px #ff0000;
+border:1px solid #ff0000;
+}
+
+#volume::-webkit-slider-thumb{
+-webkit-appearance:none;
+width:16px;
+height:16px;
+border-radius:4px;
+background:#ff0000;
+box-shadow:0 0 8px #ff0000;
+cursor:pointer;
+}
+
+#volume::-moz-range-thumb{
+width:16px;
+height:16px;
+border:none;
+border-radius:4px;
+background:#ff0000;
+box-shadow:0 0 8px #ff0000;
+cursor:pointer;
+}
+
+.playActive{ color:#ff2a2a; text-shadow:0 0 8px #ff0000; }
+.stopActive{ color:#ff2a2a; text-shadow:0 0 8px #ff0000; }
+
+.muteActive{
+color:#ff2a2a;
+text-shadow:0 0 8px #ff0000;
+animation:pulseMute 0.8s infinite alternate;
+}
+
+@keyframes pulseMute{
+from{ transform:scale(1); }
+to{ transform:scale(1.05); }
+}
+
+#modeBtn{
+font-size:22px;
+width:66px;
+height:49px;
+}
+
+body:not(.day) #modeBtn{
+color:#ff2a2a;
+text-shadow:0 0 6px #ff0000;
+background:#111;
+box-shadow:0 0 6px #ff0000;
+}
+
+body.day #modeBtn{
+color:#ff2a2a;
+text-shadow:0 0 6px #ff0000;
+background:#d6d6d6;
+box-shadow:0 0 6px #ff0000;
+}
+
+#bottomLink{
+margin-top:10px;
+text-align:center;
+width:100%;
+}
+
+#bottomLink a{
+color:#ff2a2a;
+text-decoration:none;
+text-shadow:0 0 4px #ff0000;
+font-size:20px;
+}
+</style>
+</head>
+
+<body>
+
+<div id="title">Muzyczne Radio</div>
+<canvas id="proEqualizer"></canvas>
+
+<div id="controls">
+<button id="playBtn" onclick="playRadio()">PLAY</button>
+<button id="stopBtn" onclick="stopRadio()">STOP</button>
+<button id="muteBtn" onclick="muteRadio()">MUTE 🔊</button>
+
+<div class="volumeWrapper">
+<input id="volume" type="range" min="0" max="1" step="0.01" value="0.5">
+</div>
+
+<button id="modeBtn" onclick="toggleMode()">🌙</button>
+</div>
+
+<div id="bottomLink">
+<a href="https://www.muzyczneradio.pl" target="_blank">www.muzyczneradio.pl</a>
+</div>
+
+<audio id="audio" crossorigin="anonymous"></audio>
+
 <script>
+const STREAM_URL="https://stream.rcs.revma.com/gzwc1xcq042vv";
+
+const audio=document.getElementById("audio");
+const volume=document.getElementById("volume");
+const canvas=document.getElementById("proEqualizer");
+const ctx=canvas.getContext("2d");
+
+let audioCtx, analyser, source, dataArray;
+let smoothBars=[];
+
+function setupAudio(){
+if(audioCtx) return;
+
+audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+
+source=audioCtx.createMediaElementSource(audio);
+
+analyser=audioCtx.createAnalyser();
+analyser.fftSize=1024;
+analyser.smoothingTimeConstant=0.85;
+
+source.connect(analyser);
+analyser.connect(audioCtx.destination);
+
+dataArray=new Uint8Array(analyser.frequencyBinCount);
+}
+
+function playRadio(){
+setupAudio();
+if(audioCtx.state==="suspended") audioCtx.resume();
+audio.src=STREAM_URL;
+audio.play();
+draw();
+}
+
+function stopRadio(){ audio.pause(); }
+function muteRadio(){ audio.muted=!audio.muted; }
+
+volume.addEventListener("input",()=>audio.volume=parseFloat(volume.value));
+
+function resizeCanvas(){
+let dpr=window.devicePixelRatio||1;
+let w=document.getElementById("title").offsetWidth;
+
+canvas.width=w*dpr;
+canvas.height=260*dpr;
+
+canvas.style.width=w+"px";
+canvas.style.height="260px";
+
+ctx.setTransform(1,0,0,1,0,0);
+ctx.scale(dpr,dpr);
+
+smoothBars = new Array(90).fill(0);
+}
+
+window.addEventListener("load",resizeCanvas);
+window.addEventListener("resize",resizeCanvas);
+
 function draw(){
 requestAnimationFrame(draw);
 if(!analyser) return;
@@ -10,17 +268,15 @@ let h=canvas.height/window.devicePixelRatio;
 
 ctx.clearRect(0,0,w,h);
 
-/* baseline */
+/* CENTER BASELINE (jak na Vecteezy) */
 let mid=h/2;
 
-/* style gradient (subtle like vector image) */
-let bars=85;
-let step=Math.floor(dataArray.length/bars);
+let bars=90;
 let barW=w/bars;
 
-/* soft rainbow gradient horizontally */
+/* gradient like vector graphic */
 let grad=ctx.createLinearGradient(0,0,w,0);
-grad.addColorStop(0,"#ff0000");
+grad.addColorStop(0,"#ff0040");
 grad.addColorStop(0.2,"#ff9900");
 grad.addColorStop(0.4,"#ffee00");
 grad.addColorStop(0.6,"#00ff66");
@@ -31,18 +287,24 @@ ctx.fillStyle=grad;
 
 for(let i=0;i<bars;i++){
 
-let v=dataArray[i*step]||0;
+let index=Math.floor(i*(dataArray.length/bars));
+let v=dataArray[index]||0;
 
-/* amplitude smoothing (important for “vector look”) */
-let amp=(v/255)*(h*0.4);
+/* smoothing for fluid look */
+smoothBars[i]=smoothBars[i]*0.75 + ((v/255)*(h*0.42))*0.25;
+
+let amp=smoothBars[i];
 
 let x=i*barW;
 
-/* TOP */
+/* top */
 ctx.fillRect(x,mid-amp,barW-1,amp);
 
-/* BOTTOM mirror */
+/* bottom mirror */
 ctx.fillRect(x,mid,barW-1,amp);
 }
 }
 </script>
+
+</body>
+</html>
