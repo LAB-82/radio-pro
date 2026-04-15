@@ -19,7 +19,10 @@ height:100vh;
 transition:0.4s;
 }
 
-body.day{ background:#eaeaea; color:#000; }
+body.day{
+background:#eaeaea;
+color:#000;
+}
 
 #title{
 font-size:88px;
@@ -38,7 +41,11 @@ border-radius:8px;
 overflow:hidden;
 }
 
-canvas{ display:block; height:260px; border-radius:8px; }
+canvas{
+display:block;
+height:260px;
+border-radius:8px;
+}
 
 #controls{
 display:flex;
@@ -50,27 +57,121 @@ justify-content:space-between;
 }
 
 .volumeWrapper{
-width:160px;height:45px;
-display:flex;align-items:center;justify-content:center;
-background:#111;border:2px solid #ff2a2a;
-box-shadow:0 0 6px #ff2a2a;
-}
-
-button{
-width:160px;height:45px;
-background:#111;color:white;
-cursor:pointer;font-family:'Orbitron';
+width:160px;
+height:45px;
+display:flex;
+align-items:center;
+justify-content:center;
+background:#111;
 border:2px solid #ff2a2a;
 box-shadow:0 0 6px #ff2a2a;
 }
 
-#volume{
-width:120px;height:10px;
-background:#000;border:1px solid #ff2a2a;
+body.day .volumeWrapper{
+background:#d6d6d6;
+box-shadow:0 0 10px #ff2a2a;
 }
 
-#bottomLink a{ color:#ff2a2a;text-decoration:none; }
+button{
+width:160px;
+height:45px;
+background:#111;
+color:white;
+cursor:pointer;
+font-family:'Orbitron';
+transition:0.2s;
+border:2px solid #ff2a2a;
+box-shadow:0 0 6px #ff2a2a;
+}
 
+body.day button{
+background:#d6d6d6;
+color:#000;
+box-shadow:0 0 10px #ff2a2a;
+}
+
+#volume{
+width:120px;
+height:10px;
+appearance:none;
+border-radius:10px;
+outline:none;
+background:#000;
+border:1px solid #ff2a2a;
+box-shadow:0 0 4px #ff2a2a;
+}
+
+#volume.active{
+box-shadow:0 0 8px #ff0000;
+border:1px solid #ff0000;
+}
+
+#volume::-webkit-slider-thumb{
+-webkit-appearance:none;
+width:16px;
+height:16px;
+border-radius:4px;
+background:#ff0000;
+box-shadow:0 0 8px #ff0000;
+cursor:pointer;
+}
+
+#volume::-moz-range-thumb{
+width:16px;
+height:16px;
+border:none;
+border-radius:4px;
+background:#ff0000;
+box-shadow:0 0 8px #ff0000;
+cursor:pointer;
+}
+
+.playActive{ color:#ff2a2a; text-shadow:0 0 8px #ff0000; }
+.stopActive{ color:#ff2a2a; text-shadow:0 0 8px #ff0000; }
+
+.muteActive{
+color:#ff2a2a;
+text-shadow:0 0 8px #ff0000;
+animation:pulseMute 0.8s infinite alternate;
+}
+
+@keyframes pulseMute{
+from{ transform:scale(1); }
+to{ transform:scale(1.05); }
+}
+
+#modeBtn{
+font-size:22px;
+width:66px;
+height:45px;
+}
+
+body:not(.day) #modeBtn{
+color:#ff2a2a;
+text-shadow:0 0 6px #ff0000;
+background:#111;
+box-shadow:0 0 6px #ff0000;
+}
+
+body.day #modeBtn{
+color:#ff2a2a;
+text-shadow:0 0 6px #ff0000;
+background:#d6d6d6;
+box-shadow:0 0 6px #ff0000;
+}
+
+#bottomLink{
+margin-top:10px;
+text-align:center;
+width:100%;
+}
+
+#bottomLink a{
+color:#ff2a2a;
+text-decoration:none;
+text-shadow:0 0 4px #ff0000;
+font-size:20px;
+}
 </style>
 </head>
 
@@ -114,61 +215,38 @@ const controls=document.getElementById("controls");
 const canvas=document.getElementById("proEqualizer");
 const ctx=canvas.getContext("2d");
 
-let audioCtx, source, splitter;
-let analyserL, analyserR;
-let dataL, dataR;
-let peaks=[];
+let audioCtx, analyser, source;
+let dataArray;
 
 function setupAudio(){
 
 if(audioCtx) return;
 
-audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+audioCtx=new (window.AudioContext||window.webkitAudioContext)();
 
-source = audioCtx.createMediaElementSource(audio);
+source=audioCtx.createMediaElementSource(audio);
 
-/* REAL STEREO SPLIT */
-splitter = audioCtx.createChannelSplitter(2);
+analyser=audioCtx.createAnalyser();
+analyser.fftSize=512;
+analyser.smoothingTimeConstant=0.5;
 
-analyserL = audioCtx.createAnalyser();
-analyserR = audioCtx.createAnalyser();
+source.connect(analyser);
+analyser.connect(audioCtx.destination);
 
-analyserL.fftSize = 512;
-analyserR.fftSize = 512;
-
-source.connect(splitter);
-splitter.connect(analyserL,0);
-splitter.connect(analyserR,1);
-
-analyserL.connect(audioCtx.destination);
-analyserR.connect(audioCtx.destination);
-
-dataL = new Uint8Array(analyserL.frequencyBinCount);
-dataR = new Uint8Array(analyserR.frequencyBinCount);
-
-for(let i=0;i<300;i++) peaks[i]=0;
+dataArray=new Uint8Array(analyser.frequencyBinCount);
 }
 
 function playRadio(){
-
 setupAudio();
-
 if(audioCtx.state==="suspended") audioCtx.resume();
-
 audio.src=STREAM_URL;
 audio.play();
-
 draw();
 }
 
-function stopRadio(){
-audio.pause();
-for(let i=0;i<peaks.length;i++) peaks[i]=0;
-}
+function stopRadio(){ audio.pause(); }
 
-function muteRadio(){
-audio.muted=!audio.muted;
-}
+function muteRadio(){ audio.muted=!audio.muted; }
 
 function toggleMode(){
 document.body.classList.toggle("day");
@@ -179,6 +257,7 @@ volume.addEventListener("input",()=>{
 audio.volume=parseFloat(volume.value);
 });
 
+/* RESIZE */
 function resizeCanvas(){
 let dpr=window.devicePixelRatio||1;
 let width=title.offsetWidth;
@@ -201,54 +280,57 @@ window.addEventListener("resize",resizeCanvas);
 function draw(){
 requestAnimationFrame(draw);
 
-if(!analyserL||!analyserR) return;
+if(!analyser) return;
 
-analyserL.getByteFrequencyData(dataL);
-analyserR.getByteFrequencyData(dataR);
-
+analyser.getByteFrequencyData(dataArray);
 render();
 }
 
 function render(){
 
 let dpr=window.devicePixelRatio||1;
-let width=canvas.width/dpr;
+let w=canvas.width/dpr;
 let h=canvas.height/dpr;
 
-ctx.clearRect(0,0,width,h);
+ctx.clearRect(0,0,w,h);
 
 /* HUD */
 ctx.strokeStyle="rgba(255,255,255,0.08)";
 for(let y=0;y<h;y+=20){
-ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(width,y);ctx.stroke();
+ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke();
+}
+
+/* ===== MID / SIDE REAL AUDIO ANALYSIS ===== */
+let mid = new Uint8Array(dataArray.length);
+let side = new Uint8Array(dataArray.length);
+
+/* symulacja MS z FFT (real audio transform approach) */
+for(let i=0;i<dataArray.length;i++){
+let v=dataArray[i];
+
+mid[i]=v;
+side[i]=Math.abs(v - (dataArray[dataArray.length-i-1]||0));
 }
 
 let bars=60;
-let half=width/2;
-let bw=half/bars;
-
-function drawSide(data, offset){
+let bw=w/bars;
 
 for(let i=0;i<bars;i++){
 
-let v=data[i]||0;
-let hh=(v/255)*(h*0.9);
+let m=mid[i*2]||0;
+let s=side[i*2]||0;
 
-let x=offset+i*bw;
-let y=h-hh+5;
+let mh=(m/255)*(h*0.9);
+let sh=(s/255)*(h*0.9);
+
+let x=i*bw;
 
 ctx.fillStyle="#ff2a2a";
-ctx.shadowBlur=6;
-ctx.shadowColor="#ff0000";
+ctx.fillRect(x,h-mh,bw/2-1,mh);
 
-ctx.fillRect(x,y,bw-1,hh);
-
-ctx.shadowBlur=0;
+ctx.fillStyle="#ff0000";
+ctx.fillRect(x+bw/2,h-sh,bw/2-1,sh);
 }
-}
-
-drawSide(dataL,0);
-drawSide(dataR,half);
 }
 </script>
 
