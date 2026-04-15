@@ -336,10 +336,10 @@ let heightCanvas = canvas.height / dpr;
 
 ctx.clearRect(0,0,width,heightCanvas);
 
-/* przycięcie do środka suwaka */
-let maxWidth = width * 0.72;
+/* pełna szerokość */
+let maxWidth = width;
 
-let bars = Math.max(1, Math.floor(maxWidth / 8));
+let bars = Math.max(1, Math.floor(maxWidth / 10));
 let barWidth = maxWidth / bars;
 
 let step=Math.max(1, Math.floor(dataArray.length/bars));
@@ -360,30 +360,29 @@ let h=Math.min(maxHeight, heightCanvas*percent);
 let x=i*barWidth;
 let y=heightCanvas-h + yOffset;
 
-/* HUD segmenty */
-let segmentHeight = 4;
-let gap = 2;
+/* HUD – wydajny */
+let segmentHeight = 5;
+let gap = 3;
 
 let segments = Math.floor(h / (segmentHeight + gap));
 
 ctx.fillStyle="#ff2a2a";
-ctx.shadowBlur=6;
+ctx.shadowBlur=4;
 ctx.shadowColor="#ff0000";
 
-for(let s=0;s<segments;s++){
+for(let s=0;s<segments;s+=2){
 let segY = y + h - (s+1)*(segmentHeight+gap);
 ctx.fillRect(x, segY, barWidth-2, segmentHeight);
 }
 
 ctx.shadowBlur=0;
 
-/* peak */
 if(!peaks[i]) peaks[i]=0;
 
 if(h>peaks[i]){
 peaks[i]=h;
 }else{
-peaks[i]-=1.5;
+peaks[i]-=1.2;
 }
 
 if(peaks[i]<0) peaks[i]=0;
