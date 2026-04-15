@@ -215,11 +215,9 @@ const controls=document.getElementById("controls");
 const canvas=document.getElementById("proEqualizer");
 const ctx=canvas.getContext("2d");
 
-let audioCtx, analyser, source;
-let dataArray;
+let audioCtx, analyser, source, dataArray;
 
 function setupAudio(){
-
 if(audioCtx) return;
 
 audioCtx=new (window.AudioContext||window.webkitAudioContext)();
@@ -227,8 +225,8 @@ audioCtx=new (window.AudioContext||window.webkitAudioContext)();
 source=audioCtx.createMediaElementSource(audio);
 
 analyser=audioCtx.createAnalyser();
-analyser.fftSize=512;
-analyser.smoothingTimeConstant=0.5;
+analyser.fftSize=1024;
+analyser.smoothingTimeConstant=0.75;
 
 source.connect(analyser);
 analyser.connect(audioCtx.destination);
@@ -257,7 +255,7 @@ volume.addEventListener("input",()=>{
 audio.volume=parseFloat(volume.value);
 });
 
-/* RESIZE */
+/* resize */
 function resizeCanvas(){
 let dpr=window.devicePixelRatio||1;
 let width=title.offsetWidth;
@@ -300,36 +298,29 @@ for(let y=0;y<h;y+=20){
 ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke();
 }
 
-/* ===== MID / SIDE REAL AUDIO ANALYSIS ===== */
-let mid = new Uint8Array(dataArray.length);
-let side = new Uint8Array(dataArray.length);
-
-/* symulacja MS z FFT (real audio transform approach) */
-for(let i=0;i<dataArray.length;i++){
-let v=dataArray[i];
-
-mid[i]=v;
-side[i]=Math.abs(v - (dataArray[dataArray.length-i-1]||0));
-}
-
-let bars=60;
-let bw=w/bars;
+/* ===== REAL LOG SPECTRUM ===== */
+let bars=90;
+let step=Math.floor(dataArray.length / bars);
 
 for(let i=0;i<bars;i++){
 
-let m=mid[i*2]||0;
-let s=side[i*2]||0;
+/* logarithmic perception mapping */
+let logIndex=Math.floor(Math.pow(i/bars,2) * dataArray.length);
+let value=dataArray[logIndex]||0;
 
-let mh=(m/255)*(h*0.9);
-let sh=(s/255)*(h*0.9);
+let barHeight=(value/255)*(h*0.9);
+let barWidth=w/bars;
 
-let x=i*bw;
+let x=i*barWidth;
+let y=h-barHeight+5;
 
 ctx.fillStyle="#ff2a2a";
-ctx.fillRect(x,h-mh,bw/2-1,mh);
+ctx.shadowBlur=6;
+ctx.shadowColor="#ff0000";
 
-ctx.fillStyle="#ff0000";
-ctx.fillRect(x+bw/2,h-sh,bw/2-1,sh);
+ctx.fillRect(x,y,barWidth-1,barHeight);
+
+ctx.shadowBlur=0;
 }
 }
 </script>
