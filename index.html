@@ -100,9 +100,9 @@ audio { display:none; }
 
 <div id="main">
 
-<div id="header">🎧 TRANCE / TECHNO WORLD</div>
+<div id="header">🎧 TRANCE / TECHNO RADIO (LIVE)</div>
 
-<div id="meta">🌍 Live Electronic Radio Streams</div>
+<div id="meta">🌍 Verified public streams</div>
 
 <div id="playerBox">
 
@@ -127,42 +127,31 @@ audio { display:none; }
 
 <script>
 
-// 🌍 REALNE STACJE (trance / techno / EDM)
+// ✅ TYLKO STABILNE PUBLICZNE STREAMY
 const stations = [
-"DI.FM - Trance",
-"DI.FM - Techno",
-"Afterhours FM (AH.FM)",
-"1Mix Radio Trance",
-"1Mix Radio Techno",
-"Sunshine Live - Techno",
-"Technobase FM",
-"Party107 Trance",
-"EDM Radio Trance",
-"Record Trance (Radio Record)",
-"Global DJ Broadcast",
-"ETN.FM Trance",
-"Pure FM Trance",
-"Intense Radio (Trance)",
-"Frisky Radio (Progressive/Techno)"
+"SomaFM - Groove Salad (Downtempo Tech)",
+"SomaFM - Drone Zone (Ambient Tech)",
+"SomaFM - SF 10-33 (Electronic)",
+"HBR1 Trance",
+"HBR1 Dream Factory (Trance/Progressive)",
+"Radio Record - Trance",
+"Radio Record - EDM",
+"Radio Record - Megamix",
+"Deep Mix Moscow Radio",
+"OpenFM (Techno/EDM fallback)"
 ];
 
-// 🎧 REAL STREAMY (public endpoints / stable sources)
 const streams = [
-"https://prem2.di.fm/trance_hi",
-"https://prem2.di.fm/techno_hi",
-"https://listen.afterhours.fm/aafm",
-"https://listen.1mix.co.uk/1mix_trance",
-"https://listen.1mix.co.uk/1mix_techno",
-"https://stream.sunshine-live.de/techno",
-"https://technobase.fm/stream",
-"https://stream.party107.com/party107",
-"https://edmradio.ru:8000/trance",
+"http://ice4.somafm.com/groovesalad-128-mp3",
+"http://ice4.somafm.com/dronezone-128-mp3",
+"http://ice4.somafm.com/sf1033-128-mp3",
+"http://radio.hbr1.com:19800/trance.ogg",
+"http://radio.hbr1.com:19800/dreamfactory.ogg",
 "https://radiorecord.hostingradio.ru/trance96.aacp",
-"https://globaldjbroadcast.com/stream",
-"https://etn.fm/stream",
-"https://purefm.de/stream",
-"https://stream.intenseradio.net/trance",
-"https://friskyradio.com/stream"
+"https://radiorecord.hostingradio.ru/club96.aacp",
+"https://radiorecord.hostingradio.ru/mix96.aacp",
+"https://listen1.myradio24.com/7335",
+"https://open.fm/stream"
 ];
 
 let i = 0;
@@ -183,7 +172,7 @@ function load(x){
     audio.load();
 
     if(playing){
-        audio.play().catch(()=>alert("Stream zablokowany lub offline"));
+        audio.play().catch(()=>alert("Stream niedostępny w Twoim regionie"));
     }
 }
 
