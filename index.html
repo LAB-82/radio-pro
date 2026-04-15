@@ -1,106 +1,145 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-<meta charset="UTF-8">
-<title>LOTTO AI SINGULARITY MODE</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Polskie Radio Online</title>
 
 <style>
-*{box-sizing:border-box;}
-html,body{
- margin:0;height:100%;
- background:#ffd800;
- font-family:Arial,Helvetica,sans-serif;
- display:flex;justify-content:center;align-items:flex-start;
- overflow:hidden;
-}
-#app{
- width:1200px;height:800px;
- display:flex;flex-direction:column;padding-top:10px;
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #0f0f0f;
+    color: white;
 }
 
-/* ===== HEADER JAK NA SCREENIE ===== */
-header{
- height:120px;
- margin:0 10px 5px 10px;
- border-radius:12px;
- overflow:hidden;
- padding:0;
- display:block;
+header {
+    padding: 15px;
+    text-align: center;
+    font-size: 22px;
+    background: #1a1a1a;
+    font-weight: bold;
 }
 
-/* obraz jako prawdziwy element */
-header img{
- width:100%;
- height:100%;
- object-fit:cover;
- display:block;
+#player {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background: #111;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-top: 1px solid #333;
 }
 
-.panel{flex:1;padding:8px;display:flex;flex-direction:column;gap:6px;}
-.game{
- height:62px;background:linear-gradient(#ffe95e,#f2d43c);
- border-radius:12px;padding:6px 12px;
- display:flex;align-items:center;gap:10px;
-}
-.title{
- display:flex;align-items:center;gap:8px;
- font-size:16px;font-weight:bold;min-width:320px;color:#003a8f;
-}
-.icon{font-size:18px;}
-.icon.lotto{color:#0b6cd4;}
-.icon.mini{color:#c8a200;}
-.icon.multi{color:#6a1b9a;}
-.icon.keno{color:#ff9800;}
-.icon.pensja{color:#2e7d32;}
-.icon.euro{color:#d4af37;}
-.icon.szybkie{color:#ff7043;}
-
-select{
- margin-left:6px;padding:3px 6px;
- border-radius:5px;border:1px solid #003c8f;
- font-weight:bold;font-size:14px;background:white;
+#stations {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px;
+    padding: 15px;
+    padding-bottom: 80px;
 }
 
-.balls{
- flex:1;height:40px;display:flex;flex-wrap:wrap;gap:5px;overflow:hidden;
+.station {
+    background: #1c1c1c;
+    border-radius: 10px;
+    padding: 10px;
+    cursor: pointer;
+    transition: 0.2s;
+    text-align: center;
 }
 
-.ball{
- width:32px;height:32px;border-radius:50%;
- display:flex;align-items:center;justify-content:center;
- font-weight:bold;color:white;font-size:13px;
- box-shadow:
-  inset 0 3px 6px rgba(255,255,255,0.4),
-  inset 0 -3px 6px rgba(0,0,0,0.4),
-  0 2px 4px rgba(0,0,0,0.3);
+.station:hover {
+    background: #2a2a2a;
+    transform: scale(1.03);
 }
 
-.ball.lotto{background:radial-gradient(circle at 30% 30%, #6bd0ff, #0b6cd4 60%, #003a8f);}
-.ball.mini{background:radial-gradient(circle at 30% 30%, #fff176, #fbc02d 60%, #8d6e00);}
-.ball.multi{background:radial-gradient(circle at 30% 30%, #ba68c8, #6a1b9a 60%, #2e003e);}
-.ball.keno{background:radial-gradient(circle at 30% 30%, #ffcc80, #ff9800 60%, #6d3b00);}
-.ball.pensja{background:radial-gradient(circle at 30% 30%, #a5d6a7, #2e7d32 60%, #1b5e20);}
-.ball.euro{background:radial-gradient(circle at 30% 30%, #fff8c4, #d4af37 60%, #6b5500);}
-.ball.szybkie{background:radial-gradient(circle at 30% 30%, #ffab91, #ff7043 60%, #bf360c);}
+.station img {
+    width: 60px;
+    height: 60px;
+    border-radius: 10px;
+    margin-bottom: 8px;
+}
 
-.extra{filter:brightness(1.1);color:black;}
+.station-name {
+    font-size: 14px;
+}
 
-button{
- background:#003c8f;color:white;border:none;
- padding:5px 10px;border-radius:6px;
- cursor:pointer;font-weight:bold;font-size:13px;
+button {
+    padding: 8px 12px;
+    border: none;
+    background: #ff3b3b;
+    color: white;
+    cursor: pointer;
+    border-radius: 6px;
 }
 </style>
 </head>
 
 <body>
 
-<div id="app">
+<header>📻 Polskie Radio Online</header>
 
-<header>
- <img src="header.png">
-</header>
+<div id="stations"></div>
 
-<div class="panel">
+<div id="player">
+    <div id="now">Nie gra nic</div>
+    <button onclick="stopRadio()">Stop</button>
+    <audio id="audio" controls autoplay></audio>
+</div>
 
-<!-- RESZTA KODU 1:1 BEZ ZMIAN -->
+<script>
+// POLSKIE STACJE (z MyRadioOnline – najpopularniejsze)
+const stations = [
+    { name: "RMF FM", img: "https://myradioonline.pl/images/rmffm.png", url: "https://rs6-krk2-cyfronet.rmfstream.pl/RMFFM48" },
+    { name: "Radio ZET", img: "https://myradioonline.pl/images/radiozet.png", url: "https://zt03.cdn.eurozet.pl/ZET010.mp3" },
+    { name: "Radio ESKA", img: "https://myradioonline.pl/images/eska.png", url: "https://waw02-01.cdn.eurozet.pl/eska.mp3" },
+    { name: "VOX FM", img: "https://myradioonline.pl/images/voxfm.png", url: "https://stream.voxfm.pl/vox.mp3" },
+    { name: "Antyradio", img: "https://myradioonline.pl/images/antyradio.png", url: "https://n-4-1.dcs.redcdn.pl/sc/o2/Eurozet/live/antyradio.livx" },
+    { name: "Radio TOK FM", img: "https://myradioonline.pl/images/tokfm.png", url: "https://radiostream.pl/tuba9-1.mp3" },
+    { name: "Radio Plus", img: "https://myradioonline.pl/images/radioplus.png", url: "https://pldm.ml/radio?url=http://stream.radioplus.pl" }
+];
+
+const stationsDiv = document.getElementById("stations");
+const audio = document.getElementById("audio");
+const now = document.getElementById("now");
+
+function playRadio(station) {
+    now.textContent = "Gra: " + station.name;
+    audio.src = station.url;
+    audio.play();
+}
+
+// hover = start (jak na myradioonline.pl)
+function createStation(station) {
+    const div = document.createElement("div");
+    div.className = "station";
+
+    div.innerHTML = `
+        <img src="${station.img}" onerror="this.src='https://via.placeholder.com/60'">
+        <div class="station-name">${station.name}</div>
+    `;
+
+    div.addEventListener("mouseenter", () => {
+        playRadio(station);
+    });
+
+    div.addEventListener("click", () => {
+        playRadio(station);
+    });
+
+    stationsDiv.appendChild(div);
+}
+
+stations.forEach(createStation);
+
+function stopRadio() {
+    audio.pause();
+    audio.src = "";
+    now.textContent = "Zatrzymano";
+}
+</script>
+
+</body>
+</html>
