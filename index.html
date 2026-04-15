@@ -44,6 +44,7 @@ overflow:hidden;
 canvas{
 display:block;
 height:260px;
+border-radius:8px;
 }
 
 #controls{
@@ -206,7 +207,7 @@ const canvas=document.getElementById("proEqualizer");
 const ctx=canvas.getContext("2d");
 
 let audioCtx, analyser, source, dataArray;
-let smoothBars=[];
+let eqSmooth=[];
 
 function setupAudio(){
 if(audioCtx) return;
@@ -222,7 +223,7 @@ analyser.smoothingTimeConstant=0.85;
 source.connect(analyser);
 analyser.connect(audioCtx.destination);
 
-dataArray=new Uint8Array(analyser.frequencyBinCount);
+dataArray=new Uint8Array(analyser.frequencyCount);
 }
 
 function playRadio(){
@@ -251,7 +252,7 @@ canvas.style.height="260px";
 ctx.setTransform(1,0,0,1,0,0);
 ctx.scale(dpr,dpr);
 
-smoothBars = new Array(90).fill(0);
+eqSmooth = new Array(100).fill(0);
 }
 
 window.addEventListener("load",resizeCanvas);
@@ -268,39 +269,40 @@ let h=canvas.height/window.devicePixelRatio;
 
 ctx.clearRect(0,0,w,h);
 
-/* CENTER BASELINE (jak na Vecteezy) */
-let mid=h/2;
+/* ===== VECTEEZY STRUCTURE MAP ===== */
 
-let bars=90;
+let bars=100;
+let mid=h*0.5;
 let barW=w/bars;
+let step=dataArray.length/bars;
 
-/* gradient like vector graphic */
+/* flat spectrum gradient (no glow, no effects) */
 let grad=ctx.createLinearGradient(0,0,w,0);
-grad.addColorStop(0,"#ff0040");
-grad.addColorStop(0.2,"#ff9900");
+grad.addColorStop(0,"#ff0000");
+grad.addColorStop(0.2,"#ff7a00");
 grad.addColorStop(0.4,"#ffee00");
 grad.addColorStop(0.6,"#00ff66");
-grad.addColorStop(0.8,"#0099ff");
-grad.addColorStop(1,"#9900ff");
+grad.addColorStop(0.8,"#00aaff");
+grad.addColorStop(1,"#ff00ff");
 
 ctx.fillStyle=grad;
 
 for(let i=0;i<bars;i++){
 
-let index=Math.floor(i*(dataArray.length/bars));
-let v=dataArray[index]||0;
+let v=dataArray[Math.floor(i*step)]||0;
 
-/* smoothing for fluid look */
-smoothBars[i]=smoothBars[i]*0.75 + ((v/255)*(h*0.42))*0.25;
+/* visual model (not audio realism, like vector image) */
+let target=(v/255)*(h*0.4);
+eqSmooth[i]=eqSmooth[i]*0.7 + target*0.3;
 
-let amp=smoothBars[i];
+let amp=eqSmooth[i];
 
 let x=i*barW;
 
-/* top */
+/* TOP */
 ctx.fillRect(x,mid-amp,barW-1,amp);
 
-/* bottom mirror */
+/* BOTTOM MIRROR */
 ctx.fillRect(x,mid,barW-1,amp);
 }
 }
