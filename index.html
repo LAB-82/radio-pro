@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Radio FIX RESTORE</title>
+<title>RADIO ENGINE v3</title>
 
 <style>
 body {
@@ -27,8 +27,8 @@ body {
     border-bottom:1px solid #222;
     cursor:pointer;
     display:flex;
-    align-items:center;
     gap:10px;
+    align-items:center;
 }
 
 .station:hover { background:#222; }
@@ -36,13 +36,6 @@ body {
 .station.active {
     background:#2a2a2a;
     color:#00ff90;
-    font-weight:bold;
-}
-
-.station img{
-    width:20px;
-    height:20px;
-    border-radius:4px;
 }
 
 #main {
@@ -71,52 +64,65 @@ body {
     background:#111;
     border-radius:14px;
     display:flex;
-    flex-direction:column;
     align-items:center;
     justify-content:center;
     position:relative;
+    gap:40px;
 }
 
+/* LEFT */
+#center {
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+}
+
+/* LOGO */
 #logoBox img{
-    width:220px;
-    margin-bottom:20px;
-    border-radius:10px;
+    width:180px;
+    height:180px;
+    border-radius:20px;
     background:#222;
 }
 
-/* BIG PLAY */
+/* PLAY */
 #bigPlay{
     font-size:70px;
     cursor:pointer;
+    margin-top:10px;
 }
 
-/* RIGHT CONTROL PANEL (NOWY ELEMENT – zgodnie z Twoją prośbą) */
-#sideControls{
-    position:absolute;
-    right:20px;
-    top:50%;
-    transform:translateY(-50%);
+/* RIGHT CONTROLS */
+#controlsPanel{
     display:flex;
     flex-direction:column;
     gap:10px;
     background:#1a1a1a;
-    padding:10px;
+    padding:12px;
     border-radius:12px;
+    align-items:center;
 }
 
-.ctrlBtn{
+.ctrl {
     cursor:pointer;
-    padding:8px;
+    font-size:16px;
     background:#222;
+    padding:8px 12px;
+    border-radius:8px;
+    width:90px;
     text-align:center;
-    border-radius:6px;
-    font-size:14px;
 }
 
-.ctrlBtn:hover{
+.ctrl:hover {
     background:#333;
 }
 
+#volume {
+    width:90px;
+}
+
+/* bottom bar kept */
 #bottomBar{
     position:absolute;
     bottom:12px;
@@ -129,18 +135,13 @@ body {
     gap:18px;
 }
 
-#controls {
-    height:70px;
-    background:#111;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    gap:20px;
+.activeDot {
+    width:8px;
+    height:8px;
+    border-radius:50%;
+    background:#00ff90;
 }
-
-.btn { cursor:pointer; font-size:20px; }
 </style>
-
 </head>
 
 <body>
@@ -149,40 +150,29 @@ body {
 
 <div id="main">
 
-<div id="header">🎧 RADIO FIX RESTORE</div>
+<div id="header">🎧 RADIO ENGINE v3 (AGGREGATOR)</div>
 
 <div id="playerBox">
     <div id="radioPlayer">
 
-        <div id="logoBox">
-            <img id="stationLogo" src="">
+        <!-- CENTER -->
+        <div id="center">
+            <div id="logoBox">
+                <img id="stationLogo" src="">
+            </div>
+
+            <div id="bigPlay" onclick="toggle()">▶</div>
         </div>
 
-        <div id="bigPlay" onclick="toggle()">▶</div>
-
-        <!-- RIGHT PANEL (PLAY / STOP / MUTE / VOLUME) -->
-        <div id="sideControls">
-            <div class="ctrlBtn" onclick="toggle()">Play</div>
-            <div class="ctrlBtn" onclick="stopRadio()">Stop</div>
-            <div class="ctrlBtn" onclick="mute()">Mute</div>
-            <div class="ctrlBtn" onclick="volumeUp()">Vol+</div>
-        </div>
-
-        <div id="bottomBar">
-            <div onclick="prev()">⏮</div>
-            <div onclick="toggle()" id="playIcon">▶</div>
-            <div onclick="next()">⏭</div>
-            <div onclick="mute()">🔊</div>
+        <!-- RIGHT PANEL -->
+        <div id="controlsPanel">
+            <div class="ctrl" onclick="play()">PLAY</div>
+            <div class="ctrl" onclick="stop()">STOP</div>
+            <div class="ctrl" onclick="mute()">MUTE</div>
+            <input id="volume" type="range" min="0" max="1" step="0.01" value="0.6">
         </div>
 
     </div>
-</div>
-
-<div id="controls">
-    <div class="btn" onclick="prev()">⏮</div>
-    <div class="btn" onclick="toggle()">⏯</div>
-    <div class="btn" onclick="next()">⏭</div>
-    <div class="btn" onclick="mute()">🔊</div>
 </div>
 
 </div>
@@ -191,152 +181,167 @@ body {
 
 <script>
 
-/* =========================
-   STATIONS
-========================= */
-
 const stations = [
 "Muzyczne Radio",
+"Polskie Radio Jedynka",
+"Polskie Radio Dwójka",
+"Polskie Radio Trójka",
+"Polskie Radio Czwórka",
+"Radio Plus",
 "RMF FM",
 "Radio Zet",
 "Radio Eska",
-"Polskie Radio Jedynka",
-"Polskie Radio Trójka",
-"Polskie Radio Czwórka",
+"Radio Wrocław",
+"Radio Wnet",
 "Tok FM",
 "Antyradio",
-"Radio Wrocław",
-"Radio Wnet"
+"Radio Kolor",
+"Polish Radio London 24",
+"Polskie Radio Dzieciom",
+"Polskie Radio Chopin",
+"Radio Republika",
+"Radio Maryja",
+"Radio Jasna Góra"
 ];
 
-/* =========================
-   WORKING STREAMS ONLY
-========================= */
+const audio = document.getElementById("audio");
+const sidebar = document.getElementById("sidebar");
+const volume = document.getElementById("volume");
 
-const STREAMS = {
-"Muzyczne Radio":"https://stream.rcs.revma.com/gzwc1xcq042vv",
-"RMF FM":"https://rs6-krk2.rmfstream.pl/rmf_fm",
-"Radio Zet":"https://zt.cdn.eurozet.pl/ZET.mp3",
-"Radio Eska":"https://waw01-01.ic.smcdn.pl/t043-1.mp3",
-"Polskie Radio Jedynka":"https://stream.polskieradio.pl/program1.mp3",
-"Polskie Radio Trójka":"https://stream3.polskieradio.pl/pr3_aac128",
-"Polskie Radio Czwórka":"https://stream4.polskieradio.pl/pr4_aac128",
-"Tok FM":"https://radiostream.pl/tuba10-1.mp3",
-"Antyradio":"https://antyradio-01.cdn.eurozet.pl/antyradio.mp3",
-"Radio Wrocław":"https://stream4.nadaje.com/radiowroclaw",
-"Radio Wnet":"https://stream.rcs.revma.com/wnet"
-};
+let index = 0;
+let playing = false;
+let cache = {};
+let candidates = [];
 
-let index=0;
-let playing=false;
+audio.volume = volume.value;
 
-const audio=document.getElementById("audio");
-const sidebar=document.getElementById("sidebar");
+/* ---------------------------
+   RADIO BROWSER AGGREGATOR
+----------------------------*/
+async function resolve(name){
 
-let volumeStep=0.2;
+    if(cache[name]) return cache[name];
 
-function getStream(name){
-    return STREAMS[name] || null;
+    try {
+        const r = await fetch(
+          `https://de1.api.radio-browser.info/json/stations/byname/${encodeURIComponent(name)}?limit=10`
+        );
+        const data = await r.json();
+
+        if(!data || !data.length) return [];
+
+        const urls = data
+            .map(s => s.url_resolved)
+            .filter(Boolean);
+
+        cache[name] = urls;
+        return urls;
+
+    } catch(e){
+        return [];
+    }
 }
 
-/* ICONS */
-function icon(name){
-    return `https://www.google.com/s2/favicons?sz=64&domain=${name.replace(/ /g,"")}.pl`;
+/* ---------------------------
+   DEAD STREAM HANDLER
+----------------------------*/
+let currentTry = 0;
+
+async function load(i){
+
+    index = i;
+    const name = stations[i];
+
+    setLogo(name);
+
+    candidates = await resolve(name);
+    currentTry = 0;
+
+    if(!candidates.length){
+        audio.src = "";
+        return;
+    }
+
+    playCandidate();
 }
 
+function playCandidate(){
+
+    if(currentTry >= candidates.length){
+        console.log("ALL STREAMS FAILED");
+        return;
+    }
+
+    const url = candidates[currentTry];
+    audio.src = url;
+
+    audio.play().catch(() => {
+        currentTry++;
+        playCandidate();
+    });
+
+    monitorStream();
+}
+
+/* detect dead stream */
+function monitorStream(){
+    audio.onerror = () => {
+        currentTry++;
+        playCandidate();
+    };
+
+    setTimeout(() => {
+        if(audio.readyState < 2){
+            currentTry++;
+            playCandidate();
+        }
+    }, 5000);
+}
+
+/* ---------------------------
+   UI
+----------------------------*/
 function setLogo(name){
- document.getElementById("stationLogo").src =
- "https://via.placeholder.com/220x120?text="+encodeURIComponent(name);
+    document.getElementById("stationLogo").src =
+      "https://logo.clearbit.com/" +
+      encodeURIComponent(name.toLowerCase().replace(/\s/g,'') + ".com");
 }
 
-function setActive(){
- document.querySelectorAll(".station").forEach((el,i)=>{
-    el.classList.toggle("active", i===index);
- });
+function play(){
+    if(!audio.src) load(index);
+    audio.play();
+    playing = true;
 }
 
-function load(i){
-
-index=i;
-let name=stations[i];
-
-setLogo(name);
-
-let url=getStream(name);
-
-if(!url){
-    audio.removeAttribute("src");
-    document.getElementById("playIcon").innerText="❌";
-    return;
-}
-
-audio.src=url;
-
-if(playing){
-    audio.play().catch(()=>{});
-}
-
-setUI();
-setActive();
-}
-
-function toggle(){
-
-if(!audio.src) load(index);
-
-if(!audio.src) return;
-
-if(playing){
+function stop(){
     audio.pause();
-    playing=false;
-}else{
-    audio.play().catch(()=>{});
-    playing=true;
-}
-
-setUI();
-}
-
-function stopRadio(){
-audio.pause();
-audio.removeAttribute("src");
-playing=false;
-setUI();
+    playing = false;
 }
 
 function mute(){
-audio.muted=!audio.muted;
+    audio.muted = !audio.muted;
 }
 
-function volumeUp(){
-audio.volume = Math.min(1, audio.volume + volumeStep);
+function toggle(){
+    if(audio.paused){
+        play();
+    } else {
+        stop();
+    }
 }
 
-function setUI(){
-document.getElementById("bigPlay").innerText=playing?"⏸":"▶";
-document.getElementById("playIcon").innerText=playing?"⏸":"▶";
-}
+/* volume */
+volume.addEventListener("input", () => {
+    audio.volume = volume.value;
+});
 
-function prev(){
-index=(index-1+stations.length)%stations.length;
-load(index);
-}
-
-function next(){
-index=(index+1)%stations.length;
-load(index);
-}
-
-/* SIDEBAR */
+/* sidebar */
 stations.forEach((s,i)=>{
-let div=document.createElement("div");
-div.className="station";
-div.innerHTML=`
-<img src="${icon(s)}" onerror="this.src='https://via.placeholder.com/20'">
-<span>${s}</span>
-`;
-div.onclick=()=>load(i);
-sidebar.appendChild(div);
+    const div = document.createElement("div");
+    div.className = "station";
+    div.innerHTML = `<span class="activeDot"></span> ${s}`;
+    div.onclick = () => load(i);
+    sidebar.appendChild(div);
 });
 
 load(0);
