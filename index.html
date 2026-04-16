@@ -1,18 +1,62 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-<meta charset="UTF-8">
-<title>REAL WORKING RADIO ENGINE</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Production Radio Engine</title>
+
 <style>
-body { background:#0b0b0b; color:white; font-family:Arial; display:flex; }
-#sidebar { width:300px; background:#141414; height:100vh; overflow:auto; }
-.station { padding:10px; border-bottom:1px solid #333; cursor:pointer; }
-.station.ok { color:#00ff88; }
-.station.bad { color:#ff4d4d; }
-#main { flex:1; display:flex; justify-content:center; align-items:center; flex-direction:column; }
-#status { margin-top:10px; font-size:14px; color:#aaa; }
-button { font-size:40px; background:none; color:white; border:none; cursor:pointer; }
-img { width:220px; height:120px; object-fit:contain; }
+body {
+    margin:0;
+    font-family:Arial;
+    background:#0b0b0b;
+    color:white;
+    display:flex;
+    height:100vh;
+}
+
+#sidebar {
+    width:320px;
+    background:#141414;
+    overflow:auto;
+    border-right:1px solid #222;
+}
+
+.station {
+    padding:10px;
+    border-bottom:1px solid #222;
+    cursor:pointer;
+}
+.station:hover { background:#222; }
+
+#main {
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+}
+
+#logo {
+    width:220px;
+    height:120px;
+    object-fit:contain;
+    margin-bottom:20px;
+}
+
+#status {
+    margin-top:10px;
+    color:#aaa;
+    font-size:14px;
+}
+
+button {
+    font-size:50px;
+    background:none;
+    border:none;
+    color:white;
+    cursor:pointer;
+}
 </style>
 </head>
 
@@ -30,18 +74,42 @@ img { width:220px; height:120px; object-fit:contain; }
 
 <script>
 
+/* =========================
+   PRODUKCYJNA LISTA STACJI
+   (tylko web-playable streams)
+   ========================= */
+
 const stations = [
-{ name:"Muzyczne Radio", url:"https://stream.rc.fm/muzyczne", logo:"https://www.muzyczneradio.pl/wp-content/uploads/logo.png" },
-{ name:"Polskie Radio Jedynka", url:"https://stream.polskieradio.pl/program1.mp3", logo:"https://upload.wikimedia.org/wikipedia/commons/3/3f/PR1_logo.png" },
-{ name:"RMF FM", url:"https://rs6-krk2.rmfstream.pl/RMFFM48", logo:"https://upload.wikimedia.org/wikipedia/commons/2/2e/RMF_FM_logo.png" },
-{ name:"Radio Zet", url:"https://zt01.cdn.eurozet.pl/ZET010.mp3", logo:"https://upload.wikimedia.org/wikipedia/commons/3/3c/Radio_ZET_logo.png" },
-{ name:"Radio Eska", url:"https://waw01-01.cdn.eurozet.pl/eska.mp3", logo:"https://upload.wikimedia.org/wikipedia/commons/9/9f/Radio_Eska_logo.png" }
+{
+    name:"Muzyczne Radio",
+    url:"https://stream.rc.fm/muzyczne",
+    logo:"https://www.muzyczneradio.pl/wp-content/uploads/logo.png"
+},
+{
+    name:"RMF FM",
+    url:"https://rs6-krk2.rmfstream.pl/RMFFM48",
+    logo:"https://upload.wikimedia.org/wikipedia/commons/2/2e/RMF_FM_logo.png"
+},
+{
+    name:"Radio Zet",
+    url:"https://zt01.cdn.eurozet.pl/ZET010.mp3",
+    logo:"https://upload.wikimedia.org/wikipedia/commons/3/3c/Radio_ZET_logo.png"
+},
+{
+    name:"Radio Eska",
+    url:"https://waw01-01.cdn.eurozet.pl/eska.mp3",
+    logo:"https://upload.wikimedia.org/wikipedia/commons/9/9f/Radio_Eska_logo.png"
+}
 ];
 
 const audio = document.getElementById("audio");
 
 let current = 0;
-let ready = false;
+let locked = false;
+
+/* =========================
+   CORE STREAM LOADER
+   ========================= */
 
 function setStatus(t){
     document.getElementById("status").innerText = t;
@@ -49,59 +117,64 @@ function setStatus(t){
 
 function load(i){
 
+    if(locked) return;
+
     current = i;
     const st = stations[i];
 
     document.getElementById("logo").src = st.logo;
 
-    setStatus("TESTING STREAM...");
+    setStatus("CONNECTING...");
 
+    locked = true;
+
+    audio.pause();
     audio.src = st.url;
     audio.load();
 
+    const timeout = setTimeout(()=>{
+        setStatus("STREAM TIMEOUT");
+        locked = false;
+    }, 7000);
+
     audio.oncanplay = () => {
-        ready = true;
-        setStatus("READY → PLAY");
-        play();
+        clearTimeout(timeout);
+
+        audio.play()
+        .then(()=>{
+            setStatus("LIVE");
+        })
+        .catch(()=>{
+            setStatus("BLOCKED PLAYBACK");
+        })
+        .finally(()=>{
+            locked = false;
+        });
     };
 
     audio.onerror = () => {
-        ready = false;
-        setStatus("STREAM FAILED → NEXT");
-        next();
+        clearTimeout(timeout);
+        setStatus("STREAM ERROR");
+        locked = false;
     };
-
-    // HARD TIMEOUT (klucz!)
-    setTimeout(()=>{
-        if(!ready){
-            setStatus("TIMEOUT → NEXT");
-            next();
-        }
-    }, 6000);
 }
 
-function play(){
-    audio.play()
-    .then(()=> setStatus("LIVE"))
-    .catch(()=>{
-        setStatus("BLOCKED → NEXT");
-        next();
-    });
-}
+/* =========================
+   CONTROL
+   ========================= */
 
 function toggle(){
     if(audio.paused){
-        play();
+        load(current);
     } else {
         audio.pause();
         setStatus("PAUSED");
     }
 }
 
-function next(){
-    current = (current + 1) % stations.length;
-    load(current);
-}
+/* =========================
+   UI
+   ========================= */
 
 stations.forEach((s,i)=>{
     const div = document.createElement("div");
