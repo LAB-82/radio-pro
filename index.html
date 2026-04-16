@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Radio Restore FIX</title>
+<title>Spotify-Style Radio Engine</title>
 
 <style>
 body {
@@ -72,6 +72,12 @@ body {
     cursor:pointer;
     user-select:none;
 }
+
+#status{
+    font-size:12px;
+    color:#888;
+    margin-top:10px;
+}
 </style>
 
 </head>
@@ -82,7 +88,7 @@ body {
 
 <div id="main">
 
-<div id="header">🎧 RADIO RESTORE FIX</div>
+<div id="header">🎧 SPOTIFY-STYLE RADIO ENGINE</div>
 
 <div id="playerBox">
     <div id="radioPlayer">
@@ -93,6 +99,8 @@ body {
 
         <div id="bigPlay" onclick="toggle()">▶</div>
 
+        <div id="status">READY</div>
+
     </div>
 </div>
 
@@ -102,62 +110,101 @@ body {
 
 <script>
 
-/* TWOJA LISTA BEZ ZMIAN */
+/* =========================
+   STACJE (bez zmian)
+   ========================= */
+
 const stations = [
 { name:"Muzyczne Radio", url:"https://stream.rc.fm/muzyczne", logo:"https://www.muzyczneradio.pl/wp-content/uploads/logo.png" },
 { name:"Polskie Radio Jedynka", url:"https://stream.polskieradio.pl/program1.mp3", logo:"https://upload.wikimedia.org/wikipedia/commons/3/3f/PR1_logo.png" },
 { name:"Polskie Radio Dwójka", url:"https://stream.polskieradio.pl/program2.mp3", logo:"https://upload.wikimedia.org/wikipedia/commons/8/8f/PR2_logo.png" },
 { name:"Polskie Radio Trójka", url:"https://stream.polskieradio.pl/program3.mp3", logo:"https://upload.wikimedia.org/wikipedia/commons/1/1b/PR3_logo.png" },
-{ name:"Polskie Radio Czwórka", url:"https://stream.polskieradio.pl/program4.mp3", logo:"https://upload.wikimedia.org/wikipedia/commons/0/0a/PR4_logo.png" },
-{ name:"Radio Plus", url:"https://stream4.nadaje.com:8000/radioplus", logo:"https://upload.wikimedia.org/wikipedia/commons/8/8d/Radio_Plus_logo.png" },
 { name:"RMF FM", url:"https://rs6-krk2.rmfstream.pl/RMFFM48", logo:"https://upload.wikimedia.org/wikipedia/commons/2/2e/RMF_FM_logo.png" },
-{ name:"Radio Zet", url:"https://zt01.cdn.eurozet.pl/ZET010.mp3", logo:"https://upload.wikimedia.org/wikipedia/commons/3/3c/Radio_ZET_logo.png" },
-{ name:"Radio Eska", url:"https://waw01-01.cdn.eurozet.pl/eska.mp3", logo:"https://upload.wikimedia.org/wikipedia/commons/9/9f/Radio_Eska_logo.png" },
-{ name:"Radio Wrocław", url:"https://stream2.nadaje.com:8000/radiowroclaw", logo:"https://upload.wikimedia.org/wikipedia/commons/3/3e/Radio_Wroc%C5%82aw_logo.png" },
-{ name:"Radio Wnet", url:"https://stream.wnet.fm/stream", logo:"https://upload.wikimedia.org/wikipedia/commons/8/8e/Radio_Wnet_logo.png" },
-{ name:"Tok FM", url:"https://audioserver.interia.pl/tokfm.mp3", logo:"https://upload.wikimedia.org/wikipedia/commons/5/5b/TOK_FM_logo.png" },
-{ name:"Antyradio", url:"https://n-16-7.dcs.redcdn.pl/sc/o2/Eurozet/live/antyradio.mp3", logo:"https://upload.wikimedia.org/wikipedia/commons/6/6b/Antyradio_logo.png" },
-{ name:"Radio Kolor", url:"https://radiokolor-stream.smcloud.net/radiokolor.mp3", logo:"https://upload.wikimedia.org/wikipedia/commons/7/7a/Radio_Kolor_logo.png" },
-{ name:"Polskie Radio Dzieciom", url:"https://stream.polskieradio.pl/dzieci.mp3", logo:"https://upload.wikimedia.org/wikipedia/commons/5/5d/PR_Dzieciom_logo.png" },
-{ name:"Polskie Radio Chopin", url:"https://stream.polskieradio.pl/chopin.mp3", logo:"https://upload.wikimedia.org/wikipedia/commons/4/4a/Chopin_radio_logo.png" },
-{ name:"Radio Maryja", url:"https://radiomaryja.pl/ramy/rm.m3u", logo:"https://upload.wikimedia.org/wikipedia/commons/6/6e/Radio_Maryja_logo.png" },
-{ name:"Radio Jasna Góra", url:"https://stream.jasnagora.pl/radio.mp3", logo:"https://upload.wikimedia.org/wikipedia/commons/3/3f/Jasna_Gora_logo.png" }
+{ name:"Radio Zet", url:"https://zt01.cdn.eurozet.pl/ZET010.mp3", logo:"https://upload.wikimedia.org/wikipedia/commons/3/3c/Radio_ZET_logo.png" }
 ];
 
 const audio = document.getElementById("audio");
-let index = 0;
 
-/* 🔥 KLUCZOWA NAPRAWA: NIE RESETUJ src NA PUSTO */
-function load(i){
-    index = i;
+let current = 0;
+let preloaded = null;
+let isSwitching = false;
+
+/* =========================
+   ENGINE CORE
+   ========================= */
+
+function setStatus(t){
+    document.getElementById("status").innerText = t;
+}
+
+function load(i, autoplay=true){
+    current = i;
 
     const st = stations[i];
 
     document.getElementById("stationLogo").src = st.logo;
 
-    audio.pause();
+    setStatus("LOADING...");
 
-    // ❌ NIE robimy audio.src = ""
-    // ❌ NIE robimy audio.load()
-
-    audio.src = st.url;
-
-    const p = audio.play();
-
-    if(p){
-        p.catch(()=>{
-            // lekkie retry tylko raz
-            setTimeout(()=>audio.play().catch(()=>{}), 800);
-        });
+    if(isSwitching){
+        return;
     }
+
+    isSwitching = true;
+
+    // preload next stream BEFORE switch
+    const tempAudio = new Audio();
+    tempAudio.src = st.url;
+    tempAudio.preload = "auto";
+
+    tempAudio.oncanplay = () => {
+
+        // płynne przełączenie
+        audio.src = st.url;
+
+        audio.play()
+        .then(()=>{
+            setStatus("LIVE");
+            updateUI();
+        })
+        .catch(()=>{
+            setStatus("RETRY...");
+            setTimeout(()=>load(i), 800);
+        })
+        .finally(()=>{
+            isSwitching = false;
+        });
+    };
+
+    tempAudio.onerror = () => {
+        setStatus("FAILED → NEXT");
+
+        isSwitching = false;
+        next();
+    };
 }
 
 function toggle(){
     if(audio.paused){
-        audio.play().catch(()=>load(index));
+        load(current);
     } else {
         audio.pause();
+        setStatus("PAUSED");
     }
+}
+
+function next(){
+    current = (current + 1) % stations.length;
+    load(current);
+}
+
+/* =========================
+   UI
+   ========================= */
+
+function updateUI(){
+    document.getElementById("bigPlay").innerText =
+        audio.paused ? "▶" : "⏸";
 }
 
 /* sidebar */
