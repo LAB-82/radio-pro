@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Production Radio Engine</title>
+<title>Radio Platform v1</title>
 
 <style>
 body {
@@ -16,7 +16,7 @@ body {
 }
 
 #sidebar {
-    width:320px;
+    width:340px;
     background:#141414;
     overflow:auto;
     border-right:1px solid #222;
@@ -26,8 +26,20 @@ body {
     padding:10px;
     border-bottom:1px solid #222;
     cursor:pointer;
+    display:flex;
+    justify-content:space-between;
 }
 .station:hover { background:#222; }
+
+.badge {
+    font-size:11px;
+    padding:2px 6px;
+    border-radius:6px;
+    background:#333;
+}
+
+.ok { color:#00ff99; }
+.fail { color:#ff4d4d; }
 
 #main {
     flex:1;
@@ -47,7 +59,6 @@ body {
 #status {
     margin-top:10px;
     color:#aaa;
-    font-size:14px;
 }
 
 button {
@@ -67,7 +78,7 @@ button {
 <div id="main">
     <img id="logo">
     <button onclick="toggle()">▶</button>
-    <div id="status">READY</div>
+    <div id="status">INITIALIZING PLATFORM...</div>
 </div>
 
 <audio id="audio"></audio>
@@ -75,8 +86,7 @@ button {
 <script>
 
 /* =========================
-   PRODUKCYJNA LISTA STACJI
-   (tylko web-playable streams)
+   STACJE PLATFORMY
    ========================= */
 
 const stations = [
@@ -99,69 +109,139 @@ const stations = [
     name:"Radio Eska",
     url:"https://waw01-01.cdn.eurozet.pl/eska.mp3",
     logo:"https://upload.wikimedia.org/wikipedia/commons/9/9f/Radio_Eska_logo.png"
+},
+{
+    name:"Tok FM",
+    url:"https://audioserver.interia.pl/tokfm.mp3",
+    logo:"https://upload.wikimedia.org/wikipedia/commons/5/5b/TOK_FM_logo.png"
 }
 ];
 
 const audio = document.getElementById("audio");
 
+let readyList = [];
 let current = 0;
-let locked = false;
 
 /* =========================
-   CORE STREAM LOADER
+   STREAM TESTER (CORE PLATFORM FEATURE)
    ========================= */
 
-function setStatus(t){
-    document.getElementById("status").innerText = t;
+function testStream(station){
+    return new Promise((resolve)=>{
+        const testAudio = new Audio();
+
+        let done = false;
+
+        const timeout = setTimeout(()=>{
+            if(!done){
+                done = true;
+                resolve(false);
+            }
+        }, 4000);
+
+        testAudio.src = station.url;
+
+        testAudio.oncanplay = () => {
+            if(done) return;
+            done = true;
+            clearTimeout(timeout);
+            resolve(true);
+        };
+
+        testAudio.onerror = () => {
+            if(done) return;
+            done = true;
+            clearTimeout(timeout);
+            resolve(false);
+        };
+    });
 }
+
+/* =========================
+   PLATFORM INIT
+   ========================= */
+
+async function initPlatform(){
+
+    setStatus("TESTING STREAMS...");
+
+    readyList = [];
+
+    for(let st of stations){
+        const ok = await testStream(st);
+
+        if(ok){
+            readyList.push(st);
+        }
+
+        renderSidebar();
+    }
+
+    setStatus(`READY (${readyList.length}/${stations.length})`);
+
+    if(readyList.length > 0){
+        load(0);
+    } else {
+        setStatus("NO WORKING STREAMS");
+    }
+}
+
+/* =========================
+   LOAD ENGINE
+   ========================= */
 
 function load(i){
 
-    if(locked) return;
-
     current = i;
-    const st = stations[i];
+
+    const st = readyList[i];
+
+    if(!st){
+        setStatus("EMPTY PLATFORM");
+        return;
+    }
 
     document.getElementById("logo").src = st.logo;
 
     setStatus("CONNECTING...");
 
-    locked = true;
-
     audio.pause();
     audio.src = st.url;
     audio.load();
 
-    const timeout = setTimeout(()=>{
-        setStatus("STREAM TIMEOUT");
-        locked = false;
-    }, 7000);
-
-    audio.oncanplay = () => {
-        clearTimeout(timeout);
-
-        audio.play()
-        .then(()=>{
-            setStatus("LIVE");
-        })
-        .catch(()=>{
-            setStatus("BLOCKED PLAYBACK");
-        })
-        .finally(()=>{
-            locked = false;
-        });
-    };
-
-    audio.onerror = () => {
-        clearTimeout(timeout);
-        setStatus("STREAM ERROR");
-        locked = false;
-    };
+    audio.play()
+    .then(()=>{
+        setStatus("LIVE");
+    })
+    .catch(()=>{
+        setStatus("PLAY BLOCKED");
+    });
 }
 
 /* =========================
-   CONTROL
+   UI
    ========================= */
+
+function renderSidebar(){
+
+    const sidebar = document.getElementById("sidebar");
+    sidebar.innerHTML = "";
+
+    readyList.forEach((s,i)=>{
+
+        const div = document.createElement("div");
+        div.className = "station";
+
+        div.innerHTML = `
+            <span>${s.name}</span>
+            <span class="badge ok">LIVE</span>
+        `;
+
+        div.onclick = ()=>load(i);
+
+        sidebar.appendChild(div);
+    });
+}
 
 function toggle(){
     if(audio.paused){
@@ -172,19 +252,12 @@ function toggle(){
     }
 }
 
-/* =========================
-   UI
-   ========================= */
+function setStatus(t){
+    document.getElementById("status").innerText = t;
+}
 
-stations.forEach((s,i)=>{
-    const div = document.createElement("div");
-    div.className = "station";
-    div.innerText = s.name;
-    div.onclick = ()=>load(i);
-    document.getElementById("sidebar").appendChild(div);
-});
-
-load(0);
+/* START PLATFORM */
+initPlatform();
 
 </script>
 
