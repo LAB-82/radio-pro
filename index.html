@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Radio PRO STREAM ENGINE</title>
+<title>Radio FINAL</title>
 
 <style>
 body {
@@ -27,7 +27,6 @@ body {
     border-bottom:1px solid #222;
     cursor:pointer;
 }
-
 .station:hover { background:#222; }
 
 #main {
@@ -63,6 +62,8 @@ body {
 
 #logoBox img{
     width:220px;
+    height:120px;
+    object-fit:contain;
     margin-bottom:20px;
 }
 
@@ -70,32 +71,9 @@ body {
     font-size:70px;
     cursor:pointer;
 }
-
-#bottomBar{
-    position:absolute;
-    bottom:12px;
-    left:50%;
-    transform:translateX(-50%);
-    background:#222;
-    padding:10px 18px;
-    border-radius:30px;
-    display:flex;
-    gap:18px;
-}
-
-#controls {
-    height:70px;
-    background:#111;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    gap:20px;
-}
-
-.btn { cursor:pointer; font-size:20px; }
-
-.active { color:#00ff90; }
 </style>
+
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 
 </head>
 
@@ -105,7 +83,7 @@ body {
 
 <div id="main">
 
-<div id="header">🎧 RADIO STREAM ENGINE</div>
+<div id="header">🎧 RADIO FINAL</div>
 
 <div id="playerBox">
     <div id="radioPlayer">
@@ -116,21 +94,7 @@ body {
 
         <div id="bigPlay" onclick="toggle()">▶</div>
 
-        <div id="bottomBar">
-            <div onclick="prev()">⏮</div>
-            <div onclick="toggle()" id="playIcon">▶</div>
-            <div onclick="next()">⏭</div>
-            <div onclick="mute()">🔊</div>
-        </div>
-
     </div>
-</div>
-
-<div id="controls">
-    <div class="btn" onclick="prev()">⏮</div>
-    <div class="btn" onclick="toggle()">⏯</div>
-    <div class="btn" onclick="next()">⏭</div>
-    <div class="btn" onclick="mute()">🔊</div>
 </div>
 
 </div>
@@ -139,85 +103,94 @@ body {
 
 <script>
 
+/* TWOJE STACJE */
 const stations = [
 "Muzyczne Radio",
 "Polskie Radio Jedynka",
 "Polskie Radio Dwójka",
 "Polskie Radio Trójka",
 "Polskie Radio Czwórka",
-"Radio Plus",
 "RMF FM",
 "Radio Zet",
 "Radio Eska",
-"Radio Wrocław",
-"Radio Wnet",
 "Tok FM",
 "Antyradio",
 "Radio Kolor",
-"Open FM",
-"Open FM Disco Polo",
-"Disco Radio",
-"Polish Radio London 24",
 "Polskie Radio Dzieciom",
 "Polskie Radio Chopin",
-"Radio Yanosik",
-"Radio Republika",
-"Radio dla Ciebie",
-"Radio Maryja",
 "Radio Jasna Góra"
 ];
 
 let index=0;
 let playing=false;
+let hls=null;
 
 const audio=document.getElementById("audio");
 const sidebar=document.getElementById("sidebar");
 
-/* 🔥 CURATED STREAM PACK */
-const STREAMS = {
+let cache={};
 
-"RMF FM":"https://rs6-krk2.rmfstream.pl/rmf_fm",
-"Radio Zet":"https://zt.cdn.eurozet.pl/ZET.mp3",
-"Radio Eska":"https://waw01-01.ic.smcdn.pl/t043-1.mp3",
-"Antyradio":"https://antyradio-01.cdn.eurozet.pl/antyradio.mp3",
-"Tok FM":"https://radiostream.pl/tuba10-1.mp3",
+/* 🔥 STREAM + LOGO */
+async function resolveStation(name){
 
-"Polskie Radio Jedynka":"https://stream.polskieradio.pl/program1.mp3",
-"Polskie Radio Dwójka":"https://stream.polskieradio.pl/program2.mp3",
-"Polskie Radio Trójka":"https://stream3.polskieradio.pl/pr3_aac128",
-"Polskie Radio Czwórka":"https://stream4.polskieradio.pl/pr4_aac128",
-"Polskie Radio Dzieciom":"https://stream.polskieradio.pl/prd.mp3",
+if(cache[name]) return cache[name];
 
-"Radio Wrocław":"https://stream4.nadaje.com/radiowroclaw",
-"Radio Wnet":"https://stream.rcs.revma.com/wnet",
+try{
+    const res = await fetch(
+        `https://de1.api.radio-browser.info/json/stations/byname/${encodeURIComponent(name)}?limit=1`
+    );
 
-"Radio Kampus":"https://stream.radiokampus.fm/kampus",
+    const data = await res.json();
 
-"Muzyczne Radio":"https://stream.rcs.revma.com/gzwc1xcq042vv"
+    if(!data || data.length===0) return null;
 
-};
+    const station = {
+        url: data[0].url_resolved,
+        logo: data[0].favicon
+    };
 
-/* ===================== */
+    cache[name]=station;
+    return station;
 
-function getStream(name){
-    return STREAMS[name] || "https://stream.rcs.revma.com/gzwc1xcq042vv";
+}catch(e){
+    return null;
+}
 }
 
-function setLogo(name){
- document.getElementById("stationLogo").src =
- "https://via.placeholder.com/220x120?text="+encodeURIComponent(name);
+/* LOGO */
+function setLogo(url, name){
+
+document.getElementById("stationLogo").src =
+url || "https://via.placeholder.com/220x120?text="+encodeURIComponent(name);
 }
 
-function load(i){
+/* LOAD */
+async function load(i){
 
 index=i;
 let name=stations[i];
 
-setLogo(name);
+if(hls){hls.destroy();hls=null;}
 
-let url = getStream(name);
+let station = await resolveStation(name);
 
-audio.src=url;
+if(!station){
+    audio.src="";
+    setLogo("", name);
+    return;
+}
+
+/* ustaw logo */
+setLogo(station.logo, name);
+
+/* ustaw stream */
+if(station.url.includes(".m3u8")){
+    hls=new Hls();
+    hls.loadSource(station.url);
+    hls.attachMedia(audio);
+}else{
+    audio.src=station.url;
+}
 
 if(playing){
     audio.play().catch(()=>{});
@@ -226,8 +199,12 @@ if(playing){
 setUI();
 }
 
+/* PLAY */
 function toggle(){
- if(!audio.src) load(index);
+
+ if(!audio.src){
+   load(index);
+ }
 
  if(playing){
    audio.pause();
@@ -240,25 +217,12 @@ function toggle(){
  setUI();
 }
 
+/* UI */
 function setUI(){
  document.getElementById("bigPlay").innerText=playing?"⏸":"▶";
- document.getElementById("playIcon").innerText=playing?"⏸":"▶";
 }
 
-function prev(){
- index=(index-1+stations.length)%stations.length;
- load(index);
-}
-
-function next(){
- index=(index+1)%stations.length;
- load(index);
-}
-
-function mute(){
- audio.muted=!audio.muted;
-}
-
+/* SIDEBAR */
 stations.forEach((s,i)=>{
  let div=document.createElement("div");
  div.className="station";
@@ -267,6 +231,7 @@ stations.forEach((s,i)=>{
  sidebar.appendChild(div);
 });
 
+/* START */
 load(0);
 
 </script>
