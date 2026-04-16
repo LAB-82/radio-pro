@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Radio Platform v2</title>
+<title>Simple Radio</title>
 
 <style>
 body {
@@ -16,7 +16,7 @@ body {
 }
 
 #sidebar {
-    width:340px;
+    width:320px;
     background:#141414;
     overflow:auto;
     border-right:1px solid #222;
@@ -44,13 +44,8 @@ body {
     margin-bottom:20px;
 }
 
-#status { color:#aaa; margin-top:10px; }
-
-button {
-    font-size:50px;
-    background:none;
-    border:none;
-    color:white;
+#play {
+    font-size:60px;
     cursor:pointer;
 }
 </style>
@@ -62,19 +57,14 @@ button {
 
 <div id="main">
     <img id="logo">
-    <button onclick="toggle()">▶</button>
-    <div id="status">READY</div>
+    <div id="play" onclick="toggle()">▶</div>
 </div>
 
-<audio id="audioA"></audio>
-<audio id="audioB"></audio>
+<audio id="audio"></audio>
 
 <script>
 
-/* =========================
-   TWOJA LISTA (BEZ USUWANIA)
-   ========================= */
-
+/* TWOJA LISTA – NIC NIE USUWAM */
 const stations = [
 { name:"Muzyczne Radio", url:"https://stream.rc.fm/muzyczne", logo:"https://www.muzyczneradio.pl/wp-content/uploads/logo.png" },
 { name:"Polskie Radio Jedynka", url:"https://stream.polskieradio.pl/program1.mp3", logo:"https://upload.wikimedia.org/wikipedia/commons/3/3f/PR1_logo.png" },
@@ -97,85 +87,33 @@ const stations = [
 { name:"Radio Jasna Góra", url:"https://stream.jasnagora.pl/radio.mp3", logo:"https://upload.wikimedia.org/wikipedia/commons/3/3f/Jasna_Gora_logo.png" }
 ];
 
-/* =========================
-   ENGINE v2
-   ========================= */
+const audio = document.getElementById("audio");
 
 let current = 0;
-let active = 0;
 
-const players = [
-    document.getElementById("audioA"),
-    document.getElementById("audioB")
-];
-
-players.forEach(p=>p.volume=0);
-
-function setStatus(t){
-    document.getElementById("status").innerText = t;
-}
-
-function crossfade(newPlayer, oldPlayer){
-
-    newPlayer.volume = 0;
-    newPlayer.play().catch(()=>{ setStatus("PLAY BLOCKED"); });
-
-    let step = 0;
-
-    const fade = setInterval(()=>{
-        step += 0.05;
-
-        newPlayer.volume = step;
-        oldPlayer.volume = 1 - step;
-
-        if(step >= 1){
-            clearInterval(fade);
-            oldPlayer.pause();
-        }
-
-    }, 100);
-}
-
+/* NAJPROSTSZY LOAD */
 function load(i){
-
     current = i;
 
     const st = stations[i];
 
     document.getElementById("logo").src = st.logo;
 
-    setStatus("CONNECTING...");
+    audio.src = st.url;
 
-    const next = (active + 1) % 2;
-
-    players[next].src = st.url;
-
-    players[next].oncanplay = () => {
-        crossfade(players[next], players[active]);
-        active = next;
-        setStatus("LIVE");
-    };
-
-    players[next].onerror = () => {
-        setStatus("STREAM ERROR");
-    };
+    audio.play().catch(()=>{});
 }
 
+/* PLAY / PAUSE */
 function toggle(){
-    const p = players[active];
-
-    if(p.paused){
-        p.play().catch(()=>load(current));
+    if(audio.paused){
+        audio.play().catch(()=>load(current));
     } else {
-        p.pause();
-        setStatus("PAUSED");
+        audio.pause();
     }
 }
 
-/* =========================
-   UI
-   ========================= */
-
+/* SIDEBAR */
 stations.forEach((s,i)=>{
     const div = document.createElement("div");
     div.className = "station";
@@ -184,6 +122,7 @@ stations.forEach((s,i)=>{
     document.getElementById("sidebar").appendChild(div);
 });
 
+/* START */
 load(0);
 
 </script>
