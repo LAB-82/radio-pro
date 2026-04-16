@@ -3,145 +3,156 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>POPULARNE STACJE RADIOWE ENGINE</title>
+<title>RADIO ENGINE PRO FIX</title>
 
 <style>
-body {
-    margin:0;
-    font-family:Arial;
-    background:#0b0b0b;
-    color:white;
+body{
+margin:0;
+font-family:Arial;
+background:#0b0b0b;
+color:#fff;
+display:flex;
+height:100vh;
 }
 
-/* HEADER */
-#header {
-    padding:14px;
-    background:#1a1a1a;
-    font-weight:bold;
+/* SIDEBAR */
+#sidebar{
+width:420px;
+background:#141414;
+overflow:auto;
+border-right:1px solid #222;
+padding:10px;
 }
 
-/* LAYOUT */
-#layout {
-    display:flex;
-    height:calc(100vh - 52px);
+/* GRID 3 COL */
+#stations{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:10px;
 }
 
-/* GRID LEFT */
-#sidebar {
-    flex:1;
-    padding:20px;
-    overflow:auto;
+.station{
+background:#1a1a1a;
+padding:10px;
+cursor:pointer;
+border-radius:8px;
+text-align:center;
+transition:0.2s;
+font-size:12px;
 }
 
-.title {
-    color:#aaa;
-    font-size:13px;
-    margin-bottom:15px;
-    letter-spacing:1px;
+.station:hover{
+background:#2a2a2a;
 }
 
-.grid {
-    display:grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap:12px;
+.station.active{
+background:#00aa66;
 }
 
-.station {
-    background:#141414;
-    border:1px solid #222;
-    padding:12px;
-    border-radius:10px;
-    cursor:pointer;
-    display:flex;
-    align-items:center;
-    gap:10px;
-    transition:0.2s;
+/* MAIN */
+#main{
+flex:1;
+display:flex;
+flex-direction:column;
 }
 
-.station:hover {
-    background:#222;
+#header{
+padding:12px;
+background:#1a1a1a;
+font-weight:bold;
 }
 
-.station.active {
-    border-color:#00ff90;
-    color:#00ff90;
-    background:#2a2a2a;
+#playerBox{
+flex:1;
+display:flex;
+justify-content:center;
+align-items:center;
+background:#000;
 }
 
-/* RIGHT PLAYER */
-#playerBox {
-    width:340px;
-    background:#111;
-    border-left:1px solid #222;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    gap:16px;
+/* PLAYER */
+#radioPlayer{
+width:90%;
+height:90%;
+background:#111;
+border-radius:14px;
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+position:relative;
 }
 
-/* LOGO */
 #logoBox img{
-    width:170px;
-    height:170px;
-    border-radius:18px;
-    background:#222;
+width:180px;
+height:180px;
+border-radius:12px;
+background:#222;
+margin-bottom:10px;
 }
 
-/* ICONS ABOVE BUTTONS */
-#icons {
-    display:flex;
-    gap:12px;
-    font-size:18px;
-    margin-top:10px;
+/* CONTROLS UNDER LOGO */
+#controls{
+display:flex;
+gap:10px;
+align-items:center;
+margin-top:10px;
 }
 
-/* CONTROLS */
-.ctrl {
-    width:140px;
-    padding:10px;
-    background:#222;
-    border-radius:8px;
-    text-align:center;
-    cursor:pointer;
+button{
+background:#222;
+color:#fff;
+border:none;
+padding:8px 12px;
+cursor:pointer;
+border-radius:6px;
 }
 
-.ctrl:hover {
-    background:#333;
+button:hover{
+background:#333;
 }
 
-#volume {
-    width:140px;
+#volume{
+width:120px;
 }
+
+#status{
+margin-top:10px;
+font-size:12px;
+opacity:0.7;
+}
+
 </style>
+
 </head>
 
 <body>
 
-<div id="header">🎧 POPULARNE STACJE RADIOWE</div>
-
-<div id="layout">
-
 <div id="sidebar">
-    <div class="title">ONLINE RADIOBOX STREAM ENGINE</div>
-    <div class="grid" id="grid"></div>
+<div id="stations"></div>
 </div>
 
+<div id="main">
+
+<div id="header">🎧 RADIO ENGINE PRO FIX (REAL STREAMS)</div>
+
 <div id="playerBox">
+<div id="radioPlayer">
 
-    <div id="logoBox">
-        <img id="stationLogo">
-    </div>
+<div id="logoBox">
+<img id="logo" />
+</div>
 
-    <!-- ICONS ABOVE BUTTONS (FIXED) -->
-    <div id="icons">▶ ⏹ 🔇 🔊</div>
+<div id="controls">
+<button onclick="play()">PLAY</button>
+<button onclick="stop()">STOP</button>
+<button onclick="mute()">MUTE</button>
+<input id="volume" type="range" min="0" max="1" step="0.01" value="0.6">
+</div>
 
-    <div class="ctrl" onclick="play()">PLAY</div>
-    <div class="ctrl" onclick="stop()">STOP</div>
-    <div class="ctrl" onclick="mute()">MUTE</div>
+<div id="status">READY</div>
 
-    <input id="volume" type="range" min="0" max="1" step="0.01" value="0.6">
-
+</div>
 </div>
 
 </div>
@@ -150,203 +161,118 @@ body {
 
 <script>
 
-/* =========================
-   STATIONS (ONLINE RADIOBOX BASED)
-========================= */
-
 const stations = [
-{
- name:"Muzyczne Radio",
- url:"https://www.muzyczneradio.pl/index.php/player/hi.html?type=hi"
-},
-{
- name:"RMF FM",
- url:"https://onlineradiobox.com/pl/radiormf/?cs=pl.radiormf&played=1"
-},
-{
- name:"Radio Zet",
- url:"https://onlineradiobox.com/pl/radioeska/?cs=pl.radioeska&played=1"
-},
-{
- name:"Radio Eska",
- url:"https://onlineradiobox.com/pl/radioeska/?cs=pl.radioeska&played=1"
-},
-{
- name:"Radio Złote Przeboje",
- url:"https://onlineradiobox.com/pl/radiozloteprzeboje/?cs=pl.radiozloteprzeboje&played=1"
-},
-{
- name:"Jedynka",
- url:"https://onlineradiobox.com/pl/jedynka/?cs=pl.jedynka&played=1"
-},
-{
- name:"Dwójka",
- url:"https://onlineradiobox.com/pl/dwojka/?cs=pl.dwojka&played=1"
-},
-{
- name:"Trójka",
- url:"https://onlineradiobox.com/pl/trojka/?cs=pl.trojka&played=1"
-},
-{
- name:"Czwórka",
- url:"https://onlineradiobox.com/pl/czworka/?cs=pl.czworka&played=1"
-},
-{
- name:"TOK FM",
- url:"https://onlineradiobox.com/pl/tokfm/?cs=pl.tokfm&played=1"
-},
-{
- name:"Antyradio",
- url:"https://onlineradiobox.com/pl/antyradio94/?cs=pl.antyradio94&played=1"
-},
-{
- name:"Radio Wrocław",
- url:"https://onlineradiobox.com/pl/radiowroclaw/?cs=pl.radiowroclaw&played=1"
-},
-{
- name:"Radio WNET",
- url:"https://onlineradiobox.com/pl/wnet/?cs=pl.wnet&played=1"
-},
-{
- name:"Radio Maryja",
- url:"https://onlineradiobox.com/pl/maryja/?cs=pl.maryja&played=1"
-},
-{
- name:"Radio Kampus",
- url:"https://onlineradiobox.com/pl/kampus971/?cs=pl.kampus971&played=1"
-}
+"RMF FM",
+"Radio Zet",
+"Radio Eska",
+"Radio Plus",
+"Tok FM",
+"Antyradio",
+"Radio Wrocław",
+"Radio Wnet",
+"Radio Kolor",
+"Radio Maryja",
+"Jedynka",
+"Dwojka",
+"Trojka",
+"Czworka",
+"Dzieciom",
+"Chopin",
+"Kampus",
+"Nepokalanow",
+"Rodzina"
 ];
 
-/* =========================
-   ENGINE (UNCHANGED CORE LOGIC)
-========================= */
+const audio=document.getElementById("audio");
+const logo=document.getElementById("logo");
+const status=document.getElementById("status");
+const volume=document.getElementById("volume");
 
-const audio = document.getElementById("audio");
-const grid = document.getElementById("grid");
-const volume = document.getElementById("volume");
+let current=0;
+let cache={};
 
-let index = 0;
-let cache = {};
-let candidates = [];
-let currentTry = 0;
+volume.oninput=()=>audio.volume=volume.value;
 
-audio.volume = volume.value;
+/* REAL STREAM RESOLVER (RadioBrowser – STABLE) */
+async function getStream(name){
 
-/* STREAM RESOLVER */
-async function resolve(name){
+if(cache[name]) return cache[name];
 
-    if(cache[name]) return cache[name];
+try{
+const res=await fetch(
+`https://de1.api.radio-browser.info/json/stations/byname/${encodeURIComponent(name)}`
+);
 
-    try{
-        const r = await fetch(
-            `https://de1.api.radio-browser.info/json/stations/byname/${encodeURIComponent(name)}?limit=10`
-        );
+const data=await res.json();
 
-        const data = await r.json();
-        if(!data || !data.length) return [];
-
-        const urls = data.map(s => s.url_resolved).filter(Boolean);
-
-        cache[name] = urls;
-        return urls;
-
-    }catch(e){
-        return [];
-    }
+if(!data.length){
+status.innerText="NO STREAM FOUND";
+return null;
 }
 
-/* LOAD ENGINE */
+const url=data[0].url_resolved;
+cache[name]=url;
+return url;
+
+}catch(e){
+status.innerText="ERROR FETCHING STREAM";
+return null;
+}
+}
+
+function setLogo(name){
+logo.src=`https://www.radio-browser.info/backends/logos/${encodeURIComponent(name)}.png`;
+}
+
 async function load(i){
 
-    index = i;
-    const station = stations[i];
+current=i;
+const name=stations[i];
 
-    setLogo(station.name);
-    setActive(i);
+document.querySelectorAll(".station").forEach((el,idx)=>{
+el.classList.toggle("active",idx===i);
+});
 
-    candidates = await resolve(station.name);
+setLogo(name);
 
-    if(!candidates.length){
-        candidates = [station.url];
-    }
+status.innerText="LOADING...";
 
-    currentTry = 0;
-    playCandidate();
+const url=await getStream(name);
+
+if(!url){
+audio.removeAttribute("src");
+status.innerText="NO STREAM";
+return;
 }
 
-function playCandidate(){
+audio.src=url;
+audio.play().catch(()=>{});
 
-    if(currentTry >= candidates.length) return;
-
-    const url = candidates[currentTry];
-    audio.src = url;
-
-    audio.play().catch(()=>{
-        currentTry++;
-        playCandidate();
-    });
-
-    monitor();
+status.innerText="PLAYING: "+name;
 }
 
-function monitor(){
-    audio.onerror = () => {
-        currentTry++;
-        playCandidate();
-    };
-
-    setTimeout(()=>{
-        if(audio.readyState < 2){
-            currentTry++;
-            playCandidate();
-        }
-    }, 5000);
-}
-
-/* UI LOGO FROM ONLINE RADIOBOX */
-function setLogo(name){
-    document.getElementById("stationLogo").src =
-        "https://www.onlineradiobox.com/img/logo/" +
-        name.toLowerCase().replace(/\s/g,'') +
-        ".png";
-}
-
-/* ACTIVE STATE */
-function setActive(i){
-    document.querySelectorAll(".station").forEach((el,idx)=>{
-        el.classList.toggle("active", idx===i);
-    });
-}
-
-/* CONTROLS */
 function play(){
-    if(!audio.src) load(index);
-    audio.play();
+load(current);
 }
 
 function stop(){
-    audio.pause();
+audio.pause();
+audio.src="";
+status.innerText="STOPPED";
 }
 
 function mute(){
-    audio.muted = !audio.muted;
+audio.muted=!audio.muted;
 }
 
-/* VOLUME */
-volume.addEventListener("input", ()=>{
-    audio.volume = volume.value;
-});
-
-/* GRID */
 stations.forEach((s,i)=>{
-    const div = document.createElement("div");
-    div.className = "station";
-    div.innerHTML = s.name;
-    div.onclick = ()=>load(i);
-    grid.appendChild(div);
+const div=document.createElement("div");
+div.className="station";
+div.innerText=s;
+div.onclick=()=>load(i);
+document.getElementById("stations").appendChild(div);
 });
 
-/* INIT */
 load(0);
 
 </script>
