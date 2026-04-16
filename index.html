@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Always-On Radio Engine</title>
+<title>Radio Restore FIX</title>
 
 <style>
 body {
@@ -72,26 +72,6 @@ body {
     cursor:pointer;
     user-select:none;
 }
-
-#status{
-    font-size:12px;
-    color:#888;
-    margin-top:10px;
-}
-
-#volumeBox{
-    position:absolute;
-    bottom:30px;
-    left:50%;
-    transform:translateX(-50%);
-    background:#222;
-    padding:10px 14px;
-    border-radius:20px;
-}
-
-input[type="range"]{
-    width:140px;
-}
 </style>
 
 </head>
@@ -102,7 +82,7 @@ input[type="range"]{
 
 <div id="main">
 
-<div id="header">🎧 ALWAYS-ON RADIO ENGINE</div>
+<div id="header">🎧 RADIO RESTORE FIX</div>
 
 <div id="playerBox">
     <div id="radioPlayer">
@@ -113,12 +93,6 @@ input[type="range"]{
 
         <div id="bigPlay" onclick="toggle()">▶</div>
 
-        <div id="status">READY</div>
-
-        <div id="volumeBox">
-            🔊 <input id="volume" type="range" min="0" max="1" step="0.01" value="0.8">
-        </div>
-
     </div>
 </div>
 
@@ -128,10 +102,7 @@ input[type="range"]{
 
 <script>
 
-/* =========================
-   FULL LIST (UNCHANGED LOGICALLY)
-   ========================= */
-
+/* TWOJA LISTA BEZ ZMIAN */
 const stations = [
 { name:"Muzyczne Radio", url:"https://stream.rc.fm/muzyczne", logo:"https://www.muzyczneradio.pl/wp-content/uploads/logo.png" },
 { name:"Polskie Radio Jedynka", url:"https://stream.polskieradio.pl/program1.mp3", logo:"https://upload.wikimedia.org/wikipedia/commons/3/3f/PR1_logo.png" },
@@ -154,137 +125,40 @@ const stations = [
 ];
 
 const audio = document.getElementById("audio");
-audio.volume = 0.8;
-
 let index = 0;
-let retry = 0;
-let watchdog = null;
 
-/* =========================
-   STREAM RESOLVER (.m3u FIX)
-   ========================= */
-
-async function resolve(url){
-
-    if(url.includes(".m3u")){
-        try{
-            const res = await fetch(url);
-            const txt = await res.text();
-            return txt.split("\n").find(l => l.startsWith("http")) || null;
-        } catch(e){
-            return null;
-        }
-    }
-
-    return url;
-}
-
-/* =========================
-   WATCHDOG (CORE STABILITY)
-   ========================= */
-
-function startWatchdog(st){
-    clearTimeout(watchdog);
-
-    watchdog = setTimeout(()=>{
-        setStatus("TIMEOUT → RETRY");
-        handleFail();
-    }, 8000); // 8s max na start streamu
-}
-
-/* =========================
-   ENGINE
-   ========================= */
-
-async function load(i){
+/* 🔥 KLUCZOWA NAPRAWA: NIE RESETUJ src NA PUSTO */
+function load(i){
     index = i;
 
     const st = stations[i];
 
-    document.getElementById("stationLogo").src =
-        st.logo || "https://via.placeholder.com/220x120?text=Radio";
-
-    setStatus("LOADING...");
-
-    let url = await resolve(st.url);
-
-    if(!url){
-        setStatus("INVALID STREAM");
-        next();
-        return;
-    }
+    document.getElementById("stationLogo").src = st.logo;
 
     audio.pause();
-    audio.src = url;
-    audio.load();
 
-    startWatchdog(st);
+    // ❌ NIE robimy audio.src = ""
+    // ❌ NIE robimy audio.load()
 
-    audio.play()
-    .then(()=>{
-        clearTimeout(watchdog);
-        retry = 0;
-        setStatus("LIVE");
-        updateUI();
-    })
-    .catch(()=>{
-        handleFail();
-    });
-}
+    audio.src = st.url;
 
-/* =========================
-   FAIL HANDLING (NO CRASH)
-   ========================= */
+    const p = audio.play();
 
-function handleFail(){
-    retry++;
-
-    setStatus("RETRY " + retry);
-
-    if(retry > 4){
-        retry = 0;
-        next();
-        return;
+    if(p){
+        p.catch(()=>{
+            // lekkie retry tylko raz
+            setTimeout(()=>audio.play().catch(()=>{}), 800);
+        });
     }
-
-    setTimeout(()=>load(index), 1200);
 }
-
-function next(){
-    index = (index + 1) % stations.length;
-    load(index);
-}
-
-/* =========================
-   CONTROLS
-   ========================= */
 
 function toggle(){
     if(audio.paused){
-        load(index);
+        audio.play().catch(()=>load(index));
     } else {
         audio.pause();
-        setStatus("PAUSED");
     }
 }
-
-/* =========================
-   UI
-   ========================= */
-
-function setStatus(t){
-    document.getElementById("status").innerText = t;
-}
-
-function updateUI(){
-    document.getElementById("bigPlay").innerText =
-        audio.paused ? "▶" : "⏸";
-}
-
-/* volume */
-document.getElementById("volume").addEventListener("input",(e)=>{
-    audio.volume = e.target.value;
-});
 
 /* sidebar */
 stations.forEach((s,i)=>{
