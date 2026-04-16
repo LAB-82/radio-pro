@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Radio Stable Engine</title>
+<title>Smart Radio Engine</title>
 
 <style>
 body {
@@ -58,7 +58,6 @@ body {
     flex-direction:column;
     align-items:center;
     justify-content:center;
-    position:relative;
 }
 
 #logoBox img{
@@ -75,10 +74,9 @@ body {
 }
 
 #status{
-    position:absolute;
-    bottom:80px;
     font-size:12px;
     color:#888;
+    margin-top:10px;
 }
 
 #volumeBox{
@@ -104,7 +102,7 @@ input[type="range"]{
 
 <div id="main">
 
-<div id="header">🎧 RADIO STABLE ENGINE (AUTO-RETRY)</div>
+<div id="header">🎧 SMART RADIO ENGINE (NO SERVER)</div>
 
 <div id="playerBox">
     <div id="radioPlayer">
@@ -131,7 +129,7 @@ input[type="range"]{
 <script>
 
 /* =========================
-   TWOJA LISTA (100% ZACHOWANA)
+   TWOJA LISTA (BEZ ZMIAN)
    ========================= */
 
 const stations = [
@@ -159,76 +157,40 @@ const audio = document.getElementById("audio");
 audio.volume = 0.8;
 
 let index = 0;
-let retryCount = 0;
-let retryTimer = null;
+let retry = 0;
 
 /* =========================
-   STATUS UI
+   SMART ENGINE
    ========================= */
 
-function setStatus(txt){
-    document.getElementById("status").innerText = txt;
-}
+async function resolveStream(url){
 
-/* =========================
-   CORE ENGINE
-   ========================= */
-
-function playStream(st){
-
-    setStatus("CONNECTING...");
-
-    audio.pause();
-    audio.src = "";
-    audio.load();
-
-    audio.src = st.url;
-
-    const playPromise = audio.play();
-
-    playPromise
-    .then(()=>{
-        retryCount = 0;
-        setStatus("LIVE");
-        updateUI();
-    })
-    .catch(()=>{
-        handleRetry(st);
-    });
-}
-
-/* =========================
-   AUTO RETRY PER STATION
-   ========================= */
-
-function handleRetry(st){
-
-    retryCount++;
-
-    setStatus("RETRY " + retryCount);
-
-    if(retryTimer) clearTimeout(retryTimer);
-
-    if(retryCount > 5){
-        setStatus("FAILED (skipping)");
-
-        retryCount = 0;
-
-        // przejdź do następnej stacji
-        next();
-        return;
+    // case 1: normal stream
+    if(url.endsWith(".mp3") || url.includes("stream") || url.includes(".aac")){
+        return url;
     }
 
-    retryTimer = setTimeout(()=>{
-        playStream(st);
-    }, 1200);
+    // case 2: m3u (VERY IMPORTANT FIX)
+    if(url.includes(".m3u")){
+        try{
+            const res = await fetch(url);
+            const text = await res.text();
+
+            const first = text.split("\n").find(l => l.startsWith("http"));
+            return first || null;
+        } catch(e){
+            return null;
+        }
+    }
+
+    return url;
 }
 
 /* =========================
-   CONTROLS
+   PLAY ENGINE
    ========================= */
 
-function load(i){
+async function load(i){
     index = i;
 
     const st = stations[i];
@@ -236,12 +198,51 @@ function load(i){
     document.getElementById("stationLogo").src =
         st.logo || "https://via.placeholder.com/220x120?text=Radio";
 
-    playStream(st);
+    setStatus("LOADING...");
+
+    let url = await resolveStream(st.url);
+
+    if(!url){
+        setStatus("FAILED");
+        return;
+    }
+
+    audio.pause();
+    audio.src = url;
+    audio.load();
+
+    const playPromise = audio.play();
+
+    if(playPromise){
+        playPromise
+        .then(()=>{
+            retry = 0;
+            setStatus("LIVE");
+            updateUI();
+        })
+        .catch(()=>{
+            handleRetry();
+        });
+    }
+}
+
+function handleRetry(){
+    retry++;
+
+    setStatus("RETRY " + retry);
+
+    if(retry > 5){
+        retry = 0;
+        next();
+        return;
+    }
+
+    setTimeout(()=>load(index), 1200);
 }
 
 function toggle(){
     if(audio.paused){
-        playStream(stations[index]);
+        load(index);
     } else {
         audio.pause();
         setStatus("PAUSED");
@@ -256,6 +257,10 @@ function next(){
 /* =========================
    UI
    ========================= */
+
+function setStatus(t){
+    document.getElementById("status").innerText = t;
+}
 
 function updateUI(){
     document.getElementById("bigPlay").innerText =
