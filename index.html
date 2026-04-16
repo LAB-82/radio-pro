@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Spotify-Style Radio Engine</title>
+<title>NO FAIL ENGINE v2</title>
 
 <style>
 body {
@@ -27,7 +27,14 @@ body {
     border-bottom:1px solid #222;
     cursor:pointer;
 }
+
 .station:hover { background:#222; }
+
+.station.active{
+    background:#2a2a2a;
+    color:#00ff90;
+    font-weight:bold;
+}
 
 #main {
     flex:1;
@@ -58,26 +65,44 @@ body {
     flex-direction:column;
     align-items:center;
     justify-content:center;
+    position:relative;
 }
 
 #logoBox img{
     width:220px;
-    height:120px;
-    object-fit:contain;
     margin-bottom:20px;
+    border-radius:10px;
+    background:#222;
 }
 
 #bigPlay{
-    font-size:80px;
+    font-size:70px;
     cursor:pointer;
     user-select:none;
 }
 
-#status{
-    font-size:12px;
-    color:#888;
-    margin-top:10px;
+#bottomBar{
+    position:absolute;
+    bottom:12px;
+    left:50%;
+    transform:translateX(-50%);
+    background:#222;
+    padding:10px 18px;
+    border-radius:30px;
+    display:flex;
+    gap:18px;
 }
+
+#controls {
+    height:70px;
+    background:#111;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:20px;
+}
+
+.btn { cursor:pointer; font-size:20px; }
 </style>
 
 </head>
@@ -88,20 +113,32 @@ body {
 
 <div id="main">
 
-<div id="header">🎧 SPOTIFY-STYLE RADIO ENGINE</div>
+<div id="header">🔥 NO FAIL ENGINE v2</div>
 
 <div id="playerBox">
     <div id="radioPlayer">
 
         <div id="logoBox">
-            <img id="stationLogo" src="">
+            <img id="stationLogo">
         </div>
 
         <div id="bigPlay" onclick="toggle()">▶</div>
 
-        <div id="status">READY</div>
+        <div id="bottomBar">
+            <div onclick="prev()">⏮</div>
+            <div onclick="toggle()" id="playIcon">▶</div>
+            <div onclick="next()">⏭</div>
+            <div onclick="mute()">🔊</div>
+        </div>
 
     </div>
+</div>
+
+<div id="controls">
+    <div class="btn" onclick="prev()">⏮</div>
+    <div class="btn" onclick="toggle()">⏯</div>
+    <div class="btn" onclick="next()">⏭</div>
+    <div class="btn" onclick="mute()">🔊</div>
 </div>
 
 </div>
@@ -111,111 +148,239 @@ body {
 <script>
 
 /* =========================
-   STACJE (bez zmian)
-   ========================= */
+   STATIONS
+========================= */
 
 const stations = [
-{ name:"Muzyczne Radio", url:"https://stream.rc.fm/muzyczne", logo:"https://www.muzyczneradio.pl/wp-content/uploads/logo.png" },
-{ name:"Polskie Radio Jedynka", url:"https://stream.polskieradio.pl/program1.mp3", logo:"https://upload.wikimedia.org/wikipedia/commons/3/3f/PR1_logo.png" },
-{ name:"Polskie Radio Dwójka", url:"https://stream.polskieradio.pl/program2.mp3", logo:"https://upload.wikimedia.org/wikipedia/commons/8/8f/PR2_logo.png" },
-{ name:"Polskie Radio Trójka", url:"https://stream.polskieradio.pl/program3.mp3", logo:"https://upload.wikimedia.org/wikipedia/commons/1/1b/PR3_logo.png" },
-{ name:"RMF FM", url:"https://rs6-krk2.rmfstream.pl/RMFFM48", logo:"https://upload.wikimedia.org/wikipedia/commons/2/2e/RMF_FM_logo.png" },
-{ name:"Radio Zet", url:"https://zt01.cdn.eurozet.pl/ZET010.mp3", logo:"https://upload.wikimedia.org/wikipedia/commons/3/3c/Radio_ZET_logo.png" }
+"Muzyczne Radio",
+"RMF FM",
+"Radio Zet",
+"Radio Eska",
+"Tok FM",
+"Antyradio",
+"Polskie Radio Jedynka",
+"Polskie Radio Trójka",
+"Radio Wrocław",
+"Radio Wnet"
 ];
 
-const audio = document.getElementById("audio");
+/* =========================
+   CDN CACHE (LOCAL STORAGE)
+========================= */
 
-let current = 0;
-let preloaded = null;
-let isSwitching = false;
+let cache = JSON.parse(localStorage.getItem("radio_cache") || "{}");
+
+function saveCache(){
+    localStorage.setItem("radio_cache", JSON.stringify(cache));
+}
 
 /* =========================
-   ENGINE CORE
-   ========================= */
+   MULTI SOURCE (SCRAPING BASE)
+========================= */
 
-function setStatus(t){
-    document.getElementById("status").innerText = t;
+const baseSources = {
+"RMF FM":[
+"https://rs6-krk2-cyfronet.rmfstream.pl/RMFFM48"
+],
+"Radio Zet":[
+"https://zt.cdn.eurozet.pl/ZET010.mp3"
+],
+"Radio Eska":[
+"https://waw01-01.ic.smcdn.pl/t043-1.mp3"
+],
+"Antyradio":[
+"https://stream.antyradio.pl/stream.mp3"
+],
+"Tok FM":[
+"https://radiostream.pl/tuba10-1.mp3"
+],
+"Polskie Radio Jedynka":[
+"https://stream.polskieradio.pl/program1.mp3"
+],
+"Polskie Radio Trójka":[
+"https://stream3.polskieradio.pl/pr3_aac128"
+],
+"Radio Wrocław":[
+"https://stream4.nadaje.com/radiowroclaw"
+],
+"Radio Wnet":[
+"https://stream.rcs.revma.com/wnet"
+],
+"Muzyczne Radio":[
+"https://stream.rcs.revma.com/gzwc1xcq042vv"
+]
+};
+
+/* =========================
+   LIVE HEALTH CHECK
+========================= */
+
+async function healthCheck(url){
+
+    return new Promise((resolve)=>{
+
+        const test = new Audio();
+        test.src = url;
+        test.preload = "metadata";
+
+        let done = false;
+
+        const timeout = setTimeout(()=>{
+            if(!done) resolve(false);
+        }, 1500);
+
+        test.oncanplay = () => {
+            done = true;
+            clearTimeout(timeout);
+            resolve(true);
+        };
+
+        test.onerror = () => {
+            done = true;
+            clearTimeout(timeout);
+            resolve(false);
+        };
+    });
 }
 
-function load(i, autoplay=true){
-    current = i;
+/* =========================
+   RESOLVER (SMART + CACHE + SCRAPE)
+========================= */
 
-    const st = stations[i];
+async function resolveStream(name){
 
-    document.getElementById("stationLogo").src = st.logo;
-
-    setStatus("LOADING...");
-
-    if(isSwitching){
-        return;
+    // 1. cache first
+    if(cache[name]){
+        return cache[name];
     }
 
-    isSwitching = true;
+    // 2. known sources
+    let list = baseSources[name];
 
-    // preload next stream BEFORE switch
-    const tempAudio = new Audio();
-    tempAudio.src = st.url;
-    tempAudio.preload = "auto";
+    // 3. fallback scraping (Radio Browser)
+    if(!list){
+        try{
+            const res = await fetch(
+                `https://de1.api.radio-browser.info/json/stations/byname/${encodeURIComponent(name)}?limit=5`
+            );
+            const data = await res.json();
 
-    tempAudio.oncanplay = () => {
+            list = data.map(s => s.url_resolved).filter(Boolean);
+        }catch(e){
+            return null;
+        }
+    }
 
-        // płynne przełączenie
-        audio.src = st.url;
+    if(!list || list.length === 0) return null;
 
-        audio.play()
-        .then(()=>{
-            setStatus("LIVE");
-            updateUI();
-        })
-        .catch(()=>{
-            setStatus("RETRY...");
-            setTimeout(()=>load(i), 800);
-        })
-        .finally(()=>{
-            isSwitching = false;
-        });
-    };
+    // 4. health check loop
+    for(let url of list){
 
-    tempAudio.onerror = () => {
-        setStatus("FAILED → NEXT");
+        let ok = await healthCheck(url);
 
-        isSwitching = false;
-        next();
-    };
+        if(ok){
+            cache[name] = url;
+            saveCache();
+            return url;
+        }
+    }
+
+    return null;
 }
+
+/* ========================= */
+
+function setLogo(name){
+    document.getElementById("stationLogo").src =
+    "https://via.placeholder.com/220x120?text=" + encodeURIComponent(name);
+}
+
+function setActiveUI(){
+    document.querySelectorAll(".station").forEach((el,i)=>{
+        el.classList.toggle("active", i === index);
+    });
+}
+
+/* ========================= */
+
+let index = 0;
+let playing = false;
+
+const audio = document.getElementById("audio");
+const sidebar = document.getElementById("sidebar");
+
+async function load(i){
+
+    index = i;
+    const name = stations[i];
+
+    setLogo(name);
+
+    let url = await resolveStream(name);
+
+    if(!url){
+        url = "https://stream.rcs.revma.com/gzwc1xcq042vv";
+    }
+
+    audio.src = url;
+
+    if(playing){
+        audio.play().catch(()=>{});
+    }
+
+    setUI();
+    setActiveUI();
+}
+
+/* ========================= */
 
 function toggle(){
-    if(audio.paused){
-        load(current);
-    } else {
+
+    if(!audio.src) load(index);
+
+    if(playing){
         audio.pause();
-        setStatus("PAUSED");
+        playing = false;
+    }else{
+        audio.play().catch(()=>{});
+        playing = true;
     }
+
+    setUI();
+}
+
+function setUI(){
+    document.getElementById("bigPlay").innerText = playing ? "⏸" : "▶";
+    document.getElementById("playIcon").innerText = playing ? "⏸" : "▶";
+}
+
+function prev(){
+    index = (index - 1 + stations.length) % stations.length;
+    load(index);
 }
 
 function next(){
-    current = (current + 1) % stations.length;
-    load(current);
+    index = (index + 1) % stations.length;
+    load(index);
+}
+
+function mute(){
+    audio.muted = !audio.muted;
 }
 
 /* =========================
-   UI
-   ========================= */
+   UI BUILD
+========================= */
 
-function updateUI(){
-    document.getElementById("bigPlay").innerText =
-        audio.paused ? "▶" : "⏸";
-}
-
-/* sidebar */
 stations.forEach((s,i)=>{
     const div = document.createElement("div");
     div.className = "station";
-    div.innerText = s.name;
-    div.onclick = ()=>load(i);
-    document.getElementById("sidebar").appendChild(div);
+    div.innerText = s;
+    div.onclick = () => load(i);
+    sidebar.appendChild(div);
 });
 
+/* INIT */
 load(0);
 
 </script>
