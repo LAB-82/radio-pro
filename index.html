@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>RADIO ENGINE v3 GRID</title>
+<title>POPULARNE STACJE RADIOWE - ENGINE v3 PRO</title>
 
 <style>
 body {
@@ -13,34 +13,31 @@ body {
     color:white;
 }
 
-/* HEADER */
 #header {
-    padding:12px;
+    padding:14px;
     background:#1a1a1a;
     font-weight:bold;
 }
 
-/* WRAPPER */
 #layout {
     display:flex;
     height:calc(100vh - 50px);
 }
 
-/* LEFT GRID */
+/* GRID */
 #sidebar {
     flex:1;
     padding:20px;
     overflow:auto;
 }
 
-/* TITLE */
-#title {
+.title {
     font-size:14px;
     color:#aaa;
     margin-bottom:15px;
+    letter-spacing:1px;
 }
 
-/* GRID like radiofm-online */
 .grid {
     display:grid;
     grid-template-columns: repeat(3, 1fr);
@@ -54,9 +51,9 @@ body {
     cursor:pointer;
     display:flex;
     align-items:center;
-    gap:8px;
-    transition:0.2s;
+    gap:10px;
     border:1px solid #222;
+    transition:0.2s;
 }
 
 .station:hover {
@@ -69,7 +66,7 @@ body {
     color:#00ff90;
 }
 
-/* RIGHT PANEL */
+/* RIGHT PLAYER */
 #playerBox {
     width:320px;
     background:#111;
@@ -81,68 +78,53 @@ body {
     gap:20px;
 }
 
-/* LOGO */
 #logoBox img{
     width:160px;
     height:160px;
-    border-radius:20px;
+    border-radius:18px;
     background:#222;
 }
 
 /* CONTROLS */
-#controlsPanel {
-    display:flex;
-    flex-direction:column;
-    gap:10px;
-}
-
 .ctrl {
     background:#222;
     padding:10px;
+    width:130px;
     text-align:center;
     border-radius:8px;
     cursor:pointer;
-    width:120px;
 }
 
-.ctrl:hover {
-    background:#333;
-}
+.ctrl:hover { background:#333; }
 
 #volume {
-    width:120px;
+    width:130px;
 }
-
-/* hidden big play removed */
 </style>
-
 </head>
 
 <body>
 
-<div id="header">🎧 RADIO ENGINE v3 — GRID MODE</div>
+<div id="header">🎧 POPULARNE STACJE RADIOWE</div>
 
 <div id="layout">
 
-<!-- GRID -->
 <div id="sidebar">
-    <div id="title">POPULARNE STACJE RADIOWE</div>
+    <div class="title">GRID VIEW</div>
     <div class="grid" id="grid"></div>
 </div>
 
-<!-- PLAYER -->
 <div id="playerBox">
 
     <div id="logoBox">
-        <img id="stationLogo" src="">
+        <img id="stationLogo">
     </div>
 
-    <div id="controlsPanel">
-        <div class="ctrl" onclick="play()">PLAY</div>
-        <div class="ctrl" onclick="stop()">STOP</div>
-        <div class="ctrl" onclick="mute()">MUTE</div>
-        <input id="volume" type="range" min="0" max="1" step="0.01" value="0.6">
-    </div>
+    <div class="ctrl" onclick="play()">PLAY</div>
+    <div class="ctrl" onclick="stop()">STOP</div>
+    <div class="ctrl" onclick="mute()">MUTE</div>
+
+    <input id="volume" type="range" min="0" max="1" step="0.01" value="0.6">
 
 </div>
 
@@ -152,81 +134,90 @@ body {
 
 <script>
 
-/* ================= STATIONS ================= */
+/* =========================
+   YOUR STATIONS (from links)
+========================= */
 
 const stations = [
-"Muzyczne Radio",
-"Polskie Radio Jedynka",
-"Polskie Radio Dwójka",
-"Polskie Radio Trójka",
-"Polskie Radio Czwórka",
-"Radio Plus",
-"RMF FM",
-"Radio Zet",
-"Radio Eska",
-"Radio Wrocław",
-"Radio Wnet",
-"Tok FM",
-"Antyradio",
-"Radio Kolor",
-"Polish Radio London 24",
-"Polskie Radio Dzieciom",
-"Polskie Radio Chopin",
-"Radio Republika",
-"Radio Maryja",
-"Radio Jasna Góra"
+{ name:"Radio Plus 🔊", url:"https://onlineradiobox.com/pl/plus/?cs=pl.plus&played=1" },
+{ name:"Złote Przeboje 🎶", url:"https://onlineradiobox.com/pl/radiozloteprzeboje/?cs=pl.radiozloteprzeboje&played=1" },
+{ name:"RMF FM 📻", url:"https://onlineradiobox.com/pl/radiormf/?cs=pl.radiormf&played=1" },
+{ name:"Radio Eska 🔥", url:"https://onlineradiobox.com/pl/radioeska/?cs=pl.radioeska&played=1" },
+{ name:"Eska Rock 🤘", url:"https://onlineradiobox.com/pl/radioeskarock/?cs=pl.radioeskarock&played=1" },
+{ name:"Jedynka 🇵🇱", url:"https://onlineradiobox.com/pl/jedynka/?cs=pl.jedynka&played=1" },
+{ name:"Dwójka 🎼", url:"https://onlineradiobox.com/pl/dwojka/?cs=pl.dwojka&played=1" },
+{ name:"Trójka 🎧", url:"https://onlineradiobox.com/pl/trojka/?cs=pl.trojka&played=1" },
+{ name:"Czwórka 📡", url:"https://onlineradiobox.com/pl/czworka/?cs=pl.czworka&played=1" },
+{ name:"Radio Wrocław 🌍", url:"http://p.onlineradiobox.com/pl/radiowroclaw/player/?cs=pl.radiowroclaw&played=1" },
+{ name:"Planeta FM 🌌", url:"https://onlineradiobox.com/pl/planetafm/?cs=pl.planetafm&played=1" },
+{ name:"Radio WNET 🧠", url:"https://onlineradiobox.com/pl/wnet/?cs=pl.wnet&played=1" },
+{ name:"Radio Kolor 🌈", url:"https://onlineradiobox.com/pl/radiokolor103/?cs=pl.radiokolor103&played=1" },
+{ name:"TOK FM 🗣️", url:"https://onlineradiobox.com/pl/tokfm/?cs=pl.tokfm&played=1" },
+{ name:"Antyradio ⚡", url:"https://onlineradiobox.com/pl/antyradio94/?cs=pl.antyradio94&played=1" },
+{ name:"Dzieciom 🧸", url:"https://onlineradiobox.com/pl/dzieciom/?cs=pl.dzieciom&played=1" },
+{ name:"Chopin 🎹", url:"https://onlineradiobox.com/pl/polskiechopin/?cs=pl.polskiechopin&played=1" },
+{ name:"Radio Kampus 🎓", url:"https://onlineradiobox.com/pl/kampus971/?cs=pl.kampus971&played=1" },
+{ name:"Live Radio 🔴", url:"http://p.onlineradiobox.com/pl/liveradio/player/?cs=pl.liveradio&played=1" },
+{ name:"Rock Radio 🤘", url:"https://onlineradiobox.com/pl/rockradio/?cs=pl.rockradio&played=1" },
+{ name:"Radio Maryja ✝️", url:"https://onlineradiobox.com/pl/maryja/?cs=pl.maryja&played=1" },
+{ name:"Radio Niepokalanów ⛪", url:"https://onlineradiobox.com/pl/radioniepokalanow1027/?cs=pl.radioniepokalanow1027&played=1" },
+{ name:"Radio Rodzina 👨‍👩‍👧", url:"https://onlineradiobox.com/pl/radiorodzina920/?cs=pl.radiorodzina920&played=1" }
 ];
+
+/* =========================
+   ENGINE v3 (UNCHANGED CORE)
+========================= */
 
 const audio = document.getElementById("audio");
 const grid = document.getElementById("grid");
 const volume = document.getElementById("volume");
 
 let index = 0;
-let playing = false;
 let cache = {};
+let playing = false;
 let candidates = [];
 let currentTry = 0;
 
 audio.volume = volume.value;
 
-/* ================= STREAM ENGINE (UNCHANGED LOGIC) ================= */
-
+/* resolver from radio-browser fallback */
 async function resolve(name){
 
     if(cache[name]) return cache[name];
 
-    try {
+    try{
         const r = await fetch(
-          `https://de1.api.radio-browser.info/json/stations/byname/${encodeURIComponent(name)}?limit=10`
+            `https://de1.api.radio-browser.info/json/stations/byname/${encodeURIComponent(name)}?limit=8`
         );
 
         const data = await r.json();
         if(!data || !data.length) return [];
 
         const urls = data.map(s => s.url_resolved).filter(Boolean);
+
         cache[name] = urls;
         return urls;
 
-    } catch(e){
+    }catch(e){
         return [];
     }
 }
 
+/* LOAD ENGINE */
 async function load(i){
 
     index = i;
-    const name = stations[i];
+    const station = stations[i];
 
-    setLogo(name);
-
+    setLogo(station.name);
     setActive(i);
 
-    candidates = await resolve(name);
+    candidates = await resolve(station.name);
     currentTry = 0;
 
+    // fallback to provided page (some streams hidden)
     if(!candidates.length){
-        audio.src = "";
-        return;
+        candidates = [station.url];
     }
 
     playCandidate();
@@ -239,21 +230,21 @@ function playCandidate(){
     const url = candidates[currentTry];
     audio.src = url;
 
-    audio.play().catch(() => {
+    audio.play().catch(()=>{
         currentTry++;
         playCandidate();
     });
 
-    monitorStream();
+    monitor();
 }
 
-function monitorStream(){
+function monitor(){
     audio.onerror = () => {
         currentTry++;
         playCandidate();
     };
 
-    setTimeout(() => {
+    setTimeout(()=>{
         if(audio.readyState < 2){
             currentTry++;
             playCandidate();
@@ -261,17 +252,16 @@ function monitorStream(){
     }, 5000);
 }
 
-/* ================= UI ================= */
-
+/* UI */
 function setLogo(name){
     document.getElementById("stationLogo").src =
         "https://logo.clearbit.com/" +
-        name.toLowerCase().replace(/\s/g,'') + ".com";
+        name.toLowerCase().replace(/[^a-z0-9]/g,'') + ".com";
 }
 
 function setActive(i){
     document.querySelectorAll(".station").forEach((el,idx)=>{
-        el.classList.toggle("active", idx === i);
+        el.classList.toggle("active", idx===i);
     });
 }
 
@@ -291,17 +281,17 @@ function mute(){
     audio.muted = !audio.muted;
 }
 
+/* volume */
 volume.addEventListener("input", ()=>{
     audio.volume = volume.value;
 });
 
-/* ================= GRID BUILD ================= */
-
+/* GRID BUILD */
 stations.forEach((s,i)=>{
     const div = document.createElement("div");
     div.className = "station";
-    div.innerHTML = "🔊 " + s;
-    div.onclick = () => load(i);
+    div.innerHTML = s.name;
+    div.onclick = ()=>load(i);
     grid.appendChild(div);
 });
 
