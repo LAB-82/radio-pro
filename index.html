@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>RADIO ENGINE v3</title>
+<title>RADIO ENGINE v3 GRID</title>
 
 <style>
 body {
@@ -11,107 +11,98 @@ body {
     font-family:Arial;
     background:#0b0b0b;
     color:white;
-    display:flex;
-    height:100vh;
 }
 
-#sidebar {
-    width:320px;
-    background:#141414;
-    overflow:auto;
-    border-right:1px solid #222;
-}
-
-.station {
-    padding:10px;
-    border-bottom:1px solid #222;
-    cursor:pointer;
-    display:flex;
-    gap:10px;
-    align-items:center;
-}
-
-.station:hover { background:#222; }
-
-.station.active {
-    background:#2a2a2a;
-    color:#00ff90;
-}
-
-#main {
-    flex:1;
-    display:flex;
-    flex-direction:column;
-}
-
+/* HEADER */
 #header {
     padding:12px;
     background:#1a1a1a;
     font-weight:bold;
 }
 
-#playerBox {
+/* WRAPPER */
+#layout {
+    display:flex;
+    height:calc(100vh - 50px);
+}
+
+/* LEFT GRID */
+#sidebar {
     flex:1;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    background:#000;
+    padding:20px;
+    overflow:auto;
 }
 
-#radioPlayer{
-    width:90%;
-    height:90%;
+/* TITLE */
+#title {
+    font-size:14px;
+    color:#aaa;
+    margin-bottom:15px;
+}
+
+/* GRID like radiofm-online */
+.grid {
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap:12px;
+}
+
+.station {
+    background:#141414;
+    padding:12px;
+    border-radius:10px;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    transition:0.2s;
+    border:1px solid #222;
+}
+
+.station:hover {
+    background:#222;
+}
+
+.station.active {
+    background:#2a2a2a;
+    border-color:#00ff90;
+    color:#00ff90;
+}
+
+/* RIGHT PANEL */
+#playerBox {
+    width:320px;
     background:#111;
-    border-radius:14px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    position:relative;
-    gap:40px;
-}
-
-/* LEFT */
-#center {
+    border-left:1px solid #222;
     display:flex;
     flex-direction:column;
     align-items:center;
     justify-content:center;
+    gap:20px;
 }
 
 /* LOGO */
 #logoBox img{
-    width:180px;
-    height:180px;
+    width:160px;
+    height:160px;
     border-radius:20px;
     background:#222;
 }
 
-/* PLAY */
-#bigPlay{
-    font-size:70px;
-    cursor:pointer;
-    margin-top:10px;
-}
-
-/* RIGHT CONTROLS */
-#controlsPanel{
+/* CONTROLS */
+#controlsPanel {
     display:flex;
     flex-direction:column;
     gap:10px;
-    background:#1a1a1a;
-    padding:12px;
-    border-radius:12px;
-    align-items:center;
 }
 
 .ctrl {
-    cursor:pointer;
-    font-size:16px;
     background:#222;
-    padding:8px 12px;
-    border-radius:8px;
-    width:90px;
+    padding:10px;
     text-align:center;
+    border-radius:8px;
+    cursor:pointer;
+    width:120px;
 }
 
 .ctrl:hover {
@@ -119,60 +110,40 @@ body {
 }
 
 #volume {
-    width:90px;
+    width:120px;
 }
 
-/* bottom bar kept */
-#bottomBar{
-    position:absolute;
-    bottom:12px;
-    left:50%;
-    transform:translateX(-50%);
-    background:#222;
-    padding:10px 18px;
-    border-radius:30px;
-    display:flex;
-    gap:18px;
-}
-
-.activeDot {
-    width:8px;
-    height:8px;
-    border-radius:50%;
-    background:#00ff90;
-}
+/* hidden big play removed */
 </style>
+
 </head>
 
 <body>
 
-<div id="sidebar"></div>
+<div id="header">🎧 RADIO ENGINE v3 — GRID MODE</div>
 
-<div id="main">
+<div id="layout">
 
-<div id="header">🎧 RADIO ENGINE v3 (AGGREGATOR)</div>
+<!-- GRID -->
+<div id="sidebar">
+    <div id="title">POPULARNE STACJE RADIOWE</div>
+    <div class="grid" id="grid"></div>
+</div>
 
+<!-- PLAYER -->
 <div id="playerBox">
-    <div id="radioPlayer">
 
-        <!-- CENTER -->
-        <div id="center">
-            <div id="logoBox">
-                <img id="stationLogo" src="">
-            </div>
-
-            <div id="bigPlay" onclick="toggle()">▶</div>
-        </div>
-
-        <!-- RIGHT PANEL -->
-        <div id="controlsPanel">
-            <div class="ctrl" onclick="play()">PLAY</div>
-            <div class="ctrl" onclick="stop()">STOP</div>
-            <div class="ctrl" onclick="mute()">MUTE</div>
-            <input id="volume" type="range" min="0" max="1" step="0.01" value="0.6">
-        </div>
-
+    <div id="logoBox">
+        <img id="stationLogo" src="">
     </div>
+
+    <div id="controlsPanel">
+        <div class="ctrl" onclick="play()">PLAY</div>
+        <div class="ctrl" onclick="stop()">STOP</div>
+        <div class="ctrl" onclick="mute()">MUTE</div>
+        <input id="volume" type="range" min="0" max="1" step="0.01" value="0.6">
+    </div>
+
 </div>
 
 </div>
@@ -180,6 +151,8 @@ body {
 <audio id="audio"></audio>
 
 <script>
+
+/* ================= STATIONS ================= */
 
 const stations = [
 "Muzyczne Radio",
@@ -205,19 +178,19 @@ const stations = [
 ];
 
 const audio = document.getElementById("audio");
-const sidebar = document.getElementById("sidebar");
+const grid = document.getElementById("grid");
 const volume = document.getElementById("volume");
 
 let index = 0;
 let playing = false;
 let cache = {};
 let candidates = [];
+let currentTry = 0;
 
 audio.volume = volume.value;
 
-/* ---------------------------
-   RADIO BROWSER AGGREGATOR
-----------------------------*/
+/* ================= STREAM ENGINE (UNCHANGED LOGIC) ================= */
+
 async function resolve(name){
 
     if(cache[name]) return cache[name];
@@ -226,14 +199,11 @@ async function resolve(name){
         const r = await fetch(
           `https://de1.api.radio-browser.info/json/stations/byname/${encodeURIComponent(name)}?limit=10`
         );
-        const data = await r.json();
 
+        const data = await r.json();
         if(!data || !data.length) return [];
 
-        const urls = data
-            .map(s => s.url_resolved)
-            .filter(Boolean);
-
+        const urls = data.map(s => s.url_resolved).filter(Boolean);
         cache[name] = urls;
         return urls;
 
@@ -242,17 +212,14 @@ async function resolve(name){
     }
 }
 
-/* ---------------------------
-   DEAD STREAM HANDLER
-----------------------------*/
-let currentTry = 0;
-
 async function load(i){
 
     index = i;
     const name = stations[i];
 
     setLogo(name);
+
+    setActive(i);
 
     candidates = await resolve(name);
     currentTry = 0;
@@ -267,10 +234,7 @@ async function load(i){
 
 function playCandidate(){
 
-    if(currentTry >= candidates.length){
-        console.log("ALL STREAMS FAILED");
-        return;
-    }
+    if(currentTry >= candidates.length) return;
 
     const url = candidates[currentTry];
     audio.src = url;
@@ -283,7 +247,6 @@ function playCandidate(){
     monitorStream();
 }
 
-/* detect dead stream */
 function monitorStream(){
     audio.onerror = () => {
         currentTry++;
@@ -298,15 +261,21 @@ function monitorStream(){
     }, 5000);
 }
 
-/* ---------------------------
-   UI
-----------------------------*/
+/* ================= UI ================= */
+
 function setLogo(name){
     document.getElementById("stationLogo").src =
-      "https://logo.clearbit.com/" +
-      encodeURIComponent(name.toLowerCase().replace(/\s/g,'') + ".com");
+        "https://logo.clearbit.com/" +
+        name.toLowerCase().replace(/\s/g,'') + ".com";
 }
 
+function setActive(i){
+    document.querySelectorAll(".station").forEach((el,idx)=>{
+        el.classList.toggle("active", idx === i);
+    });
+}
+
+/* controls */
 function play(){
     if(!audio.src) load(index);
     audio.play();
@@ -322,28 +291,21 @@ function mute(){
     audio.muted = !audio.muted;
 }
 
-function toggle(){
-    if(audio.paused){
-        play();
-    } else {
-        stop();
-    }
-}
-
-/* volume */
-volume.addEventListener("input", () => {
+volume.addEventListener("input", ()=>{
     audio.volume = volume.value;
 });
 
-/* sidebar */
+/* ================= GRID BUILD ================= */
+
 stations.forEach((s,i)=>{
     const div = document.createElement("div");
     div.className = "station";
-    div.innerHTML = `<span class="activeDot"></span> ${s}`;
+    div.innerHTML = "🔊 " + s;
     div.onclick = () => load(i);
-    sidebar.appendChild(div);
+    grid.appendChild(div);
 });
 
+/* INIT */
 load(0);
 
 </script>
