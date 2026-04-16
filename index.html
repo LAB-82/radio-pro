@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Radio Engine FULL RESTORE</title>
+<title>Radio PRO STREAM ENGINE FIX</title>
 
 <style>
 body {
@@ -58,6 +58,7 @@ body {
     flex-direction:column;
     align-items:center;
     justify-content:center;
+    position:relative;
 }
 
 #logoBox img{
@@ -87,6 +88,7 @@ input[type="range"]{
     width:140px;
 }
 </style>
+
 </head>
 
 <body>
@@ -95,7 +97,7 @@ input[type="range"]{
 
 <div id="main">
 
-<div id="header">🎧 RADIO ENGINE RESTORED</div>
+<div id="header">🎧 RADIO PRO STREAM ENGINE (FIXED)</div>
 
 <div id="playerBox">
     <div id="radioPlayer">
@@ -120,7 +122,7 @@ input[type="range"]{
 <script>
 
 /* =========================
-   FULL ORIGINAL LIST (UNCHANGED LOGICALLY)
+   TWOJA PEŁNA LISTA (NIC NIE USUNIĘTE)
    ========================= */
 
 const stations = [
@@ -167,7 +169,7 @@ audio.volume = 0.8;
 let index = 0;
 
 /* =========================
-   STABLE PLAYER ENGINE
+   FIXED STREAM ENGINE
    ========================= */
 
 function load(i){
@@ -179,7 +181,7 @@ function load(i){
         st.logo || "https://via.placeholder.com/220x120?text=Radio";
 
     audio.pause();
-    audio.src = "";
+    audio.removeAttribute("src");
     audio.load();
 
     audio.src = st.url;
@@ -187,15 +189,24 @@ function load(i){
     const playPromise = audio.play();
 
     if(playPromise !== undefined){
-        playPromise.catch(()=> {
-            // zamiast error popup → cisza (stabilność UI)
-        });
+        playPromise
+            .then(()=>{
+                // OK
+            })
+            .catch(()=>{
+                // retry (BEZ psucia UI)
+                setTimeout(()=>{
+                    audio.play().catch(()=>{});
+                }, 700);
+            });
     }
 }
 
 function toggle(){
     if(audio.paused){
-        audio.play().catch(()=>{});
+        audio.play().catch(()=>{
+            setTimeout(()=>audio.play().catch(()=>{}), 700);
+        });
     } else {
         audio.pause();
     }
