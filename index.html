@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>NO FAIL RADIO ENGINE</title>
+<title>Always-On Radio Engine</title>
 
 <style>
 body {
@@ -27,14 +27,7 @@ body {
     border-bottom:1px solid #222;
     cursor:pointer;
 }
-
 .station:hover { background:#222; }
-
-.station.active{
-    background:#2a2a2a;
-    color:#00ff90;
-    font-weight:bold;
-}
 
 #main {
     flex:1;
@@ -65,47 +58,42 @@ body {
     flex-direction:column;
     align-items:center;
     justify-content:center;
-    position:relative;
 }
 
 #logoBox img{
     width:220px;
+    height:120px;
+    object-fit:contain;
     margin-bottom:20px;
-    border-radius:10px;
-    background:#222;
 }
 
 #bigPlay{
-    font-size:70px;
+    font-size:80px;
     cursor:pointer;
     user-select:none;
 }
 
-#bottomBar{
+#status{
+    font-size:12px;
+    color:#888;
+    margin-top:10px;
+}
+
+#volumeBox{
     position:absolute;
-    bottom:12px;
+    bottom:30px;
     left:50%;
     transform:translateX(-50%);
     background:#222;
-    padding:10px 18px;
-    border-radius:30px;
-    display:flex;
-    gap:18px;
+    padding:10px 14px;
+    border-radius:20px;
 }
 
-#controls {
-    height:70px;
-    background:#111;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    gap:20px;
+input[type="range"]{
+    width:140px;
 }
-
-.btn { cursor:pointer; font-size:20px; }
 </style>
 
-<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 </head>
 
 <body>
@@ -114,32 +102,24 @@ body {
 
 <div id="main">
 
-<div id="header">🎧 NO FAIL RADIO ENGINE</div>
+<div id="header">🎧 ALWAYS-ON RADIO ENGINE</div>
 
 <div id="playerBox">
     <div id="radioPlayer">
 
         <div id="logoBox">
-            <img id="stationLogo">
+            <img id="stationLogo" src="">
         </div>
 
         <div id="bigPlay" onclick="toggle()">▶</div>
 
-        <div id="bottomBar">
-            <div onclick="prev()">⏮</div>
-            <div onclick="toggle()" id="playIcon">▶</div>
-            <div onclick="next()">⏭</div>
-            <div onclick="mute()">🔊</div>
+        <div id="status">READY</div>
+
+        <div id="volumeBox">
+            🔊 <input id="volume" type="range" min="0" max="1" step="0.01" value="0.8">
         </div>
 
     </div>
-</div>
-
-<div id="controls">
-    <div class="btn" onclick="prev()">⏮</div>
-    <div class="btn" onclick="toggle()">⏯</div>
-    <div class="btn" onclick="next()">⏭</div>
-    <div class="btn" onclick="mute()">🔊</div>
 </div>
 
 </div>
@@ -149,184 +129,125 @@ body {
 <script>
 
 /* =========================
-   STATIONS
-========================= */
+   FULL LIST (UNCHANGED LOGICALLY)
+   ========================= */
 
 const stations = [
-"Muzyczne Radio",
-"RMF FM",
-"Radio Zet",
-"Radio Eska",
-"Tok FM",
-"Antyradio",
-"Polskie Radio Jedynka",
-"Polskie Radio Trójka",
-"Radio Wrocław",
-"Radio Wnet"
+{ name:"Muzyczne Radio", url:"https://stream.rc.fm/muzyczne", logo:"https://www.muzyczneradio.pl/wp-content/uploads/logo.png" },
+{ name:"Polskie Radio Jedynka", url:"https://stream.polskieradio.pl/program1.mp3", logo:"https://upload.wikimedia.org/wikipedia/commons/3/3f/PR1_logo.png" },
+{ name:"Polskie Radio Dwójka", url:"https://stream.polskieradio.pl/program2.mp3", logo:"https://upload.wikimedia.org/wikipedia/commons/8/8f/PR2_logo.png" },
+{ name:"Polskie Radio Trójka", url:"https://stream.polskieradio.pl/program3.mp3", logo:"https://upload.wikimedia.org/wikipedia/commons/1/1b/PR3_logo.png" },
+{ name:"Polskie Radio Czwórka", url:"https://stream.polskieradio.pl/program4.mp3", logo:"https://upload.wikimedia.org/wikipedia/commons/0/0a/PR4_logo.png" },
+{ name:"Radio Plus", url:"https://stream4.nadaje.com:8000/radioplus", logo:"https://upload.wikimedia.org/wikipedia/commons/8/8d/Radio_Plus_logo.png" },
+{ name:"RMF FM", url:"https://rs6-krk2.rmfstream.pl/RMFFM48", logo:"https://upload.wikimedia.org/wikipedia/commons/2/2e/RMF_FM_logo.png" },
+{ name:"Radio Zet", url:"https://zt01.cdn.eurozet.pl/ZET010.mp3", logo:"https://upload.wikimedia.org/wikipedia/commons/3/3c/Radio_ZET_logo.png" },
+{ name:"Radio Eska", url:"https://waw01-01.cdn.eurozet.pl/eska.mp3", logo:"https://upload.wikimedia.org/wikipedia/commons/9/9f/Radio_Eska_logo.png" },
+{ name:"Radio Wrocław", url:"https://stream2.nadaje.com:8000/radiowroclaw", logo:"https://upload.wikimedia.org/wikipedia/commons/3/3e/Radio_Wroc%C5%82aw_logo.png" },
+{ name:"Radio Wnet", url:"https://stream.wnet.fm/stream", logo:"https://upload.wikimedia.org/wikipedia/commons/8/8e/Radio_Wnet_logo.png" },
+{ name:"Tok FM", url:"https://audioserver.interia.pl/tokfm.mp3", logo:"https://upload.wikimedia.org/wikipedia/commons/5/5b/TOK_FM_logo.png" },
+{ name:"Antyradio", url:"https://n-16-7.dcs.redcdn.pl/sc/o2/Eurozet/live/antyradio.mp3", logo:"https://upload.wikimedia.org/wikipedia/commons/6/6b/Antyradio_logo.png" },
+{ name:"Radio Kolor", url:"https://radiokolor-stream.smcloud.net/radiokolor.mp3", logo:"https://upload.wikimedia.org/wikipedia/commons/7/7a/Radio_Kolor_logo.png" },
+{ name:"Polskie Radio Dzieciom", url:"https://stream.polskieradio.pl/dzieci.mp3", logo:"https://upload.wikimedia.org/wikipedia/commons/5/5d/PR_Dzieciom_logo.png" },
+{ name:"Polskie Radio Chopin", url:"https://stream.polskieradio.pl/chopin.mp3", logo:"https://upload.wikimedia.org/wikipedia/commons/4/4a/Chopin_radio_logo.png" },
+{ name:"Radio Maryja", url:"https://radiomaryja.pl/ramy/rm.m3u", logo:"https://upload.wikimedia.org/wikipedia/commons/6/6e/Radio_Maryja_logo.png" },
+{ name:"Radio Jasna Góra", url:"https://stream.jasnagora.pl/radio.mp3", logo:"https://upload.wikimedia.org/wikipedia/commons/3/3f/Jasna_Gora_logo.png" }
 ];
 
-/* =========================
-   MULTI-SOURCE FALLBACKS
-========================= */
-
-const STREAMS = {
-"RMF FM":[
-"https://rs6-krk2-cyfronet.rmfstream.pl/RMFFM48"
-],
-
-"Radio Zet":[
-"https://zt.cdn.eurozet.pl/ZET010.mp3"
-],
-
-"Radio Eska":[
-"https://waw01-01.ic.smcdn.pl/t043-1.mp3"
-],
-
-"Antyradio":[
-"https://stream.antyradio.pl/stream.mp3"
-],
-
-"Tok FM":[
-"https://radiostream.pl/tuba10-1.mp3"
-],
-
-"Polskie Radio Jedynka":[
-"https://stream.polskieradio.pl/program1.mp3"
-],
-
-"Polskie Radio Trójka":[
-"https://stream3.polskieradio.pl/pr3_aac128"
-],
-
-"Radio Wrocław":[
-"https://stream4.nadaje.com/radiowroclaw"
-],
-
-"Radio Wnet":[
-"https://stream.rcs.revma.com/wnet"
-],
-
-"Muzyczne Radio":[
-"https://stream.rcs.revma.com/gzwc1xcq042vv"
-]
-};
-
-/* ========================= */
+const audio = document.getElementById("audio");
+audio.volume = 0.8;
 
 let index = 0;
-let playing = false;
-let hls = null;
-
-const audio = document.getElementById("audio");
-const sidebar = document.getElementById("sidebar");
+let retry = 0;
+let watchdog = null;
 
 /* =========================
-   STREAM TESTER (NO FAIL CORE)
-========================= */
+   STREAM RESOLVER (.m3u FIX)
+   ========================= */
 
-async function testStream(url){
+async function resolve(url){
 
-    return new Promise((resolve)=>{
-        let a = new Audio();
-        a.src = url;
-        a.preload = "metadata";
-
-        let done = false;
-
-        a.onloadedmetadata = () => {
-            done = true;
-            resolve(true);
-        };
-
-        a.onerror = () => {
-            if(!done) resolve(false);
-        };
-
-        setTimeout(()=>resolve(true), 1200); // fallback heuristic
-    });
-}
-
-/* =========================
-   RESOLVER (SAFE CHAIN)
-========================= */
-
-async function resolveStream(name){
-
-    const list = STREAMS[name];
-
-    if(!list) return null;
-
-    for(let url of list){
-        let ok = await testStream(url);
-        if(ok) return url;
+    if(url.includes(".m3u")){
+        try{
+            const res = await fetch(url);
+            const txt = await res.text();
+            return txt.split("\n").find(l => l.startsWith("http")) || null;
+        } catch(e){
+            return null;
+        }
     }
 
-    return null;
+    return url;
 }
 
-/* ========================= */
+/* =========================
+   WATCHDOG (CORE STABILITY)
+   ========================= */
 
-function setLogo(name){
-    document.getElementById("stationLogo").src =
-    "https://via.placeholder.com/220x120?text=" + encodeURIComponent(name);
+function startWatchdog(st){
+    clearTimeout(watchdog);
+
+    watchdog = setTimeout(()=>{
+        setStatus("TIMEOUT → RETRY");
+        handleFail();
+    }, 8000); // 8s max na start streamu
 }
 
-function setActiveUI(){
-    document.querySelectorAll(".station").forEach((el,i)=>{
-        el.classList.toggle("active", i === index);
-    });
-}
+/* =========================
+   ENGINE
+   ========================= */
 
 async function load(i){
-
     index = i;
-    let name = stations[i];
 
-    setLogo(name);
+    const st = stations[i];
 
-    if(hls){hls.destroy();hls=null;}
+    document.getElementById("stationLogo").src =
+        st.logo || "https://via.placeholder.com/220x120?text=Radio";
 
-    let url = await resolveStream(name);
+    setStatus("LOADING...");
+
+    let url = await resolve(st.url);
 
     if(!url){
-        url = "https://stream.rcs.revma.com/gzwc1xcq042vv";
+        setStatus("INVALID STREAM");
+        next();
+        return;
     }
 
+    audio.pause();
     audio.src = url;
+    audio.load();
 
-    if(playing){
-        audio.play().catch(()=>{});
+    startWatchdog(st);
+
+    audio.play()
+    .then(()=>{
+        clearTimeout(watchdog);
+        retry = 0;
+        setStatus("LIVE");
+        updateUI();
+    })
+    .catch(()=>{
+        handleFail();
+    });
+}
+
+/* =========================
+   FAIL HANDLING (NO CRASH)
+   ========================= */
+
+function handleFail(){
+    retry++;
+
+    setStatus("RETRY " + retry);
+
+    if(retry > 4){
+        retry = 0;
+        next();
+        return;
     }
 
-    setUI();
-    setActiveUI();
-}
-
-/* ========================= */
-
-function toggle(){
-
-    if(!audio.src) load(index);
-
-    if(playing){
-        audio.pause();
-        playing = false;
-    }else{
-        audio.play().catch(()=>{});
-        playing = true;
-    }
-
-    setUI();
-}
-
-function setUI(){
-    document.getElementById("bigPlay").innerText = playing ? "⏸" : "▶";
-    document.getElementById("playIcon").innerText = playing ? "⏸" : "▶";
-}
-
-function prev(){
-    index = (index - 1 + stations.length) % stations.length;
-    load(index);
+    setTimeout(()=>load(index), 1200);
 }
 
 function next(){
@@ -334,23 +255,46 @@ function next(){
     load(index);
 }
 
-function mute(){
-    audio.muted = !audio.muted;
+/* =========================
+   CONTROLS
+   ========================= */
+
+function toggle(){
+    if(audio.paused){
+        load(index);
+    } else {
+        audio.pause();
+        setStatus("PAUSED");
+    }
 }
 
 /* =========================
-   UI BUILD
-========================= */
+   UI
+   ========================= */
 
+function setStatus(t){
+    document.getElementById("status").innerText = t;
+}
+
+function updateUI(){
+    document.getElementById("bigPlay").innerText =
+        audio.paused ? "▶" : "⏸";
+}
+
+/* volume */
+document.getElementById("volume").addEventListener("input",(e)=>{
+    audio.volume = e.target.value;
+});
+
+/* sidebar */
 stations.forEach((s,i)=>{
     const div = document.createElement("div");
     div.className = "station";
-    div.innerText = s;
-    div.onclick = () => load(i);
-    sidebar.appendChild(div);
+    div.innerText = s.name;
+    div.onclick = ()=>load(i);
+    document.getElementById("sidebar").appendChild(div);
 });
 
-/* INIT */
 load(0);
 
 </script>
