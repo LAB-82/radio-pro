@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Radio App PRO</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Radio FIXED FINAL</title>
 
 <style>
 body {
@@ -16,24 +16,53 @@ body {
 }
 
 #sidebar {
-    width:300px;
+    width:320px;
     background:#141414;
     overflow:auto;
     border-right:1px solid #222;
+    padding-bottom:10px;
 }
 
 .station {
-    padding:12px;
+    padding:10px;
     border-bottom:1px solid #222;
     cursor:pointer;
+    display:flex;
+    align-items:center;
+    gap:10px;
 }
 
 .station:hover { background:#222; }
 
-.station.active {
-    background:#1f1f1f;
-    color:#00ff90;
-    font-weight:bold;
+.station.active { background:#2a2a2a; color:#00ff90; }
+
+.station img{
+    width:22px;
+    height:22px;
+    border-radius:4px;
+}
+
+.station span.badge{
+    margin-left:auto;
+    font-size:12px;
+    opacity:0.7;
+}
+
+.sidebarControls{
+    padding:10px;
+    border-bottom:1px solid #333;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:5px;
+}
+
+.sidebarControls button{
+    padding:6px;
+    font-size:12px;
+    cursor:pointer;
+    background:#222;
+    border:1px solid #333;
+    color:white;
 }
 
 #main {
@@ -45,7 +74,7 @@ body {
 #header {
     padding:12px;
     background:#1a1a1a;
-    font-size:18px;
+    font-weight:bold;
 }
 
 #playerBox {
@@ -53,23 +82,44 @@ body {
     display:flex;
     justify-content:center;
     align-items:center;
+    background:#000;
 }
 
-#radioPlayer {
-    width:400px;
-    text-align:center;
-}
-
-#logoBox img {
-    width:240px;
-    border-radius:10px;
+#radioPlayer{
+    width:90%;
+    height:90%;
     background:#111;
+    border-radius:14px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    position:relative;
 }
 
-#bigPlay {
+#logoBox img{
+    width:220px;
+    margin-bottom:20px;
+    border-radius:12px;
+    background:#222;
+}
+
+#bigPlay{
     font-size:70px;
     cursor:pointer;
-    margin-top:20px;
+}
+
+#bottomBar{
+    position:absolute;
+    bottom:12px;
+    left:50%;
+    transform:translateX(-50%);
+    background:#222;
+    padding:10px 18px;
+    border-radius:30px;
+    display:flex;
+    gap:18px;
+    cursor:pointer;
 }
 
 #controls {
@@ -78,28 +128,49 @@ body {
     display:flex;
     justify-content:center;
     align-items:center;
-    gap:25px;
+    gap:20px;
 }
 
-.btn { cursor:pointer; font-size:22px; }
+.btn { cursor:pointer; font-size:20px; }
 </style>
+
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 </head>
 
 <body>
 
-<div id="sidebar"></div>
+<div id="sidebar">
+
+<!-- SIDEBAR CONTROLS -->
+<div class="sidebarControls">
+    <button onclick="toggle()">Play</button>
+    <button onclick="stopRadio()">Stop</button>
+    <button onclick="mute()">Mute</button>
+    <button onclick="cycleVolume()">Volume</button>
+</div>
+
+</div>
 
 <div id="main">
 
-<div id="header">🎧 RADIO APP PRO</div>
+<div id="header">🎧 RADIO FIXED FINAL</div>
 
 <div id="playerBox">
     <div id="radioPlayer">
+
         <div id="logoBox">
-            <img id="logo">
+            <img id="stationLogo" src="">
         </div>
 
         <div id="bigPlay" onclick="toggle()">▶</div>
+
+        <div id="bottomBar">
+            <div onclick="prev()">⏮</div>
+            <div onclick="toggle()" id="playIcon">▶</div>
+            <div onclick="next()">⏭</div>
+            <div onclick="mute()">🔊</div>
+        </div>
+
     </div>
 </div>
 
@@ -116,121 +187,127 @@ body {
 
 <script>
 
-/* =========================
-   FULL VERIFIED STATIONS
-========================= */
-
 const stations = [
-
-{
-name:"RMF FM",
-stream:"https://rs6-krk2.rmfstream.pl/rmf_fm",
-logo:"https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/RMF_FM_logo.svg/512px-RMF_FM_logo.svg.png"
-},
-
-{
-name:"Radio ZET",
-stream:"https://zt.cdn.eurozet.pl/ZET.mp3",
-logo:"https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/Radio_ZET_logo_2021.svg/512px-Radio_ZET_logo_2021.svg.png"
-},
-
-{
-name:"Radio ESKA",
-stream:"https://waw01-01.ic.smcdn.pl/t043-1.mp3",
-logo:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Radio_Eska_logo.svg/512px-Radio_Eska_logo.svg.png"
-},
-
-{
-name:"Antyradio",
-stream:"https://antyradio-01.cdn.eurozet.pl/antyradio.mp3",
-logo:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Antyradio_logo.svg/512px-Antyradio_logo.svg.png"
-},
-
-{
-name:"TOK FM",
-stream:"https://radiostream.pl/tuba10-1.mp3",
-logo:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/TOK_FM_logo.svg/512px-TOK_FM_logo.svg.png"
-},
-
-{
-name:"Polskie Radio Jedynka",
-stream:"https://stream.polskieradio.pl/program1.mp3",
-logo:"https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Polskie_Radio_Jedynka_logo_2018.svg/512px-Polskie_Radio_Jedynka_logo_2018.svg.png"
-},
-
-{
-name:"Polskie Radio Trójka",
-stream:"https://stream3.polskieradio.pl/pr3_aac128",
-logo:"https://upload.wikimedia.org/wikipedia/commons/thumb/7/74/Polskie_Radio_Trojka_logo_2018.svg/512px-Polskie_Radio_Trojka_logo_2018.svg.png"
-},
-
-{
-name:"Radio Wrocław",
-stream:"https://stream4.nadaje.com/radiowroclaw",
-logo:"https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Radio_Wroc%C5%82aw_logo.svg/512px-Radio_Wroc%C5%82aw_logo.svg.png"
-},
-
-{
-name:"Radio Wnet",
-stream:"https://stream.rcs.revma.com/wnet",
-logo:"https://radio-wnet.pl/wp-content/uploads/2020/06/logo.png"
-},
-
-{
-name:"Muzyczne Radio",
-stream:"https://stream.rcs.revma.com/gzwc1xcq042vv",
-logo:"https://www.muzyczneradio.pl/logo.png"
-}
-
+"Muzyczne Radio",
+"Polskie Radio Jedynka",
+"Polskie Radio Dwójka",
+"Polskie Radio Trójka",
+"Polskie Radio Czwórka",
+"Radio Plus",
+"RMF FM",
+"Radio Zet",
+"Radio Eska",
+"Radio Wrocław",
+"Radio Wnet",
+"Tok FM",
+"Antyradio",
+"Radio Kolor",
+"Open FM",
+"Open FM Disco Polo",
+"Disco Radio",
+"Polish Radio London 24",
+"Polskie Radio Dzieciom",
+"Polskie Radio Chopin",
+"Radio Yanosik",
+"Radio Republika",
+"Radio dla Ciebie",
+"Radio Maryja",
+"Radio Jasna Góra"
 ];
 
-/* ========================= */
+const fixedStreams = {
+"Polskie Radio Czwórka":"https://stream.polskieradio.pl/pr4_aac128",
+"Radio Eska":"https://waw01-01.ic.smcdn.pl/t040-1.mp3",
+"Antyradio":"https://stream.antyradio.pl/stream.mp3",
+"Open FM":"https://pldm.ml/radio/openfm.mp3",
+"Open FM Disco Polo":"https://pldm.ml/radio/openfm_disco.mp3"
+};
 
-let index = 0;
-let playing = false;
+const fallback = null;
 
-const audio = document.getElementById("audio");
-const sidebar = document.getElementById("sidebar");
+let index=0;
+let playing=false;
+let volumeStep=0.2;
 
-function setActive(){
-    document.querySelectorAll(".station").forEach((el,i)=>{
-        el.classList.toggle("active", i===index);
-    });
+const audio=document.getElementById("audio");
+const sidebar=document.getElementById("sidebar");
+
+let cache={};
+
+function getStream(name){
+    return fixedStreams[name] || null;
+}
+
+/* REAL ICONS (favicon fallback) */
+function getIcon(name){
+    return `https://www.google.com/s2/favicons?sz=64&domain=${encodeURIComponent(name.toLowerCase().replace(/ /g,"")+".pl")}`;
+}
+
+function setLogo(name){
+ document.getElementById("stationLogo").src =
+ "https://via.placeholder.com/220x120?text="+encodeURIComponent(name);
+}
+
+function setActiveUI(){
+ document.querySelectorAll(".station").forEach((el,i)=>{
+    el.classList.toggle("active", i===index);
+ });
 }
 
 function load(i){
 
 index=i;
-const s=stations[i];
+let name=stations[i];
 
-audio.src=s.stream;
-document.getElementById("logo").src=s.logo;
+setLogo(name);
+
+let url=getStream(name);
+
+if(!url){
+    audio.removeAttribute("src");
+    document.getElementById("playIcon").innerText="❌";
+    return;
+}
+
+audio.src=url;
 
 if(playing){
-    audio.play().catch(()=>next());
+    audio.play().catch(()=>{});
 }
 
 setUI();
-setActive();
+setActiveUI();
 }
 
 function toggle(){
 
 if(!audio.src) load(index);
 
+if(!audio.src){
+    return;
+}
+
 if(playing){
     audio.pause();
     playing=false;
-}else{
-    audio.play().catch(()=>next());
+} else {
+    audio.play().catch(()=>{});
     playing=true;
 }
 
 setUI();
 }
 
+function stopRadio(){
+audio.pause();
+audio.removeAttribute("src");
+playing=false;
+setUI();
+}
+
 function setUI(){
 document.getElementById("bigPlay").innerText=playing?"⏸":"▶";
+document.getElementById("playIcon").innerText=playing?"⏸":"▶";
 }
 
 function prev(){
@@ -247,14 +324,22 @@ function mute(){
 audio.muted=!audio.muted;
 }
 
-/* FAIL SAFE */
-audio.onerror=()=>next();
+function cycleVolume(){
+audio.volume = audio.volume >= 1 ? 0 : audio.volume + volumeStep;
+}
 
-/* BUILD UI */
+/* BUILD SIDEBAR */
 stations.forEach((s,i)=>{
 let div=document.createElement("div");
 div.className="station";
-div.innerText=s.name;
+
+div.innerHTML=`
+<img src="${getIcon(s)}"
+     onerror="this.src='https://via.placeholder.com/22'">
+<span>${s}</span>
+<span class="badge" id="b${i}">●</span>
+`;
+
 div.onclick=()=>load(i);
 sidebar.appendChild(div);
 });
