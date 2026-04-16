@@ -3,51 +3,58 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Radio PRO STREAM FIXED</title>
+<title>RADIO ENGINE PRO FIX (STABLE)</title>
 
 <style>
-body {
+body{
 margin:0;
 font-family:Arial;
 background:#0b0b0b;
-color:white;
+color:#fff;
 display:flex;
 height:100vh;
 }
 
-#sidebar {
-width:320px;
+#sidebar{
+width:420px;
 background:#141414;
 overflow:auto;
 border-right:1px solid #222;
-}
-
-.station {
 padding:10px;
-border-bottom:1px solid #222;
+}
+
+#stations{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:10px;
+}
+
+.station{
+background:#1a1a1a;
+padding:10px;
 cursor:pointer;
+border-radius:8px;
+text-align:center;
+transition:0.2s;
+font-size:12px;
 }
 
-.station:hover { background:#222; }
+.station:hover{background:#2a2a2a;}
+.station.active{background:#00aa66;}
 
-.station.active {
-background:#2a2a2a;
-color:#00ff90;
-}
-
-#main {
+#main{
 flex:1;
 display:flex;
 flex-direction:column;
 }
 
-#header {
+#header{
 padding:12px;
 background:#1a1a1a;
 font-weight:bold;
 }
 
-#playerBox {
+#playerBox{
 flex:1;
 display:flex;
 justify-content:center;
@@ -64,79 +71,68 @@ display:flex;
 flex-direction:column;
 align-items:center;
 justify-content:center;
+position:relative;
 }
 
 #logoBox img{
-width:220px;
-margin-bottom:20px;
-border-radius:10px;
+width:180px;
+height:180px;
+border-radius:12px;
 background:#222;
-}
-
-#bigPlay{
-font-size:70px;
-cursor:pointer;
-}
-
-#bottomBar{
-position:absolute;
-bottom:12px;
-left:50%;
-transform:translateX(-50%);
-background:#222;
-padding:10px 18px;
-border-radius:30px;
-display:flex;
-gap:18px;
+margin-bottom:10px;
 }
 
 #controls{
-height:70px;
-background:#111;
 display:flex;
-justify-content:center;
+gap:10px;
 align-items:center;
-gap:20px;
+margin-top:10px;
 }
 
-.btn { cursor:pointer; font-size:20px; }
+button{
+background:#222;
+color:#fff;
+border:none;
+padding:8px 12px;
+cursor:pointer;
+border-radius:6px;
+}
 
+button:hover{background:#333;}
+
+#volume{width:120px;}
+#status{margin-top:10px;font-size:12px;opacity:0.7;}
 </style>
 
 </head>
 
 <body>
 
-<div id="sidebar"></div>
+<div id="sidebar">
+<div id="stations"></div>
+</div>
 
 <div id="main">
 
-<div id="header">🎧 RADIO STREAM ENGINE FIXED</div>
+<div id="header">🎧 RADIO ENGINE PRO FIX (STABLE RESOLVER)</div>
 
 <div id="playerBox">
 <div id="radioPlayer">
 
 <div id="logoBox">
-<img id="stationLogo">
-</div>
-
-<div id="bigPlay" onclick="toggle()">▶</div>
-
-<div id="bottomBar">
-<div onclick="prev()">⏮</div>
-<div onclick="toggle()" id="playIcon">▶</div>
-<div onclick="next()">⏭</div>
-<div onclick="mute()">🔊</div>
-</div>
-
-</div>
+<img id="logo"/>
 </div>
 
 <div id="controls">
-<div class="btn" onclick="prev()">⏮</div>
-<div class="btn" onclick="toggle()">⏯</div>
-<div class="btn" onclick="next()">⏭</div>
-<div class="btn" onclick="mute()">🔊</div>
+<button onclick="play()">PLAY</button>
+<button onclick="stop()">STOP</button>
+<button onclick="mute()">MUTE</button>
+<input id="volume" type="range" min="0" max="1" step="0.01" value="0.6">
+</div>
+
+<div id="status">READY</div>
+
+</div>
 </div>
 
 </div>
@@ -145,160 +141,110 @@ gap:20px;
 
 <script>
 
-const stations = [
-"Muzyczne Radio",
-"Polskie Radio Jedynka",
-"Polskie Radio Dwójka",
-"Polskie Radio Trójka",
-"Polskie Radio Czwórka",
-"Radio Plus",
-"RMF FM",
-"Radio Zet",
-"Radio Eska",
-"Radio Wrocław",
-"Radio Wnet",
-"Tok FM",
-"Antyradio",
-"Radio Kolor",
-"Open FM",
-"Open FM Disco Polo",
-"Polskie Radio Dzieciom",
-"Polskie Radio Chopin",
-"Radio Maryja",
-"Radio Jasna Góra"
+const stations=[
+"RMF FM","Radio Zet","Radio Eska","Radio Plus","Tok FM",
+"Antyradio","Radio Wrocław","Radio Wnet","Radio Kolor",
+"Radio Maryja","Jedynka","Dwojka","Trojka","Czworka",
+"Dzieciom","Chopin","Kampus","Nepokalanow","Rodzina"
 ];
 
-let index=0;
-let playing=false;
-
 const audio=document.getElementById("audio");
-const sidebar=document.getElementById("sidebar");
+const logo=document.getElementById("logo");
+const status=document.getElementById("status");
+const volume=document.getElementById("volume");
+
+let current=0;
+let cache={};
+
+volume.oninput=()=>audio.volume=volume.value;
 
 /* =========================
-REAL STABLE STREAM MAP
+   🔥 FIXED RESOLVER v2
 ========================= */
 
-const STREAMS = {
+async function getStream(name){
 
-"Muzyczne Radio":"https://stream.rcs.revma.com/gzwc1xcq042vv",
+if(cache[name]) return cache[name];
 
-"RMF FM":"https://rs6-krk2-1.rmfstream.pl/RMFFM48",
+status.innerText="SEARCHING STREAM...";
 
-"Radio Zet":"https://zt.cdn.eurozet.pl/ZET01.mp3",
+try{
+const res=await fetch(
+`https://de1.api.radio-browser.info/json/stations/byname/${encodeURIComponent(name)}`
+);
 
-"Radio Eska":"https://waw01-01.ic.smcdn.pl/t043-1.mp3",
+const data=await res.json();
 
-"Antyradio":"https://stream.antyradio.pl/stream.mp3",
+if(!data || !data.length){
+status.innerText="NO STREAM FOUND";
+return null;
+}
 
-"Tok FM":"https://radiostream.pl/tuba10-1.mp3",
+/* 🔥 FILTER VALID STREAMS */
+const valid = data.filter(s =>
+s.url_resolved &&
+(
+s.url_resolved.endsWith(".mp3") ||
+s.url_resolved.endsWith(".aac") ||
+s.url_resolved.includes("stream")
+)
+);
 
-"Polskie Radio Jedynka":"https://stream.polskieradio.pl/program1",
+/* fallback if filtering removes too much */
+const best = valid[0] || data[0];
 
-"Polskie Radio Dwójka":"https://stream.polskieradio.pl/program2",
+cache[name]=best.url_resolved;
+return best.url_resolved;
 
-"Polskie Radio Trójka":"https://stream3.polskieradio.pl/pr3_stream",
-
-"Polskie Radio Czwórka":"https://stream4.polskieradio.pl/pr4_stream",
-
-"Polskie Radio Dzieciom":"https://stream.polskieradio.pl/prd",
-
-"Polskie Radio Chopin":"https://stream.polskieradio.pl/chopin",
-
-"Radio Wrocław":"https://stream4.nadaje.com/radiowroclaw",
-
-"Radio Wnet":"https://stream.rcs.revma.com/wnet",
-
-"Radio Plus":"https://plc.streaming.radio.plus/stream.mp3",
-
-"Radio Kolor":"https://radiokolor.pl/stream",
-
-"Open FM":"https://stream.open.fm/1",
-
-"Open FM Disco Polo":"https://stream.open.fm/27",
-
-"Radio Maryja":"https://radiomaryja.pl/stream",
-
-"Radio Jasna Góra":"https://jasnagora.pl/radio-stream"
-
-};
-
-function getStream(name){
-return STREAMS[name] || STREAMS["Muzyczne Radio"];
+}catch(e){
+status.innerText="ERROR FETCHING STREAM";
+return null;
+}
 }
 
 function setLogo(name){
-document.getElementById("stationLogo").src =
-"https://via.placeholder.com/220x120?text="+encodeURIComponent(name);
+logo.src=`https://www.radio-browser.info/backends/logos/${encodeURIComponent(name)}.png`;
 }
 
-function setActive(){
-document.querySelectorAll(".station").forEach((el,i)=>{
-el.classList.toggle("active", i===index);
-});
-}
+async function load(i){
 
-function load(i){
-
-index=i;
+current=i;
 const name=stations[i];
+
+document.querySelectorAll(".station").forEach((el,idx)=>{
+el.classList.toggle("active",idx===i);
+});
 
 setLogo(name);
 
-const url=getStream(name);
+const url=await getStream(name);
+
+if(!url){
+audio.removeAttribute("src");
+status.innerText="NO STREAM";
+return;
+}
 
 audio.src=url;
-
-if(playing){
 audio.play().catch(()=>{});
+
+status.innerText="PLAYING: "+name;
 }
 
-setActive();
-setUI();
-}
-
-function toggle(){
-
-if(!audio.src) load(index);
-
-if(playing){
-audio.pause();
-playing=false;
-}else{
-audio.play().catch(()=>{});
-playing=true;
-}
-
-setUI();
-}
-
-function setUI(){
-document.getElementById("bigPlay").innerText=playing?"⏸":"▶";
-document.getElementById("playIcon").innerText=playing?"⏸":"▶";
-}
-
-function prev(){
-index=(index-1+stations.length)%stations.length;
-load(index);
-}
-
-function next(){
-index=(index+1)%stations.length;
-load(index);
-}
-
-function mute(){
-audio.muted=!audio.muted;
-}
-
-/* BUILD SIDEBAR */
+function play(){load(current);}
+function stop(){audio.pause();audio.src="";status.innerText="STOPPED";}
+function mute(){audio.muted=!audio.muted;}
 
 stations.forEach((s,i)=>{
 const div=document.createElement("div");
 div.className="station";
 div.innerText=s;
 div.onclick=()=>load(i);
-sidebar.appendChild(div);
+document.getElementById("stations").appendChild(div);
 });
+
+volume.value=0.6;
+audio.volume=0.6;
 
 load(0);
 
