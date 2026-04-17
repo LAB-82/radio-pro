@@ -156,22 +156,29 @@ const stations = [
 "Planeta FM",
 "Radio Kampus",
 "Radio Rodzina",
-"Radio Afera",
+"Radio Republika",
 
 "__SEPARATOR__",
 
-"BBC Radio 1",
-"BBC Radio 1Xtra",
-"SLAM!",
-"Radio Deejay",
-"RTL 102.5",
-"Ibiza Global Radio",
-"Ibiza Sonica Radio",
-"1.FM Club Radio",
-"Housebeats FM",
-"Trance Energy Radio",
-"Psyndora Psytrance",
-"Radio Schizoid"
+"technofm",
+"house-nation-uk",
+"your-trance-radio",
+"rewind-2000s",
+"res-fm2",
+"frisky-radio",
+"Radio Heaven",
+"metal-express",
+"metalfm",
+"classic-rock-station",
+"flow-103",
+"hip-hop-request",
+"electric-radio",
+"jazz-fm",
+"country-usa",
+"100hitz-rap",
+"radio-80-fm",
+"love-90s",
+"kusc-classical-915-fm-kdb"
 ];
 
 const audio = document.getElementById("audio");
@@ -191,16 +198,9 @@ function saveFavs(){
 localStorage.setItem("radio_favs", JSON.stringify(favs));
 }
 
-/* LOGO + FALLBACK */
+/* LOGO */
 function setLogo(name){
-const primary = `https://www.radio-browser.info/backends/logos/${encodeURIComponent(name)}.png`;
-const fallback = `https://api.radio-browser.info/img/${encodeURIComponent(name)}`;
-
-logo.src = primary;
-
-logo.onerror = ()=>{
-logo.src = fallback;
-};
+logo.src = `https://www.radio-browser.info/backends/logos/${encodeURIComponent(name)}.png`;
 }
 
 /* STREAM RESOLVER */
