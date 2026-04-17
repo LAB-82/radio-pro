@@ -86,6 +86,7 @@ canvas{
   gap:8px;
   margin-top:20px;
   margin-bottom:20px;
+  align-items: center;
 }
 
 .volumeWrapper{
@@ -97,6 +98,7 @@ canvas{
   background:#0a0a1a;
   border:2px solid var(--cp-cyan);
   box-shadow: 0 0 8px var(--cp-cyan), inset 0 0 8px rgba(0,240,255,0.3);
+  box-sizing: border-box;
 }
 
 button{
@@ -113,6 +115,7 @@ button{
   text-transform: uppercase;
   box-shadow: 0 0 8px var(--cp-cyan), inset 0 0 8px rgba(0,240,255,0.2);
   transition: all 0.15s ease;
+  box-sizing: border-box;
 }
 
 button:hover{
@@ -131,66 +134,4 @@ button:active{
   width:120px;
   -webkit-appearance: none;
   appearance: none;
-  height: 4px;
-  background: #0a0a1a;
-  border: 1px solid var(--cp-cyan);
-  outline: none;
-}
-
-#volume::-webkit-slider-thumb{
-  -webkit-appearance: none;
-  appearance: none;
-  width: 16px;
-  height: 16px;
-  background: var(--cp-yellow);
-  cursor: pointer;
-  border: 2px solid var(--cp-cyan);
-  box-shadow: 0 0 8px var(--cp-yellow), 0 0 15px var(--cp-cyan);
-  border-radius: 2px;
-  transition: all 0.2s ease;
-}
-
-#volume::-moz-range-thumb{
-  width: 16px;
-  height: 16px;
-  background: var(--cp-yellow);
-  cursor: pointer;
-  border: 2px solid var(--cp-cyan);
-  box-shadow: 0 0 8px var(--cp-yellow), 0 0 15px var(--cp-cyan);
-  border-radius: 2px;
-  transition: all 0.2s ease;
-}
-
-#volume::-webkit-slider-runnable-track{
-  background: linear-gradient(90deg, var(--cp-magenta), var(--cp-cyan));
-  height: 4px;
-}
-
-#volume::-moz-range-track{
-  background: linear-gradient(90deg, var(--cp-magenta), var(--cp-cyan));
-  height: 4px;
-}
-
-#volume.center::-webkit-slider-thumb{
-  background: var(--cp-yellow);
-  box-shadow: 0 0 8px var(--cp-yellow), 0 0 15px var(--cp-cyan);
-}
-
-#volume.center::-moz-range-thumb{
-  background: var(--cp-yellow);
-  box-shadow: 0 0 8px var(--cp-yellow), 0 0 15px var(--cp-cyan);
-}
-
-#volume.changed::-webkit-slider-thumb{
-  background: var(--cp-red);
-  box-shadow: 0 0 8px var(--cp-red), 0 0 15px var(--cp-magenta);
-}
-
-#volume.changed::-moz-range-thumb{
-  background: var(--cp-red);
-  box-shadow: 0 0 8px var(--cp-red), 0 0 15px var(--cp-magenta);
-}
-
-.playActive{
-  color:#000014!important;
-  background: var
+  height: 4
