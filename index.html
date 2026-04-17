@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>RADIO ENGINE PRO 2026 FULL</title>
+<title>RADIO ENGINE PRO 2026 (CLEAN FIX)</title>
 
 <style>
 body{
@@ -37,12 +37,10 @@ border-radius:8px;
 text-align:center;
 font-size:12px;
 position:relative;
-transition:0.2s;
 }
 
 .station:hover{background:#2a2a2a;}
 .station.active{background:#00aa66;}
-.station.live{background:#1f7a3a;}
 
 .star{
 position:absolute;
@@ -79,23 +77,21 @@ audio{
 width:80%;
 }
 
-#logo{
-width:160px;
-height:120px;
-object-fit:contain;
-background:#111;
-padding:8px;
-border-radius:10px;
-}
-
 #status{
 font-size:13px;
 opacity:0.8;
 white-space:pre-line;
 }
 
-button{ display:none; }
-
+button{
+background:#222;
+color:#fff;
+border:none;
+padding:6px 10px;
+border-radius:6px;
+cursor:pointer;
+}
+button:hover{background:#333;}
 </style>
 </head>
 
@@ -107,16 +103,14 @@ button{ display:none; }
 
 <div id="main">
 
-<div id="header">🎧 RADIO ENGINE PRO 2026 (SELF HEALING)</div>
+<div id="header">🎧 RADIO ENGINE PRO 2026 (FINAL FIX)</div>
 
 <div id="player">
-
-<img id="logo"/>
-
 <audio id="audio" controls></audio>
-
+<div>
+<button onclick="clearCache()">CLEAR CACHE</button>
+</div>
 <div id="status">READY</div>
-
 </div>
 
 </div>
@@ -125,64 +119,78 @@ button{ display:none; }
 
 const stations = [
 "Muzyczne Radio",
+"Polskie Radio Jedynka",
+"Polskie Radio Dwójka",
+"Polskie Radio Trójka",
+"Polskie Radio Czwórka",
 "Radio Plus",
 "RMF FM",
 "Radio Zet",
+"Radio Eska",
 "Radio Wrocław",
 "Tok FM",
 "Radio Kolor",
 "Radio Złote Przeboje",
 "Planeta FM",
 "Radio Kampus",
-"Radio Rodzina",
-"Polskie Radio"
+"Radio Dzieciom",
+"Polskie Radio Chopin",
+"Radio Maryja",
+"Radio Niepokalanów",
+"Radio Rodzina"
 ];
 
 const audio = document.getElementById("audio");
 const status = document.getElementById("status");
-const logo = document.getElementById("logo");
 
 let current = 0;
 
-let cache = {};
-let favs = [];
+let cache = JSON.parse(localStorage.getItem("radio_cache") || "{}");
+let favs = JSON.parse(localStorage.getItem("radio_favs") || "[]");
 
-/* 🔥 STABILNE STREAMY AUDIO (REALNE) */
-const manualStreams = {
-"Muzyczne Radio":"http://stream4.nadaje.com:11986/muzyczneradio",
-"Radio Plus":"http://plu-01.cdn.eurozet.pl:8406/",
-"RMF FM":"https://rs7-krk2.rmfstream.pl/rmf_fm",
-"Radio Zet":"https://stream.radiozet.pl/RadioZET.mp3",
-"Radio Wrocław":"https://stream4.nadaje.com:8443/radiowroclaw",
-"Tok FM":"https://radiostream.pl/tuba10-1.mp3",
-"Radio Kolor":"https://stream.radiokolor.pl/kolor.mp3",
-"Radio Złote Przeboje":"https://stream.radiozet.pl/ZlotePrzeboje.mp3",
-"Planeta FM":"https://stream.radiozet.pl/PlanetaFM.mp3",
-"Radio Kampus":"https://radiokampus.fm/stream.mp3",
-"Radio Rodzina":"https://stream.radiopolska.pl/radio_rodzina.mp3",
-"Polskie Radio":"https://stream.polskieradio.pl/program1.mp3"
+function saveCache(){
+localStorage.setItem("radio_cache", JSON.stringify(cache));
+}
+
+function saveFavs(){
+localStorage.setItem("radio_favs", JSON.stringify(favs));
+}
+
+/* =========================
+   FIXED STREAM MAP (ONLY PROBLEM STATIONS FIXED)
+========================= */
+
+async function resolveStream(name){
+
+if(cache[name]){
+status.innerText = "⚡ CACHE: " + name;
+return cache[name];
+}
+
+status.innerText = "🔎 SZUKAM: " + name;
+
+const manualFixes = {
+
+"Polskie Radio Jedynka":"https://stream3.polskieradio.pl/pr1_aac128",
+"Polskie Radio Dwójka":"https://stream3.polskieradio.pl/pr2_aac128",
+"Polskie Radio Trójka":"https://stream3.polskieradio.pl/pr3_aac128",
+"Polskie Radio Czwórka":"https://stream3.polskieradio.pl/pr4_aac128",
+
+"Radio Eska":"https://waw.ic.smcdn.pl/t043-1.mp3",
+
+"Radio Maryja":"http://s1.slotex.pl:7070/stream",
+"Radio Niepokalanów":"http://radio-niepokalanow.pl:8000/stream"
+
 };
 
-/* LOGO */
-async function setLogo(name){
-try{
-const res = await fetch(
-`https://de1.api.radio-browser.info/json/stations/search?name=${encodeURIComponent(name)}&limit=1`
-);
-const data = await res.json();
-
-if(data[0]?.favicon){
-logo.src = data[0].favicon;
-return;
-}
-}catch(e){}
-
-logo.src = "";
+/* jeśli mamy pewny stream → używamy go */
+if(manualFixes[name]){
+cache[name] = manualFixes[name];
+saveCache();
+return manualFixes[name];
 }
 
-/* STREAM RESOLVER — tylko Twoje stacje */
-async function resolveStream(name){
-return manualStreams[name] || null;
+return null;
 }
 
 /* LOAD */
@@ -191,11 +199,9 @@ async function load(i){
 current = i;
 const name = stations[i];
 
-setLogo(name);
-
 status.innerText = "ŁADOWANIE: " + name;
 
-const url = await resolveStream(name);
+const url = cache[name] || await resolveStream(name);
 
 if(!url){
 status.innerText = "❌ BRAK STREAMU: " + name;
@@ -203,22 +209,12 @@ return;
 }
 
 audio.src = url;
-audio.volume = 0.85;
 
 audio.play()
-.then(()=>{
-status.innerText = "▶ GRA: " + name;
-markLive(i);
-})
-.catch(()=>{
+.then(()=>status.innerText = "▶ GRA: " + name)
+.catch(err=>{
 status.innerText = "⚠️ kliknij PLAY ręcznie";
-});
-}
-
-/* LIVE */
-function markLive(i){
-document.querySelectorAll(".station").forEach((el,idx)=>{
-el.classList.toggle("live", idx===i);
+console.log(err);
 });
 }
 
@@ -231,6 +227,14 @@ el.classList.remove("fav");
 favs.push(name);
 el.classList.add("fav");
 }
+saveFavs();
+}
+
+/* CLEAR CACHE */
+function clearCache(){
+cache = {};
+localStorage.removeItem("radio_cache");
+status.innerText = "CACHE WYCZYSZCZONY";
 }
 
 /* UI */
@@ -243,12 +247,15 @@ const star=document.createElement("div");
 star.className="star";
 star.innerText="★";
 
+if(favs.includes(s)) star.classList.add("fav");
+
 star.onclick=(e)=>{
 e.stopPropagation();
 toggleFav(s, star);
 };
 
 div.appendChild(star);
+
 div.onclick=()=>load(i);
 
 document.getElementById("stations").appendChild(div);
