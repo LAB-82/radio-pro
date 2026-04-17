@@ -75,7 +75,7 @@ flex-direction:column;
 gap:10px;
 }
 
-/* 🔥 LOGO */
+/* LOGO */
 #logo{
 width:180px;
 height:120px;
@@ -83,6 +83,15 @@ object-fit:contain;
 border-radius:10px;
 background:#111;
 padding:10px;
+}
+
+/* SEPARATOR */
+.separator{
+grid-column:1/-1;
+text-align:center;
+font-size:13px;
+opacity:0.6;
+padding:6px;
 }
 
 audio{
@@ -147,7 +156,22 @@ const stations = [
 "Planeta FM",
 "Radio Kampus",
 "Radio Rodzina",
-"Radio Afera"
+"Radio Afera",
+
+"__SEPARATOR__",
+
+"BBC Radio 1",
+"BBC Radio 1Xtra",
+"SLAM!",
+"Radio Deejay",
+"RTL 102.5",
+"Ibiza Global Radio",
+"Ibiza Sonica Radio",
+"1.FM Club Radio",
+"Housebeats FM",
+"Trance Energy Radio",
+"Psyndora Psytrance",
+"Radio Schizoid"
 ];
 
 const audio = document.getElementById("audio");
@@ -167,9 +191,16 @@ function saveFavs(){
 localStorage.setItem("radio_favs", JSON.stringify(favs));
 }
 
-/* LOGO */
+/* LOGO + FALLBACK */
 function setLogo(name){
-logo.src = `https://www.radio-browser.info/backends/logos/${encodeURIComponent(name)}.png`;
+const primary = `https://www.radio-browser.info/backends/logos/${encodeURIComponent(name)}.png`;
+const fallback = `https://api.radio-browser.info/img/${encodeURIComponent(name)}`;
+
+logo.src = primary;
+
+logo.onerror = ()=>{
+logo.src = fallback;
+};
 }
 
 /* STREAM RESOLVER */
@@ -206,6 +237,8 @@ async function load(i){
 
 current = i;
 const name = stations[i];
+
+if(name==="__SEPARATOR__") return;
 
 setLogo(name);
 
@@ -260,6 +293,8 @@ console.log("🧹 auto cache cleaned");
 setInterval(async ()=>{
 for(let i=0;i<stations.length;i++){
 const name = stations[i];
+if(name==="__SEPARATOR__") continue;
+
 if(!cache[name]){
 try{
 const res = await fetch(
@@ -284,6 +319,15 @@ status.innerText = "CACHE WYCZYSZCZONY";
 
 /* UI */
 stations.forEach((s,i)=>{
+
+if(s==="__SEPARATOR__"){
+const sep=document.createElement("div");
+sep.className="separator";
+sep.innerText="Stacje zagraniczne";
+document.getElementById("stations").appendChild(sep);
+return;
+}
+
 const div=document.createElement("div");
 div.className="station";
 div.innerText=s;
