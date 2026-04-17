@@ -159,3 +159,33 @@ button:active{
   border: 2px solid var(--cp-cyan);
   box-shadow: 0 0 8px var(--cp-yellow), 0 0 15px var(--cp-cyan);
   border-radius: 2px;
+}
+
+#volume::-webkit-slider-runnable-track{
+  background: linear-gradient(90deg, var(--cp-magenta), var(--cp-cyan));
+  height: 4px;
+}
+
+#volume::-moz-range-track{
+  background: linear-gradient(90deg, var(--cp-magenta), var(--cp-cyan));
+  height: 4px;
+}
+
+#volume.center::-webkit-slider-thumb{
+  background: var(--cp-yellow);
+  box-shadow: 0 0 8px var(--cp-yellow), 0 0 15px var(--cp-cyan);
+}
+
+#volume.center::-moz-range-thumb{
+  background: var(--cp-yellow);
+  box-shadow: 0 0 8px var(--cp-yellow), 0 0 15px var(--cp-cyan);
+}
+
+#volume.changed::-webkit-slider-thumb{
+  background: var(--cp-red);
+  box-shadow: 0 0 8px var(--cp-red), 0 0 15px var(--cp-magenta);
+}
+
+#volume.changed::-moz-range-thumb{
+  background: var(--cp-red);
+  box-shadow: 0 0 8px var(--cp-red), 0 0 15px var(--cp
