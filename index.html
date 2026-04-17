@@ -11,7 +11,6 @@
   --cp-yellow:#fcee09;
   --cp-red:#ff2a2a;
   --cp-bg:#000014;
-  --cut: 8px;
 }
 
 body{
@@ -75,14 +74,29 @@ body{
   box-sizing: border-box;
   position: relative;
   background: #000014;
-  border: 2px solid var(--cp-cyan);
   box-shadow: 0 0 10px var(--cp-cyan), 0 0 20px var(--cp-magenta), inset 0 0 20px rgba(0,240,255,0.2);
+  border: 2px solid var(--cp-cyan);
+  overflow: hidden;
 }
+
+#proEqualizer .cut{
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  z-index: 2;
+}
+#proEqualizer .cut.tl{ top: -2px; left: -2px; border-width: 0 0 8px 8px; border-color: transparent transparent var(--cp-bg) var(--cp-bg); }
+#proEqualizer .cut.tr{ top: -2px; right: -2px; border-width: 8px 8px 0 0; border-color: var(--cp-bg) var(--cp-bg) transparent transparent; }
+#proEqualizer .cut.bl{ bottom: -2px; left: -2px; border-width: 8px 0 0 8px; border-color: var(--cp-bg) transparent transparent var(--cp-bg); }
+#proEqualizer .cut.br{ bottom: -2px; right: -2px; border-width: 0 8px 8px 0; border-color: transparent var(--cp-bg) var(--cp-bg) transparent; }
 
 canvas{
   display: block;
   width: 100%;
   height: 100%;
+  position: relative;
+  z-index: 0;
 }
 
 #controls{
@@ -100,10 +114,24 @@ canvas{
   align-items:center;
   justify-content:center;
   background:#0a0a1a;
+  position: relative;
   box-sizing: border-box;
-  border: 2px solid var(--cp-cyan);
   box-shadow: 0 0 8px var(--cp-cyan), inset 0 0 8px rgba(0,240,255,0.3);
+  border: 2px solid var(--cp-cyan);
+  overflow: hidden;
 }
+
+.volumeWrapper .cut{
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  z-index: 2;
+}
+.volumeWrapper .cut.tl{ top: -2px; left: -2px; border-width: 0 0 8px 8px; border-color: transparent transparent var(--cp-bg) var(--cp-bg); }
+.volumeWrapper .cut.tr{ top: -2px; right: -2px; border-width: 8px 8px 0 0; border-color: var(--cp-bg) var(--cp-bg) transparent transparent; }
+.volumeWrapper .cut.bl{ bottom: -2px; left: -2px; border-width: 8px 0 0 8px; border-color: var(--cp-bg) transparent transparent var(--cp-bg); }
+.volumeWrapper .cut.br{ bottom: -2px; right: -2px; border-width: 0 8px 8px 0; border-color: transparent var(--cp-bg) var(--cp-bg) transparent; }
 
 button{
   width:160px;
@@ -119,74 +147,18 @@ button{
   box-shadow: 0 0 8px var(--cp-cyan), inset 0 0 8px rgba(0,240,255,0.2);
   transition: all 0.15s ease;
   box-sizing: border-box;
+  position: relative;
   border: 2px solid var(--cp-cyan);
+  overflow: hidden;
 }
 
-button:hover{
-  background:var(--cp-cyan);
-  color:#000014;
-  box-shadow: 0 0 15px var(--cp-cyan), 0 0 30px var(--cp-magenta);
-  transform: translateY(-1px);
+button .cut{
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  z-index: 2;
 }
-
-button:active{
-  transform: translateY(1px);
-  box-shadow: 0 0 5px var(--cp-cyan);
-}
-
-#volume{
-  width:120px;
-  -webkit-appearance: none;
-  appearance: none;
-  height: 4px;
-  background: #0a0a1a;
-  border: 1px solid var(--cp-cyan);
-  outline: none;
-  margin: 0;
-}
-
-#volume::-webkit-slider-thumb{
-  -webkit-appearance: none;
-  appearance: none;
-  width: 16px;
-  height: 16px;
-  background: var(--cp-yellow);
-  cursor: pointer;
-  border: 2px solid var(--cp-cyan);
-  box-shadow: 0 0 8px var(--cp-yellow), 0 0 15px var(--cp-cyan);
-  border-radius: 2px;
-  margin-top: -7px;
-}
-
-#volume::-moz-range-thumb{
-  width: 16px;
-  height: 16px;
-  background: var(--cp-yellow);
-  cursor: pointer;
-  border: 2px solid var(--cp-cyan);
-  box-shadow: 0 0 8px var(--cp-yellow), 0 0 15px var(--cp-cyan);
-  border-radius: 2px;
-}
-
-#volume::-webkit-slider-runnable-track{
-  background: linear-gradient(90deg, var(--cp-magenta), var(--cp-cyan));
-  height: 4px;
-}
-
-#volume::-moz-range-track{
-  background: linear-gradient(90deg, var(--cp-magenta), var(--cp-cyan));
-  height: 4px;
-}
-
-#volume.center::-webkit-slider-thumb{
-  background: var(--cp-yellow);
-  box-shadow: 0 0 8px var(--cp-yellow), 0 0 15px var(--cp-cyan);
-}
-
-#volume.center::-moz-range-thumb{
-  background: var(--cp-yellow);
-  box-shadow: 0 0 8px var(--cp-yellow), 0 0 15px var(--cp-cyan);
-}
-
-#volume.changed::-webkit-slider-thumb{
-  background
+button .cut.tl{ top: -2px; left: -2px; border-width: 0 0 8px 8px; border-color: transparent transparent var(--cp-bg) var(--cp-bg); }
+button .cut.tr{ top: -2px; right: -2px; border-width: 8px 8px 0 0; border-color: var(--cp-bg) var(--cp-bg) transparent transparent; }
+button .cut.bl{ bottom: -2px; left: -2px; border-width: 8px 0 0 8px; border-color: var(--cp-bg
