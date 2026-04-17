@@ -94,9 +94,7 @@ opacity:0.8;
 white-space:pre-line;
 }
 
-button{
-display:none;
-}
+button{ display:none; }
 
 </style>
 </head>
@@ -158,19 +156,32 @@ localStorage.setItem("radio_favs", JSON.stringify(favs));
 }
 
 /* =========================
-   STREAMS (FIXED)
+   TWARDY MAP STREAMÓW (FIX)
 ========================= */
 const manualStreams = {
+
 "Radio Plus":"https://www.radio-polska.pl/radio-plus-legnica",
-"Polskie Radio":"https://www.radio-polska.pl/radio-poland"
+"RMF FM":"https://www.radio-polska.pl/rmf-fm",
+"Radio Zet":"https://www.radio-polska.pl/radio-zet",
+"Radio Wrocław":"https://www.radio-polska.pl/pr-radio-wroclaw-1023",
+"Tok FM":"https://www.radio-polska.pl/tok-fm",
+"Radio Kolor":"https://www.radio-polska.pl/radio-kolor-103-fm",
+"Radio Złote Przeboje":"https://www.radio-polska.pl/radio-zlote-przeboje",
+"Planeta FM":"https://www.radio-polska.pl/planeta-fm",
+"Radio Kampus":"https://www.radio-polska.pl/radio-kampus-971",
+"Radio Rodzina":"https://www.radio-polska.pl/katolickie-radio-rodzina",
+"Polskie Radio":"http://e.radio-polska.pl/embed/radio-poland-411263"
+
 };
 
 /* =========================
-   LOGO FIX (REAL WORKING)
+   LOGO FIX (PEWNE)
 ========================= */
 async function setLogo(name){
 try{
-const res = await fetch(`https://de1.api.radio-browser.info/json/stations/search?name=${encodeURIComponent(name)}&limit=1`);
+const res = await fetch(
+`https://de1.api.radio-browser.info/json/stations/search?name=${encodeURIComponent(name)}&limit=1`
+);
 const data = await res.json();
 
 if(data[0]?.favicon){
@@ -239,8 +250,6 @@ return;
 }
 
 audio.src = url;
-
-/* NORMALIZACJA GŁOŚNOŚCI */
 audio.volume = 0.8;
 
 audio.play()
@@ -272,7 +281,7 @@ el.classList.add("fav");
 saveFavs();
 }
 
-/* AUTO CACHE CLEAN (HIDDEN) */
+/* AUTO CACHE CLEAN */
 setInterval(()=>{
 cache = {};
 localStorage.removeItem("radio_cache");
@@ -297,7 +306,7 @@ saveCache();
 }
 }, 300000);
 
-/* CLEAR CACHE (DISABLED UI) */
+/* CLEAR CACHE */
 function clearCache(){
 cache = {};
 localStorage.removeItem("radio_cache");
