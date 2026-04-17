@@ -2,121 +2,113 @@
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Muzyczne Radio PRO</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
 <style>
-:root{
-  --bg:#0a0000;
-  --panel:rgba(30,5,5,.82);
-  --panel2:rgba(40,10,10,.92);
-  --red:#ff0033;
-  --red2:#ff4066;
-  --pink:#ff6699;
-  --white:#fafafa;
-  --text:#ffffff;
-  --muted:#cccccc;
-  --line:rgba(255,0,33,.35);
+body{
+margin:0;
+background:#000;
+color:#fff;
+font-family:'Orbitron',sans-serif;
+display:flex;
+flex-direction:column;
+align-items:center;
+height:100vh;
+transition:0.4s;
 }
-
-*{box-sizing:border-box}
-html,body{
-  margin:0;
-  width:100%;
-  height:100%;
-  overflow:hidden;
-  background:
-    radial-gradient(circle at 20% 20%, rgba(255,102,153,.10), transparent 28%),
-    radial-gradient(circle at 80% 30%, rgba(255,0,33,.12), transparent 26%),
-    radial-gradient(circle at 50% 80%, rgba(255,230,240,.08), transparent 30%),
-    linear-gradient(180deg,#080000 0%, #120303 40%, #060000 100%);
-  color:var(--text);
-  font-family:'Orbitron',sans-serif;
+body.day{
+background:#eaeaea;
+color:#000;
 }
-
-#app{
-  height:100%;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  padding:24px 18px 18px;
-}
-
-#shell{
-  width:min(1120px,100%);
-  height:100%;
-  display:flex;
-  flex-direction:column;
-  gap:16px;
-}
-
 #title{
-  position:relative;
-  font-size:clamp(34px,6vw,86px);
-  line-height:1;
-  text-align:center;
-  margin-top:8px;
-  color:var(--red);
-  letter-spacing:2px;
-  text-transform:uppercase;
-  text-shadow:
-    0 0 6px rgba(255,0,33,.95),
-    0 0 18px rgba(255,0,33,.65),
-    0 0 36px rgba(255,102,153,.35);
-  filter:drop-shadow(0 0 12px rgba(255,0,33,.18));
+font-size:88px;
+margin-top:50px;
+text-align:center;
+color:#ff2a2a;
+text-shadow:0 0 5px #ff2a2a,0 0 15px #ff0000,0 0 30px #ff0000,0 0 60px #ff0000;
 }
-
-#title::before,
-#title::after{
-  content:attr(data-text);
-  position:absolute;
-  inset:0;
-  pointer-events:none;
-  mix-blend-mode:screen;
-}
-
-#title::before{
-  transform:translate(2px,0);
-  color:var(--pink);
-  opacity:.72;
-  clip-path:inset(0 0 55% 0);
-}
-#title::after{
-  transform:translate(-2px,0);
-  color:var(--red);
-  opacity:.5;
-  clip-path:inset(45% 0 0 0);
-}
-
-#subline{
-  text-align:center;
-  font-size:12px;
-  color:var(--muted);
-  letter-spacing:3px;
-  text-transform:uppercase;
-  margin-top:-4px;
-}
-
 #proEqualizer{
-  width:100%;
-  border-radius:18px;
-  overflow:hidden;
-  background:
-    linear-gradient(180deg, rgba(255,0,33,.10), transparent 35%),
-    linear-gradient(180deg, rgba(255,102,153,.10), transparent 75%),
-    var(--panel);
-  border:1px solid var(--line);
-  box-shadow:
-    0 0 0 1px rgba(255,255,255,.04) inset,
-    0 0 18px rgba(255,0,33,.20),
-    0 0 48px rgba(255,102,153,.10);
-  position:relative;
+display:block;
+margin:0 auto;
+margin-top:30px;
+margin-bottom:30px;
+border-radius:8px;
+overflow:hidden;
 }
-
-#proEqualizer::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  background:
-    linear-gradient(transparent 0%, rgba(255,255,255,.04) 50%, transparent 100%);
-  poi
+canvas{
+display:block;
+height:260px;
+border-radius:8px;
+}
+#controls{
+display:flex;
+gap:8px;
+margin-top:20px;
+margin-bottom:20px;
+align-items:center;
+justify-content:space-between;
+}
+.volumeWrapper{
+width:160px;
+height:45px;
+display:flex;
+align-items:center;
+justify-content:center;
+background:#111;
+border:2px solid #ff2a2a;
+box-shadow:0 0 10px #ff2a2a;
+}
+body.day .volumeWrapper{
+background:#d6d6d6;
+box-shadow:0 0 40px #ff2a2a,0 0 80px #ff0000;
+}
+button{
+width:160px;
+height:45px;
+background:#111;
+color:white;
+cursor:pointer;
+font-family:'Orbitron';
+transition:0.2s;
+border:2px solid #ff2a2a;
+box-shadow:0 0 10px #ff2a2a;
+}
+body.day button{
+background:#d6d6d6;
+color:#000;
+box-shadow:0 0 40px #ff2a2a,0 0 80px #ff0000;
+}
+#volume{
+width:120px;
+height:10px;
+appearance:none;
+border-radius:10px;
+outline:none;
+background:#000;
+border:1px solid #ff2a2a;
+box-shadow:0 0 6px #ff2a2a;
+}
+#volume.active{
+box-shadow:0 0 10px #ff0000;
+border:1px solid #ff0000;
+}
+#volume::-webkit-slider-thumb{
+-webkit-appearance:none;
+width:16px;
+height:16px;
+border-radius:4px;
+background:#ff0000;
+box-shadow:0 0 10px red,0 0 20px red;
+cursor:pointer;
+}
+#volume::-moz-range-thumb{
+width:16px;
+height:16px;
+border:none;
+border-radius:4px;
+background:#ff0000;
+box-shadow:0 0 10px red,0 0 20px red;
+cursor:pointer;
+}
+.playActive{ color:#00ff00; text-shadow:0 0 10px #00ff00; }
+.stopActive{ c
