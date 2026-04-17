@@ -231,4 +231,56 @@ button:active{
 
 #volume.changed::-webkit-slider-thumb{
   background: var(--cp-red);
-  box-shadow: 0 0 8px var(--cp-red), 0 0 15px var(--cp-magenta
+  box-shadow: 0 0 8px var(--cp-red), 0 0 15px var(--cp-magenta);
+}
+
+#volume.changed::-moz-range-thumb{
+  background: var(--cp-red);
+  box-shadow: 0 0 8px var(--cp-red), 0 0 15px var(--cp-magenta);
+}
+
+.playActive{
+  color:#000014!important;
+  background: var(--cp-cyan)!important;
+  box-shadow: 0 0 20px var(--cp-cyan), 0 0 40px var(--cp-cyan)!important;
+}
+.stopActive{
+  color:#000014!important;
+  background: var(--cp-magenta)!important;
+  box-shadow: 0 0 20px var(--cp-magenta), 0 0 40px var(--cp-magenta)!important;
+}
+.stopActive::before{
+  border-color: var(--cp-magenta)!important;
+}
+.muteActive{
+  color:#000014!important;
+  background: var(--cp-yellow)!important;
+  box-shadow: 0 0 20px var(--cp-yellow), 0 0 40px var(--cp-yellow)!important;
+}
+.muteActive::before{
+  border-color: var(--cp-yellow)!important;
+}
+
+#bottomLink{
+  margin-top:10px;
+}
+
+#bottomLink a{
+  color:var(--cp-cyan);
+  text-decoration:none;
+  font-family:'Orbitron', sans-serif;
+  text-shadow: 0 0 5px var(--cp-cyan);
+  transition: 0.2s;
+}
+
+#bottomLink a:hover{
+  color:var(--cp-yellow);
+  text-shadow: 0 0 10px var(--cp-yellow), 0 0 20px var(--cp-magenta);
+}
+</style>
+</head>
+
+<body>
+
+<div id="title">Muzyczne Radio</div>
+<div id="proEqualizer"><canvas id="eqCanvas"></canvas></div
