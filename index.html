@@ -7,17 +7,16 @@
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#05060a;
-  --panel:rgba(10,12,20,.82);
-  --panel2:rgba(20,24,36,.92);
-  --cyan:#00e5ff;
-  --cyan2:#00a3ff;
-  --pink:#ff2bd6;
-  --red:#ff3b3b;
-  --yellow:#ffe600;
-  --text:#f4f8ff;
-  --muted:#94a3b8;
-  --line:rgba(0,229,255,.35);
+  --bg:#0a0000;
+  --panel:rgba(30,5,5,.82);
+  --panel2:rgba(40,10,10,.92);
+  --red:#ff0033;
+  --red2:#ff4066;
+  --pink:#ff6699;
+  --white:#fafafa;
+  --text:#ffffff;
+  --muted:#cccccc;
+  --line:rgba(255,0,33,.35);
 }
 
 *{box-sizing:border-box}
@@ -27,20 +26,12 @@ html,body{
   height:100%;
   overflow:hidden;
   background:
-    radial-gradient(circle at 20% 20%, rgba(255,43,214,.10), transparent 28%),
-    radial-gradient(circle at 80% 30%, rgba(0,229,255,.12), transparent 26%),
-    radial-gradient(circle at 50% 80%, rgba(255,230,0,.08), transparent 30%),
-    linear-gradient(180deg,#03040a 0%, #080b12 40%, #02030a 100%);
+    radial-gradient(circle at 20% 20%, rgba(255,102,153,.10), transparent 28%),
+    radial-gradient(circle at 80% 30%, rgba(255,0,33,.12), transparent 26%),
+    radial-gradient(circle at 50% 80%, rgba(255,230,240,.08), transparent 30%),
+    linear-gradient(180deg,#080000 0%, #120303 40%, #060000 100%);
   color:var(--text);
   font-family:'Orbitron',sans-serif;
-}
-
-body.day{
-  background:
-    radial-gradient(circle at 20% 20%, rgba(255,43,214,.15), transparent 28%),
-    radial-gradient(circle at 80% 30%, rgba(0,229,255,.16), transparent 26%),
-    linear-gradient(180deg,#d8e1f2 0%, #eff4fb 50%, #d7dfef 100%);
-  color:#08111f;
 }
 
 #app{
@@ -65,14 +56,14 @@ body.day{
   line-height:1;
   text-align:center;
   margin-top:8px;
-  color:var(--cyan);
+  color:var(--red);
   letter-spacing:2px;
   text-transform:uppercase;
   text-shadow:
-    0 0 6px rgba(0,229,255,.95),
-    0 0 18px rgba(0,229,255,.65),
-    0 0 36px rgba(255,43,214,.35);
-  filter:drop-shadow(0 0 12px rgba(0,229,255,.18));
+    0 0 6px rgba(255,0,33,.95),
+    0 0 18px rgba(255,0,33,.65),
+    0 0 36px rgba(255,102,153,.35);
+  filter:drop-shadow(0 0 12px rgba(255,0,33,.18));
 }
 
 #title::before,
@@ -92,7 +83,7 @@ body.day{
 }
 #title::after{
   transform:translate(-2px,0);
-  color:var(--cyan);
+  color:var(--red);
   opacity:.5;
   clip-path:inset(45% 0 0 0);
 }
@@ -111,14 +102,14 @@ body.day{
   border-radius:18px;
   overflow:hidden;
   background:
-    linear-gradient(180deg, rgba(0,229,255,.10), transparent 35%),
-    linear-gradient(180deg, rgba(255,43,214,.10), transparent 75%),
+    linear-gradient(180deg, rgba(255,0,33,.10), transparent 35%),
+    linear-gradient(180deg, rgba(255,102,153,.10), transparent 75%),
     var(--panel);
   border:1px solid var(--line);
   box-shadow:
     0 0 0 1px rgba(255,255,255,.04) inset,
-    0 0 18px rgba(0,229,255,.20),
-    0 0 48px rgba(255,43,214,.10);
+    0 0 18px rgba(255,0,33,.20),
+    0 0 48px rgba(255,102,153,.10);
   position:relative;
 }
 
@@ -146,11 +137,11 @@ canvas{
   flex-wrap:wrap;
   padding:14px;
   border-radius:18px;
-  background:linear-gradient(180deg, rgba(12,16,28,.95), rgba(8,10,18,.92));
+  background:linear-gradient(180deg, rgba(40,10,10,.95), rgba(20,5,5,.92));
   border:1px solid var(--line);
   box-shadow:
     0 0 0 1px rgba(255,255,255,.03) inset,
-    0 0 18px rgba(0,229,255,.10);
+    0 0 18px rgba(255,0,33,.10);
 }
 
 button{
@@ -165,37 +156,37 @@ button{
   letter-spacing:1px;
   color:var(--text);
   background:
-    linear-gradient(180deg, rgba(0,229,255,.12), rgba(255,43,214,.10)),
-    linear-gradient(180deg, #101521, #0a0f18);
-  border:1px solid rgba(0,229,255,.35);
+    linear-gradient(180deg, rgba(255,0,33,.12), rgba(255,102,153,.10)),
+    linear-gradient(180deg, #1a0505, #120303);
+  border:1px solid rgba(255,0,33,.35);
   box-shadow:
     0 0 0 1px rgba(255,255,255,.05) inset,
-    0 0 14px rgba(0,229,255,.16);
+    0 0 14px rgba(255,0,33,.16);
   transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease, filter .15s ease;
 }
 button:hover{
   transform:translateY(-1px);
-  border-color:rgba(255,43,214,.65);
+  border-color:rgba(255,102,153,.65);
   box-shadow:
     0 0 0 1px rgba(255,255,255,.05) inset,
-    0 0 18px rgba(255,43,214,.24),
-    0 0 22px rgba(0,229,255,.10);
+    0 0 18px rgba(255,102,153,.24),
+    0 0 22px rgba(255,0,33,.10);
 }
 button:active{
   transform:translateY(1px) scale(.99);
 }
 
 #playBtn.playActive{
-  color:#0cff8d;
-  text-shadow:0 0 10px rgba(12,255,141,.9);
+  color:#ff8080;
+  text-shadow:0 0 10px rgba(255,128,128,.9);
 }
 #stopBtn.stopActive{
   color:#ff5b5b;
   text-shadow:0 0 10px rgba(255,91,91,.9);
 }
 #muteBtn.muteActive{
-  color:#ffd000;
-  text-shadow:0 0 10px rgba(255,208,0,.95);
+  color:#ffd0d0;
+  text-shadow:0 0 10px rgba(255,208,208,.95);
   animation:pulseMute .8s infinite alternate;
 }
 
@@ -213,9 +204,9 @@ button:active{
   gap:12px;
   padding:0 14px;
   border-radius:12px;
-  background:linear-gradient(180deg, rgba(0,0,0,.55), rgba(18,22,33,.92));
-  border:1px solid rgba(255,43,214,.35);
-  box-shadow:0 0 18px rgba(255,43,214,.12);
+  background:linear-gradient(180deg, rgba(0,0,0,.55), rgba(40,10,10,.92));
+  border:1px solid rgba(255,102,153,.35);
+  box-shadow:0 0 18px rgba(255,102,153,.12);
 }
 
 #volume{
@@ -225,22 +216,22 @@ button:active{
   border-radius:999px;
   outline:none;
   background:
-    linear-gradient(90deg, var(--cyan) 0%, var(--cyan) var(--v,50%), rgba(255,255,255,.08) var(--v,50%), rgba(255,255,255,.08) 100%);
-  border:1px solid rgba(0,229,255,.45);
-  box-shadow:0 0 8px rgba(0,229,255,.18);
+    linear-gradient(90deg, var(--red) 0%, var(--red) var(--v,50%), rgba(255,255,255,.08) var(--v,50%), rgba(255,255,255,.08) 100%);
+  border:1px solid rgba(255,0,33,.45);
+  box-shadow:0 0 8px rgba(255,0,33,.18);
 }
 #volume.active{
-  border-color:rgba(255,43,214,.75);
-  box-shadow:0 0 10px rgba(255,43,214,.22);
+  border-color:rgba(255,102,153,.75);
+  box-shadow:0 0 10px rgba(255,102,153,.22);
 }
 #volume::-webkit-slider-thumb{
   -webkit-appearance:none;
   width:18px;
   height:18px;
   border-radius:4px;
-  background:linear-gradient(180deg, #fff, #a8fbff);
-  border:2px solid var(--cyan);
-  box-shadow:0 0 12px rgba(0,229,255,.95), 0 0 22px rgba(255,43,214,.45);
+  background:linear-gradient(180deg, #fff, #ffd0d0);
+  border:2px solid var(--red);
+  box-shadow:0 0 12px rgba(255,0,33,.95), 0 0 22px rgba(255,102,153,.45);
   cursor:pointer;
 }
 #volume::-moz-range-thumb{
@@ -248,32 +239,9 @@ button:active{
   height:18px;
   border:none;
   border-radius:4px;
-  background:linear-gradient(180deg, #fff, #a8fbff);
-  box-shadow:0 0 12px rgba(0,229,255,.95), 0 0 22px rgba(255,43,214,.45);
+  background:linear-gradient(180deg, #fff, #ffd0d0);
+  box-shadow:0 0 12px rgba(255,0,33,.95), 0 0 22px rgba(255,102,153,.45);
   cursor:pointer;
-}
-
-#modeBtn{
-  width:64px;
-  min-width:64px;
-  padding:0;
-  font-size:20px;
-  color:var(--yellow);
-  background:
-    linear-gradient(180deg, rgba(255,230,0,.15), rgba(0,229,255,.08)),
-    linear-gradient(180deg, #101521, #0a0f18);
-  border:1px solid rgba(255,230,0,.35);
-  text-shadow:0 0 8px rgba(255,230,0,.95), 0 0 16px rgba(255,230,0,.6);
-}
-
-body.day #modeBtn{
-  background:
-    linear-gradient(180deg, rgba(0,153,255,.15), rgba(255,255,255,.25)),
-    linear-gradient(180deg, #dbe8f7, #bcc9db);
-  color:#13324d;
-  box-shadow:0 0 16px rgba(0,153,255,.18);
-  border-color:rgba(0,153,255,.45);
-  text-shadow:none;
 }
 
 #bottomLink{
@@ -282,11 +250,11 @@ body.day #modeBtn{
 }
 
 #bottomLink a{
-  color:var(--cyan);
+  color:var(--red);
   text-decoration:none;
   font-size:16px;
   letter-spacing:1px;
-  text-shadow:0 0 10px rgba(0,229,255,.55);
+  text-shadow:0 0 10px rgba(255,0,33,.55);
 }
 
 #status{
@@ -310,8 +278,8 @@ body.day #modeBtn{
   inset:0;
   pointer-events:none;
   background-image:
-    linear-gradient(rgba(0,229,255,.08) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0,229,255,.08) 1px, transparent 1px);
+    linear-gradient(rgba(255,0,33,.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,0,33,.08) 1px, transparent 1px);
   background-size: 42px 42px;
   mask-image:linear-gradient(180deg, rgba(0,0,0,.55), transparent 85%);
   opacity:.22;
@@ -348,7 +316,6 @@ body.day #modeBtn{
         <span>VOL</span>
         <input id="volume" type="range" min="0" max="1" step="0.01" value="0.5">
       </div>
-      <button id="modeBtn" onclick="toggleMode()">🌙</button>
     </div>
 
     <div id="status">Gotowy do nadawania</div>
@@ -368,7 +335,6 @@ const volume = document.getElementById("volume");
 const playBtn = document.getElementById("playBtn");
 const stopBtn = document.getElementById("stopBtn");
 const muteBtn = document.getElementById("muteBtn");
-const modeBtn = document.getElementById("modeBtn");
 const title = document.getElementById("title");
 const shell = document.getElementById("shell");
 const canvas = document.getElementById("eqCanvas");
@@ -428,10 +394,7 @@ function muteRadio(){
   statusEl.textContent = audio.muted ? "Wyciszono" : "Dźwięk włączony";
 }
 
-function toggleMode(){
-  document.body.classList.toggle("day");
-  modeBtn.innerText = document.body.classList.contains("day") ? "☀️" : "🌙";
-}
+// USUNIĘTO FUNKCJĘ toggleMode() oraz bindings dla trybu dzień/noc
 
 volume.addEventListener("input", () => {
   const val = parseFloat(volume.value);
@@ -478,35 +441,4 @@ function drawEQ(){
     const value = dataArray[index] || 0;
     const percent = value / 255;
     const h = Math.min(maxHeight, height * percent);
-    const x = i * barWidth;
-    const y = height - h + yOffset;
-
-    const gradient = ctx.createLinearGradient(0, height, 0, 0);
-    gradient.addColorStop(0, "#00e5ff");
-    gradient.addColorStop(0.45, "#ff2bd6");
-    gradient.addColorStop(1, "#ffffff");
-
-    ctx.fillStyle = gradient;
-    ctx.shadowBlur = 10;
-    ctx.shadowColor = "rgba(0,229,255,.9)";
-    ctx.fillRect(x, y, barWidth - 1, h);
-    ctx.shadowBlur = 0;
-
-    if(h > peaks[i]) peaks[i] = h;
-    else peaks[i] -= 1.8;
-    if(peaks[i] < 0) peaks[i] = 0;
-
-    const peakY = height - peaks[i] + yOffset;
-    ctx.fillStyle = "#ffe600";
-    ctx.fillRect(x, peakY, barWidth - 1, 3);
-  }
-
-  ctx.fillStyle = "rgba(255,255,255,.05)";
-  for(let i = 0; i < 8; i++){
-    const y = (height / 8) * i;
-    ctx.fillRect(0, y, width, 1);
-  }
-}
-</script>
-</body>
-</html>
+    const x
