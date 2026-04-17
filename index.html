@@ -156,25 +156,26 @@ localStorage.setItem("radio_favs", JSON.stringify(favs));
 }
 
 /* =========================
-   REAL AUDIO STREAMS (FIX)
+   🔥 TYLKO PEWNE POLSKIE LINKI
 ========================= */
 const manualStreams = {
-"Radio Plus":"http://stream.rcs.revma.com/ypqt40u0x1zuv", 
-"Muzyczne Radio":"http://stream.muzyczneradio.pl:8000/stream"
+"Radio Plus":"https://www.radio-polska.pl/radio-plus-legnica",
+"RMF FM":"https://www.radio-polska.pl/rmf-fm",
+"Radio Zet":"https://www.radio-polska.pl/radio-zet",
+"Radio Wrocław":"https://www.radio-polska.pl/pr-radio-wroclaw-1023",
+"Tok FM":"https://www.radio-polska.pl/tok-fm",
+"Radio Kolor":"https://www.radio-polska.pl/radio-kolor-103-fm",
+"Radio Złote Przeboje":"https://www.radio-polska.pl/radio-zlote-przeboje",
+"Planeta FM":"https://www.radio-polska.pl/planeta-fm",
+"Radio Kampus":"https://www.radio-polska.pl/radio-kampus-971",
+"Radio Rodzina":"https://www.radio-polska.pl/katolickie-radio-rodzina",
+"Polskie Radio":"http://e.radio-polska.pl/embed/radio-poland-411263",
+"Muzyczne Radio":"https://www.muzyczneradio.pl/index.php/player/lo.html?type=lo"
 };
 
-/* blokada HTML linków */
-function isValidStream(url){
-return url && (
-url.includes(".mp3") ||
-url.includes("icecast") ||
-url.includes("shoutcast") ||
-url.includes(":8000") ||
-url.includes("/stream")
-);
-}
-
-/* LOGO */
+/* =========================
+   LOGO (stabilne + fallback)
+========================= */
 async function setLogo(name){
 try{
 const res = await fetch(
@@ -187,20 +188,25 @@ logo.src = data[0].favicon;
 return;
 }
 }catch(e){}
+
 logo.src = "";
 }
 
-/* STREAM RESOLVER */
+/* =========================
+   STREAM RESOLVER (FIX: NIE NADPISUJE MANUALI)
+========================= */
 async function resolveStream(name){
 
-if(cache[name]){
-return cache[name];
-}
-
+/* 🔥 HARD LOCK – Twoje linki ZAWSZE pierwsze */
 if(manualStreams[name]){
 cache[name] = manualStreams[name];
 saveCache();
 return manualStreams[name];
+}
+
+/* cache fallback */
+if(cache[name]){
+return cache[name];
 }
 
 try{
@@ -211,7 +217,7 @@ const data = await res.json();
 
 const best = data.find(s =>
 s.url_resolved &&
-isValidStream(s.url_resolved)
+s.url_resolved.startsWith("http")
 );
 
 if(best){
@@ -225,7 +231,9 @@ return best.url_resolved;
 return null;
 }
 
-/* LOAD */
+/* =========================
+   LOAD
+========================= */
 async function load(i){
 
 current = i;
@@ -235,7 +243,7 @@ setLogo(name);
 
 status.innerText = "ŁADOWANIE: " + name;
 
-const url = cache[name] || await resolveStream(name);
+const url = await resolveStream(name);
 
 if(!url){
 status.innerText = "❌ BRAK STREAMU: " + name;
@@ -243,7 +251,7 @@ return;
 }
 
 audio.src = url;
-audio.volume = 0.8;
+audio.volume = 0.85; /* lekkie wyrównanie głośności */
 
 audio.play()
 .then(()=>{
@@ -298,6 +306,12 @@ saveCache();
 }
 }
 }, 300000);
+
+/* CLEAR CACHE */
+function clearCache(){
+cache = {};
+localStorage.removeItem("radio_cache");
+}
 
 /* UI */
 stations.forEach((s,i)=>{
