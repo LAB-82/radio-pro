@@ -130,7 +130,8 @@ const stations = [
 "Radio Złote Przeboje",
 "Planeta FM",
 "Radio Kampus",
-"Radio Rodzina"
+"Radio Rodzina",
+"Twoje Radio"
 ];
 
 const audio = document.getElementById("audio");
@@ -239,7 +240,7 @@ setInterval(()=>{
 cache = {};
 localStorage.removeItem("radio_cache");
 console.log("🧹 auto cache cleaned");
-}, 600000); // 10 min
+}, 600000);
 
 /* =========================
    SELF HEALING BACKGROUND CHECK
@@ -260,7 +261,7 @@ saveCache();
 }catch(e){}
 }
 }
-}, 300000); // 5 min
+}, 300000);
 
 /* =========================
    CLEAR CACHE
