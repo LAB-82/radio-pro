@@ -19,7 +19,7 @@
         min-height: 100vh;
     }
 
-   .player {
+  .player {
         max-width: 480px;
         margin: 0 auto;
         background: #1a1a1a;
@@ -28,14 +28,14 @@
         box-shadow: 0 8px 32px rgba(0,0,0,0.5);
     }
 
-   .header {
+  .header {
         padding: 24px;
         text-align: center;
         background: #242424;
         border-bottom: 1px solid #333;
     }
 
-   .clock {
+  .clock {
         font-size: 48px;
         font-weight: 300;
         letter-spacing: 2px;
@@ -43,17 +43,17 @@
         font-variant-numeric: tabular-nums;
     }
 
-   .now-playing {
+  .now-playing {
         font-size: 14px;
         color: #888;
         min-height: 20px;
     }
 
-   .now-playing.active {
+  .now-playing.active {
         color: #1db954;
     }
 
-   .controls {
+  .controls {
         padding: 24px;
         display: flex;
         justify-content: center;
@@ -62,7 +62,7 @@
         background: #1a1a1a;
     }
 
-   .play-btn {
+  .play-btn {
         width: 64px;
         height: 64px;
         border-radius: 50%;
@@ -77,21 +77,21 @@
         transition: transform 0.1s, background 0.2s;
     }
 
-   .play-btn:hover {
+  .play-btn:hover {
         transform: scale(1.05);
         background: #1ed760;
     }
 
-   .play-btn:active {
+  .play-btn:active {
         transform: scale(0.95);
     }
 
-   .stations {
+  .stations {
         max-height: 60vh;
         overflow-y: auto;
     }
 
-   .station {
+  .station {
         padding: 18px 24px;
         border-bottom: 1px solid #2a2a2a;
         cursor: pointer;
@@ -101,31 +101,31 @@
         align-items: center;
     }
 
-   .station:hover {
+  .station:hover {
         background: #242424;
     }
 
-   .station.active {
+  .station.active {
         background: #282828;
         border-left: 3px solid #1db954;
         padding-left: 21px;
     }
 
-   .station.disabled {
+  .station.disabled {
         opacity: 0.4;
         cursor: not-allowed;
     }
 
-   .station-name {
+  .station-name {
         font-size: 16px;
         font-weight: 500;
     }
 
-   .station.active .station-name {
+  .station.active.station-name {
         color: #1db954;
     }
 
-   .playing-indicator {
+  .playing-indicator {
         display: none;
         width: 4px;
         height: 16px;
@@ -133,58 +133,9 @@
         animation: pulse 1s infinite;
     }
 
-   .station.active .playing-indicator {
+  .station.active.playing-indicator {
         display: block;
     }
 
     @keyframes pulse {
-        0%, 100% { opacity: 1; }
-        50% { opacity: 0.3; }
-    }
-
-   .stations::-webkit-scrollbar {
-        width: 8px;
-    }
-
-   .stations::-webkit-scrollbar-track {
-        background: #1a1a1a;
-    }
-
-   .stations::-webkit-scrollbar-thumb {
-        background: #333;
-        border-radius: 4px;
-    }
-
-   .section-title {
-        padding: 12px 24px;
-        font-size: 12px;
-        font-weight: 600;
-        color: #666;
-        background: #151515;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-    }
-</style>
-</head>
-<body>
-
-<div class="player">
-    <div class="header">
-        <div class="clock" id="clock">00:00:00</div>
-        <div class="now-playing" id="nowPlaying">Wybierz stację</div>
-    </div>
-
-    <div class="controls">
-        <button class="play-btn" id="playBtn">▶</button>
-    </div>
-
-    <div class="stations" id="stations"></div>
-</div>
-
-<audio id="audioPlayer"></audio>
-
-<script>
-    // Tylko 100% działające oficjalne streamy. null = brak publicznego streamu
-    const stations = [
-        { section: "GŁÓWNE" },
-        {
+        0%, 100% {
