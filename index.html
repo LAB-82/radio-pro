@@ -111,12 +111,17 @@
         padding-left: 21px;
     }
 
+   .station.disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+    }
+
    .station-name {
         font-size: 16px;
         font-weight: 500;
     }
 
-   .station.active.station-name {
+   .station.active .station-name {
         color: #1db954;
     }
 
@@ -128,7 +133,7 @@
         animation: pulse 1s infinite;
     }
 
-   .station.active.playing-indicator {
+   .station.active .playing-indicator {
         display: block;
     }
 
@@ -148,6 +153,16 @@
    .stations::-webkit-scrollbar-thumb {
         background: #333;
         border-radius: 4px;
+    }
+
+   .section-title {
+        padding: 12px 24px;
+        font-size: 12px;
+        font-weight: 600;
+        color: #666;
+        background: #151515;
+        text-transform: uppercase;
+        letter-spacing: 1px;
     }
 </style>
 </head>
@@ -169,99 +184,7 @@
 <audio id="audioPlayer"></audio>
 
 <script>
-    // Tylko 100% działające oficjalne streamy
+    // Tylko 100% działające oficjalne streamy. null = brak publicznego streamu
     const stations = [
-        { name: "Polskie Radio Jedynka", url: "https://stream.rcs.revma.com/ypqt40u0x1zuv" },
-        { name: "Polskie Radio Dwójka", url: "https://stream.rcs.revma.com/9w0y5a1wz1zuv" },
-        { name: "Polskie Radio Trójka", url: "https://stream.rcs.revma.com/ejz9zxtc1tzuv" },
-        { name: "Polskie Radio Czwórka", url: "https://stream.rcs.revma.com/dq5qg5yw5tzuv" },
-        { name: "RMF FM", url: "https://rs101-krk.rmfstream.pl/rmf_fm" },
-        { name: "Radio ZET", url: "https://zt.cdn.eurozet.pl/zet-tun.mp3" },
-        { name: "Radio ESKA", url: "https://ic1.smcdn.pl/2330-1.mp3" },
-        { name: "TOK FM", url: "https://pl.cdn.eurozet.pl/tok.mp3" },
-        { name: "Antyradio", url: "https://an.cdn.eurozet.pl/ant-waw.mp3" },
-        { name: "Radio Maryja", url: "https://radiomaryja.fastcast4u.com/proxy/radiomaryja?mp=/1" }
-    ];
-
-    const audio = document.getElementById('audioPlayer');
-    const playBtn = document.getElementById('playBtn');
-    const stationsEl = document.getElementById('stations');
-    const nowPlayingEl = document.getElementById('nowPlaying');
-    const clockEl = document.getElementById('clock');
-
-    let currentStation = null;
-    let isPlaying = false;
-
-    // Zegarek
-    function updateClock() {
-        const now = new Date();
-        const time = now.toLocaleTimeString('pl-PL', { hour12: false });
-        clockEl.textContent = time;
-    }
-    setInterval(updateClock, 1000);
-    updateClock();
-
-    // Render stacji
-    stations.forEach((station, index) => {
-        const div = document.createElement('div');
-        div.className = 'station';
-        div.innerHTML = `
-            <span class="station-name">${station.name}</span>
-            <div class="playing-indicator"></div>
-        `;
-        div.onclick = () => selectStation(index);
-        stationsEl.appendChild(div);
-    });
-
-    function selectStation(index) {
-        document.querySelectorAll('.station').forEach(s => s.classList.remove('active'));
-        document.querySelectorAll('.station')[index].classList.add('active');
-
-        currentStation = stations[index];
-        audio.src = currentStation.url;
-        nowPlayingEl.textContent = currentStation.name;
-        nowPlayingEl.classList.add('active');
-
-        play();
-    }
-
-    function play() {
-        if (!currentStation) {
-            selectStation(0);
-            return;
-        }
-        audio.play().then(() => {
-            isPlaying = true;
-            playBtn.textContent = '❚❚';
-        }).catch(e => {
-            console.error('Błąd odtwarzania:', e);
-            nowPlayingEl.textContent = 'Błąd streamu';
-        });
-    }
-
-    function pause() {
-        audio.pause();
-        isPlaying = false;
-        playBtn.textContent = '▶';
-    }
-
-    playBtn.onclick = () => {
-        if (isPlaying) {
-            pause();
-        } else {
-            play();
-        }
-    };
-
-    audio.onended = () => pause();
-    audio.onerror = () => {
-        nowPlayingEl.textContent = 'Stacja niedostępna';
-        pause();
-    };
-
-    // Start z pierwszą stacją
-    selectStation(0);
-</script>
-
-</body>
-</html>
+        { section: "GŁÓWNE" },
+        {
