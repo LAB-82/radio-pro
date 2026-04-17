@@ -3,59 +3,75 @@
 <head>
 <meta charset="UTF-8">
 <title>Muzyczne Radio PRO</title>
+
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700;800&family=OCR-A&display=swap" rel="stylesheet">
+
 <style>
 body{
   margin:0;
   background:#000;
   color:#fff;
-  font-family:'Rajdhani', 'OCR-A', monospace;
-  font-weight: 500;
-  letter-spacing: 1px;
+  font-family:'Rajdhani','OCR-A',monospace;
   display:flex;
   flex-direction:column;
   align-items:center;
-  justify-content: flex-start;
   height:100vh;
-  overflow: hidden;
-  transition:0.4s;
+  overflow:hidden;
 }
 
-/* (CAŁY CSS BEZ ZMIAN) */
-
+/* CYBERPUNK TITLE */
 #title{
-  font-weight: 800;
   font-size:88px;
   margin-top:50px;
-  text-align:center;
   color:#ff2a2a;
-  text-shadow:0 0 5px #ff2a2a,0 0 15px #ff0000,0 0 30px #ff0000,0 0 60px #ff0000;
+  text-transform:uppercase;
+  position:relative;
+  animation: glitch 2s infinite;
 }
 
+#title::before,
+#title::after{
+  content:attr(data-text);
+  position:absolute;
+  left:0;
+}
+
+#title::before{
+  color:#00ffff;
+  z-index:-1;
+  transform:translate(2px,0);
+}
+
+#title::after{
+  color:#ff00ff;
+  z-index:-2;
+  transform:translate(-2px,0);
+}
+
+@keyframes glitch{
+  0%{transform:skew(0deg);}
+  20%{transform:skew(2deg);}
+  40%{transform:skew(-2deg);}
+  60%{transform:skew(1deg);}
+  80%{transform:skew(-1deg);}
+  100%{transform:skew(0deg);}
+}
+
+/* CANVAS */
 #proEqualizer{
-  margin-top:30px;
-  margin-bottom:30px;
+  margin:30px 0;
+  border:2px solid #ff2a2a;
+  box-shadow:0 0 20px red;
 }
 
 canvas{
   height:260px;
 }
 
+/* CONTROLS */
 #controls{
   display:flex;
   gap:8px;
-  margin-top:20px;
-  margin-bottom:20px;
-}
-
-.volumeWrapper{
-  width:160px;
-  height:45px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:#111;
-  border:2px solid #ff2a2a;
 }
 
 button{
@@ -63,7 +79,32 @@ button{
   height:45px;
   background:#111;
   color:#fff;
+  border:2px solid #ff2a2a;
   cursor:pointer;
+  position:relative;
+  overflow:hidden;
+}
+
+/* GLITCH BUTTON */
+button::before{
+  content:"";
+  position:absolute;
+  width:100%;
+  height:100%;
+  background:linear-gradient(90deg,transparent,#fff,transparent);
+  left:-100%;
+}
+
+button:hover::before{
+  left:100%;
+  transition:0.5s;
+}
+
+.volumeWrapper{
+  width:160px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
   border:2px solid #ff2a2a;
 }
 
@@ -71,198 +112,164 @@ button{
   width:120px;
 }
 
-.playActive{ color:#00ff00; }
-.stopActive{ color:#ff4444; }
-.muteActive{ color:#ffaa00; }
-
-#bottomLink{
-  margin-top:10px;
-}
+.playActive{color:#00ff00;}
+.stopActive{color:#ff4444;}
+.muteActive{color:#ffaa00;}
 
 #bottomLink a{
   color:#ff2a2a;
-  text-decoration:none;
+}
+
+/* scanlines */
+body::after{
+  content:"";
+  position:fixed;
+  width:100%;
+  height:100%;
+  background:repeating-linear-gradient(
+    to bottom,
+    transparent,
+    transparent 2px,
+    rgba(255,255,255,0.03) 3px
+  );
+  pointer-events:none;
 }
 </style>
 </head>
 
 <body>
 
-<div id="title">Muzyczne Radio</div>
+<div id="title" data-text="Muzyczne Radio">Muzyczne Radio</div>
+
 <canvas id="proEqualizer"></canvas>
 
 <div id="controls">
-  <button id="playBtn" onclick="playRadio()">PLAY</button>
-  <button id="stopBtn" onclick="stopRadio()">STOP</button>
-  <button id="muteBtn" onclick="muteRadio()">MUTE</button>
+<button id="playBtn" onclick="playRadio()">PLAY</button>
+<button id="stopBtn" onclick="stopRadio()">STOP</button>
+<button id="muteBtn" onclick="muteRadio()">MUTE</button>
 
-  <div class="volumeWrapper">
-    <input id="volume" type="range" min="0" max="1" step="0.01" value="0.5">
-  </div>
+<div class="volumeWrapper">
+<input id="volume" type="range" min="0" max="1" step="0.01" value="0.5">
+</div>
 </div>
 
 <div id="bottomLink">
-  <a href="https://www.muzyczneradio.pl" target="_blank">www.muzyczneradio.pl</a>
+<a href="https://www.muzyczneradio.pl" target="_blank">www.muzyczneradio.pl</a>
 </div>
 
 <audio id="audio" crossorigin="anonymous"></audio>
 
 <script>
-const STREAM_URL = "https://stream.rcs.revma.com/gzwc1xcq042vv";
+const STREAM_URL="https://stream.rcs.revma.com/gzwc1xcq042vv";
 
-const audio = document.getElementById("audio");
-const volume = document.getElementById("volume");
-const playBtn = document.getElementById("playBtn");
-const stopBtn = document.getElementById("stopBtn");
-const muteBtn = document.getElementById("muteBtn");
-const canvas = document.getElementById("proEqualizer");
-const ctx = canvas.getContext("2d");
+const audio=document.getElementById("audio");
+const volume=document.getElementById("volume");
 
-audio.volume = parseFloat(volume.value);
+const playBtn=document.getElementById("playBtn");
+const stopBtn=document.getElementById("stopBtn");
+const muteBtn=document.getElementById("muteBtn");
+
+const canvas=document.getElementById("proEqualizer");
+const ctx=canvas.getContext("2d");
+
+audio.volume=parseFloat(volume.value);
 
 let audioCtx, analyser, source, dataArray;
-let peaks = [];
-let animationStarted = false;
+let peaks=[];
+let animationStarted=false;
 
-function setupAudio() {
-  if (audioCtx) return;
+function setupAudio(){
+if(audioCtx) return;
 
-  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  source = audioCtx.createMediaElementSource(audio);
+audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+source=audioCtx.createMediaElementSource(audio);
 
-  analyser = audioCtx.createAnalyser();
-  analyser.fftSize = 1024;
-  analyser.smoothingTimeConstant = 0.8;
+analyser=audioCtx.createAnalyser();
+analyser.fftSize=1024;
 
-  source.connect(analyser);
-  analyser.connect(audioCtx.destination);
+source.connect(analyser);
+analyser.connect(audioCtx.destination);
 
-  dataArray = new Uint8Array(analyser.frequencyBinCount);
+dataArray=new Uint8Array(analyser.frequencyBinCount);
 
-  for(let i = 0; i < 300; i++) peaks[i] = 0;
+for(let i=0;i<300;i++) peaks[i]=0;
 }
 
-function playRadio() {
-  setupAudio();
+function playRadio(){
+setupAudio();
 
-  if (audioCtx.state === "suspended") {
-    audioCtx.resume();
-  }
-
-  audio.src = STREAM_URL;
-  audio.play();
-
-  playBtn.classList.add("playActive");
-  stopBtn.classList.remove("stopActive");
-
-  if (!animationStarted) {
-    animationStarted = true;
-    draw();
-  }
+if(audioCtx.state==="suspended"){
+audioCtx.resume();
 }
 
-/* ✅ NAPRAWIONA funkcja (była uszkodzona) */
-function stopRadio() {
-  audio.pause();
+audio.src=STREAM_URL;
+audio.play();
 
-  stopBtn.classList.add("stopActive");
-  playBtn.classList.remove("playActive");
+playBtn.classList.add("playActive");
+stopBtn.classList.remove("stopActive");
 
-  setTimeout(() => {
-    stopBtn.classList.remove("stopActive");
-  }, 1000);
-
-  for(let i = 0; i < peaks.length; i++) {
-    peaks[i] = 0;
-  }
+if(!animationStarted){
+animationStarted=true;
+draw();
+}
 }
 
-function muteRadio() {
-  audio.muted = !audio.muted;
-  muteBtn.classList.toggle("muteActive");
+/* ✅ NAPRAWA */
+function stopRadio(){
+audio.pause();
+
+stopBtn.classList.add("stopActive");
+playBtn.classList.remove("playActive");
+
+setTimeout(()=>{
+stopBtn.classList.remove("stopActive");
+},1000);
+
+for(let i=0;i<peaks.length;i++){
+peaks[i]=0;
+}
 }
 
-volume.addEventListener("input", () => {
-  let val = parseFloat(volume.value);
-  audio.volume = val;
+function muteRadio(){
+audio.muted=!audio.muted;
+muteBtn.classList.toggle("muteActive");
+}
 
-  if (Math.abs(val - 0.5) < 0.02) {
-    volume.classList.remove("active");
-  } else {
-    volume.classList.add("active");
-  }
+volume.addEventListener("input",()=>{
+audio.volume=parseFloat(volume.value);
 });
 
-volume.dispatchEvent(new Event("input"));
-
-function resizeCanvas() {
-  let dpr = window.devicePixelRatio || 1;
-  let width = 600;
-
-  canvas.width = width * dpr;
-  canvas.height = 260 * dpr;
-
-  canvas.style.width = width + "px";
-  canvas.style.height = "260px";
-
-  ctx.setTransform(1, 0, 0, 1, 0, 0);
-  ctx.scale(dpr, dpr);
+function resizeCanvas(){
+let width=600;
+canvas.width=width;
+canvas.height=260;
+canvas.style.width=width+"px";
+canvas.style.height="260px";
 }
 
-window.addEventListener("load", resizeCanvas);
-window.addEventListener("resize", resizeCanvas);
+window.addEventListener("load",resizeCanvas);
+window.addEventListener("resize",resizeCanvas);
 
-function draw() {
-  requestAnimationFrame(draw);
+function draw(){
+requestAnimationFrame(draw);
 
-  if (!analyser || !dataArray) return;
+if(!analyser) return;
 
-  analyser.getByteFrequencyData(dataArray);
-  drawEQ();
+analyser.getByteFrequencyData(dataArray);
+
+ctx.fillStyle="#000";
+ctx.fillRect(0,0,canvas.width,canvas.height);
+
+let bars=80;
+let barWidth=canvas.width/bars;
+
+for(let i=0;i<bars;i++){
+let value=dataArray[i]||0;
+let h=(value/255)*canvas.height;
+
+ctx.fillStyle="#ff0000";
+ctx.fillRect(i*barWidth,canvas.height-h,barWidth-2,h);
 }
-
-function drawEQ() {
-  const dpr = window.devicePixelRatio || 1;
-  const width = canvas.width / dpr;
-  const heightCanvas = canvas.height / dpr;
-
-  ctx.fillStyle = '#000';
-  ctx.fillRect(0, 0, width, heightCanvas);
-
-  const bars = 80;
-  const barWidth = width / bars;
-  const step = Math.floor(dataArray.length / bars * 1.5);
-
-  const yOffset = 8;
-  const maxHeight = heightCanvas * 0.92;
-
-  for (let i = 0; i < bars; i++) {
-    const index = i * step;
-
-    let value = dataArray[index] || 0;
-    let percent = value / 255;
-    let h = Math.pow(percent, 0.6) * maxHeight;
-
-    const x = i * barWidth;
-    const y = heightCanvas - h + yOffset;
-
-    ctx.fillStyle = "#ff0000";
-    ctx.fillRect(x + 1, y, barWidth - 2, h);
-
-    if (!peaks[i]) peaks[i] = 0;
-
-    if (h > peaks[i]) {
-      peaks[i] = h;
-    } else {
-      peaks[i] *= 0.92;
-    }
-
-    if (peaks[i] < 2) peaks[i] = 0;
-
-    const peakY = heightCanvas - peaks[i] + yOffset;
-    ctx.fillStyle = "#ffaa00";
-    ctx.fillRect(x + 2, peakY, barWidth - 4, 4);
-  }
 }
 
 resizeCanvas();
