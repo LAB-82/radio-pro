@@ -1,111 +1,281 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-    <meta charset="UTF-8" />
-    <title>Odtwarzacz Radiowy</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f0f0;
-            padding: 20px;
-        }
-        h1 {
-            text-align: center;
-        }
-        .station {
-            background-color: #fff;
-            padding: 15px;
-            margin: 10px 0;
-            border-radius: 8px;
-        }
-        .station h2 {
-            margin-top: 0;
-        }
-        audio {
-            width: 100%;
-            margin-top: 10px;
-        }
-    </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>RADIO ENGINE PRO 2026 FULL</title>
+
+<style>
+body{
+margin:0;
+font-family:Arial;
+background:#0b0b0b;
+color:#fff;
+display:flex;
+height:100vh;
+}
+
+#sidebar{
+width:420px;
+background:#141414;
+overflow:auto;
+border-right:1px solid #222;
+padding:10px;
+}
+
+#stations{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:10px;
+}
+
+.station{
+background:#1a1a1a;
+padding:10px;
+cursor:pointer;
+border-radius:8px;
+text-align:center;
+font-size:12px;
+position:relative;
+transition:0.2s;
+}
+
+.station:hover{background:#2a2a2a;}
+.station.active{background:#00aa66;}
+.station.live{background:#1f7a3a;}
+
+.star{
+position:absolute;
+top:4px;
+right:6px;
+font-size:12px;
+cursor:pointer;
+opacity:0.5;
+}
+.star.fav{opacity:1;color:gold;}
+
+#main{
+flex:1;
+display:flex;
+flex-direction:column;
+}
+
+#header{
+padding:12px;
+background:#1a1a1a;
+font-weight:bold;
+}
+
+#player{
+flex:1;
+display:flex;
+justify-content:center;
+align-items:center;
+flex-direction:column;
+gap:10px;
+}
+
+audio{
+width:80%;
+}
+
+#logo{
+width:160px;
+height:120px;
+object-fit:contain;
+background:#111;
+padding:8px;
+border-radius:10px;
+}
+
+#status{
+font-size:13px;
+opacity:0.8;
+white-space:pre-line;
+}
+
+button{ display:none; }
+
+</style>
 </head>
+
 <body>
-    <h1>Odtwarzacz Radia</h1>
 
-    <div class="station">
-        <h2>Muzyczne Radio</h2>
-        <audio controls>
-            <source src="https://stream4.nadaje.com:9001/muzyczneradio" type="audio/mpeg" />
-        </audio>
-    </div>
+<div id="sidebar">
+<div id="stations"></div>
+</div>
 
-    <div class="station">
-        <h2>Radio Plus</h2>
-        <audio controls>
-            <source src="https://pl-play.adtonos.com/radio-plus" type="audio/mpeg" />
-        </audio>
-    </div>
+<div id="main">
 
-    <div class="station">
-        <h2>RMF FM</h2>
-        <audio controls>
-            <source src="https://rs7-krk2-cyfronet.rmfstream.pl/rmf_fm" type="audio/mpeg" />
-        </audio>
-    </div>
+<div id="header">🎧 RADIO ENGINE PRO 2026 (SELF HEALING)</div>
 
-    <div class="station">
-        <h2>Radio Zet</h2>
-        <audio controls>
-            <source src="https://zt02.cdn.eurozet.pl/ZET010.mp3" type="audio/mpeg" />
-        </audio>
-    </div>
+<div id="player">
 
-    <div class="station">
-        <h2>Radio Wrocław</h2>
-        <audio controls>
-            <source src="https://stream4.nadaje.com:9020/radiowroclaw" type="audio/mpeg" />
-        </audio>
-    </div>
+<img id="logo"/>
 
-    <div class="station">
-        <h2>Tok FM</h2>
-        <audio controls>
-            <source src="https://radiostream.pl/tuba10-1.mp3" type="audio/mpeg" />
-        </audio>
-    </div>
+<audio id="audio" controls></audio>
 
-    <div class="station">
-        <h2>Radio Kolor</h2>
-        <audio controls>
-            <source src="https://radiokolor-stream.pl:8443/stream" type="audio/mpeg" />
-        </audio>
-    </div>
+<div id="status">READY</div>
 
-    <div class="station">
-        <h2>Złote Przeboje</h2>
-        <audio controls>
-            <source src="https://stream.open.fm/88" type="audio/mpeg" />
-        </audio>
-    </div>
+</div>
 
-    <div class="station">
-        <h2>Radio Kampus</h2>
-        <audio controls>
-            <source src="https://stream10.radioagora.pl/tuba9-1.mp3" type="audio/mpeg" />
-        </audio>
-    </div>
+</div>
 
-    <div class="station">
-        <h2>Radio Rodzina</h2>
-        <audio controls>
-            <source src="https://stream.radioplus.pl/radio_rodzina" type="audio/mpeg" />
-        </audio>
-    </div>
+<script>
 
-    <div class="station">
-        <h2>Polskie Radio Program 1</h2>
-        <audio controls>
-            <source src="https://stream.polskieradio.pl/program1" type="audio/mpeg" />
-        </audio>
-    </div>
+const stations = [
+"Muzyczne Radio",
+"Radio Plus",
+"RMF FM",
+"Radio Zet",
+"Radio Wrocław",
+"Tok FM",
+"Radio Kolor",
+"Radio Złote Przeboje",
+"Planeta FM",
+"Radio Kampus",
+"Radio Rodzina",
+"Polskie Radio"
+];
+
+const audio = document.getElementById("audio");
+const status = document.getElementById("status");
+const logo = document.getElementById("logo");
+
+let current = 0;
+
+let cache = JSON.parse(localStorage.getItem("radio_cache") || "{}");
+let favs = JSON.parse(localStorage.getItem("radio_favs") || "[]");
+
+function saveCache(){
+localStorage.setItem("radio_cache", JSON.stringify(cache));
+}
+
+function saveFavs(){
+localStorage.setItem("radio_favs", JSON.stringify(favs));
+}
+
+/* ✅ PRAWDZIWE STREAMY AUDIO (STABILNE) */
+const manualStreams = {
+
+"Muzyczne Radio":"http://stream4.nadaje.com:11986/mr",
+"Radio Plus":"http://pldm.ml/radio?url=http://stream.radio.plus.pl:8000/plus",
+"RMF FM":"https://rs6-krk2.rmfstream.pl/rmf_fm",
+"Radio Zet":"https://zt03.cdn.eurozet.pl/zet-net.mp3",
+"Radio Wrocław":"https://stream4.nadaje.com:8176/prw",
+"Tok FM":"https://radiostream.pl/tuba9-1.mp3",
+"Radio Kolor":"https://stream.radiokolor.pl/kolor.mp3",
+"Radio Złote Przeboje":"https://zt02.cdn.eurozet.pl/zlote-przeboje.mp3",
+"Planeta FM":"https://zt03.cdn.eurozet.pl/planeta-fm.mp3",
+"Radio Kampus":"https://stream.radiokampus.fm/kampus.mp3",
+"Radio Rodzina":"http://stream4.nadaje.com:8400/radirodzina",
+"Polskie Radio":"https://stream.polskieradio.pl/pr1_mp3"
+
+};
+
+/* ✅ LOGO FIX */
+function setLogo(name){
+logo.src = `https://www.radio-browser.info/backends/logos/${encodeURIComponent(name)}.png`;
+logo.onerror = () => {
+logo.src = "https://upload.wikimedia.org/wikipedia/commons/a/a3/Image-not-found.png";
+};
+}
+
+/* STREAM RESOLVER */
+async function resolveStream(name){
+
+if(manualStreams[name]){
+cache[name] = manualStreams[name];
+saveCache();
+return manualStreams[name];
+}
+
+if(cache[name]){
+return cache[name];
+}
+
+return null;
+}
+
+/* LOAD */
+async function load(i){
+
+current = i;
+const name = stations[i];
+
+setLogo(name);
+
+status.innerText = "ŁADOWANIE: " + name;
+
+const url = await resolveStream(name);
+
+if(!url){
+status.innerText = "❌ BRAK STREAMU: " + name;
+return;
+}
+
+audio.src = url;
+audio.volume = 0.85;
+
+audio.play()
+.then(()=>{
+status.innerText = "▶ GRA: " + name;
+markLive(i);
+})
+.catch(()=>{
+status.innerText = "⚠️ kliknij PLAY ręcznie";
+});
+}
+
+/* LIVE */
+function markLive(i){
+document.querySelectorAll(".station").forEach((el,idx)=>{
+el.classList.toggle("live", idx===i);
+});
+}
+
+/* FAVORITES */
+function toggleFav(name, el){
+if(favs.includes(name)){
+favs = favs.filter(f=>f!==name);
+el.classList.remove("fav");
+}else{
+favs.push(name);
+el.classList.add("fav");
+}
+saveFavs();
+}
+
+/* AUTO CACHE CLEAN */
+setInterval(()=>{
+cache = {};
+localStorage.removeItem("radio_cache");
+}, 600000);
+
+/* UI */
+stations.forEach((s,i)=>{
+const div=document.createElement("div");
+div.className="station";
+div.innerText=s;
+
+const star=document.createElement("div");
+star.className="star";
+star.innerText="★";
+
+if(favs.includes(s)) star.classList.add("fav");
+
+star.onclick=(e)=>{
+e.stopPropagation();
+toggleFav(s, star);
+};
+
+div.appendChild(star);
+div.onclick=()=>load(i);
+
+document.getElementById("stations").appendChild(div);
+});
+
+</script>
 
 </body>
 </html>
