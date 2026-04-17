@@ -185,4 +185,101 @@ button:active{
   text-shadow:0 0 10px rgba(255,91,91,.9);
 }
 #muteBtn.muteActive{
-  c
+  color:#ffd0d0;
+  text-shadow:0 0 10px rgba(255,208,208,.95);
+  animation:pulseMute .8s infinite alternate;
+}
+
+@keyframes pulseMute{
+  from{ transform:translateY(0) scale(1); }
+  to{ transform:translateY(-1px) scale(1.06); }
+}
+
+.volumeWrapper{
+  width:220px;
+  height:48px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+  padding:0 14px;
+  border-radius:12px;
+  background:linear-gradient(180deg, rgba(0,0,0,.55), rgba(40,10,10,.92));
+  border:1px solid rgba(255,102,153,.35);
+  box-shadow:0 0 18px rgba(255,102,153,.12);
+}
+
+#volume{
+  width:140px;
+  height:10px;
+  appearance:none;
+  border-radius:999px;
+  outline:none;
+  background:
+    linear-gradient(90deg, var(--red) 0%, var(--red) var(--v,50%), rgba(255,255,255,.08) var(--v,50%), rgba(255,255,255,.08) 100%);
+  border:1px solid rgba(255,0,33,.45);
+  box-shadow:0 0 8px rgba(255,0,33,.18);
+}
+#volume.active{
+  border-color:rgba(255,102,153,.75);
+  box-shadow:0 0 10px rgba(255,102,153,.22);
+}
+#volume::-webkit-slider-thumb{
+  -webkit-appearance:none;
+  width:18px;
+  height:18px;
+  border-radius:4px;
+  background:linear-gradient(180deg, #fff, #ffd0d0);
+  border:2px solid var(--red);
+  box-shadow:0 0 12px rgba(255,0,33,.95), 0 0 22px rgba(255,102,153,.45);
+  cursor:pointer;
+}
+#volume::-moz-range-thumb{
+  width:18px;
+  height:18px;
+  border:none;
+  border-radius:4px;
+  background:linear-gradient(180deg, #fff, #ffd0d0);
+  box-shadow:0 0 12px rgba(255,0,33,.95), 0 0 22px rgba(255,102,153,.45);
+  cursor:pointer;
+}
+
+#bottomLink{
+  text-align:center;
+  padding-top:4px;
+}
+
+#bottomLink a{
+  color:var(--red);
+  text-decoration:none;
+  font-size:16px;
+  letter-spacing:1px;
+  text-shadow:0 0 10px rgba(255,0,33,.55);
+}
+
+#status{
+  min-height:22px;
+  text-align:center;
+  color:var(--muted);
+  font-size:12px;
+  letter-spacing:1px;
+}
+
+.scanline{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  background:linear-gradient(180deg, transparent 0%, rgba(255,255,255,.05) 50%, transparent 100%);
+  opacity:.09;
+  mix-blend-mode:screen;
+}
+.gridfx{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  background-image:
+    linear-gradient(rgba(255,0,33,.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,0,33,.08) 1px, transparent 1px);
+  background-size: 42px 42px;
+  mask-image:linear-gradient(180deg, rgba(0,0,0,.55), transparent 85%);
+  opa
