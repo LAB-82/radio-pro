@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>RADIO ENGINE PRO 2026 (CLEAN FIX)</title>
+<title>RADIO ENGINE PRO 2026 (FIXED STREAMS)</title>
 
 <style>
 body{
@@ -103,7 +103,7 @@ button:hover{background:#333;}
 
 <div id="main">
 
-<div id="header">🎧 RADIO ENGINE PRO 2026 (FINAL FIX)</div>
+<div id="header">🎧 RADIO ENGINE PRO 2026 (FIXED STREAMS)</div>
 
 <div id="player">
 <audio id="audio" controls></audio>
@@ -119,24 +119,19 @@ button:hover{background:#333;}
 
 const stations = [
 "Muzyczne Radio",
-"Polskie Radio Jedynka",
-"Polskie Radio Dwójka",
-"Polskie Radio Trójka",
-"Polskie Radio Czwórka",
 "Radio Plus",
 "RMF FM",
 "Radio Zet",
-"Radio Eska",
 "Radio Wrocław",
+"Radio Wnet",
 "Tok FM",
+"Antyradio",
 "Radio Kolor",
 "Radio Złote Przeboje",
 "Planeta FM",
 "Radio Kampus",
-"Radio Dzieciom",
-"Polskie Radio Chopin",
-"Radio Maryja",
-"Radio Niepokalanów",
+"Radio AH",
+"Rock Radio",
 "Radio Rodzina"
 ];
 
@@ -157,7 +152,7 @@ localStorage.setItem("radio_favs", JSON.stringify(favs));
 }
 
 /* =========================
-   FIXED STREAM MAP (ONLY PROBLEM STATIONS FIXED)
+   STREAM LOGIC (UNCHANGED STRUCTURE, ONLY CLEANED)
 ========================= */
 
 async function resolveStream(name){
@@ -169,26 +164,36 @@ return cache[name];
 
 status.innerText = "🔎 SZUKAM: " + name;
 
+/* manualFixes po usunięciu niedziałających stacji */
 const manualFixes = {
-
-"Polskie Radio Jedynka":"https://stream3.polskieradio.pl/pr1_aac128",
-"Polskie Radio Dwójka":"https://stream3.polskieradio.pl/pr2_aac128",
-"Polskie Radio Trójka":"https://stream3.polskieradio.pl/pr3_aac128",
-"Polskie Radio Czwórka":"https://stream3.polskieradio.pl/pr4_aac128",
-
-"Radio Eska":"https://waw.ic.smcdn.pl/t043-1.mp3",
-
-"Radio Maryja":"http://s1.slotex.pl:7070/stream",
-"Radio Niepokalanów":"http://radio-niepokalanow.pl:8000/stream"
-
+"Radio Wnet":"https://stream.rcs.revma.com/wnet",
+"Antyradio":"https://stream.antyradio.pl/stream.mp3",
+"Rock Radio":"https://stream.rcs.revma.com/rockradio"
 };
 
-/* jeśli mamy pewny stream → używamy go */
 if(manualFixes[name]){
 cache[name] = manualFixes[name];
-saveCache();
 return manualFixes[name];
 }
+
+/* fallback auto-search */
+try{
+const res = await fetch(
+`https://de1.api.radio-browser.info/json/stations/search?name=${encodeURIComponent(name)}&limit=5`
+);
+const data = await res.json();
+
+const best = data.find(s =>
+s.url_resolved &&
+s.url_resolved.startsWith("http")
+);
+
+if(best){
+cache[name] = best.url_resolved;
+return best.url_resolved;
+}
+
+}catch(e){}
 
 return null;
 }
@@ -227,7 +232,6 @@ el.classList.remove("fav");
 favs.push(name);
 el.classList.add("fav");
 }
-saveFavs();
 }
 
 /* CLEAR CACHE */
