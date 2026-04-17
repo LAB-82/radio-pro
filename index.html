@@ -156,7 +156,70 @@ localStorage.setItem("radio_favs", JSON.stringify(favs));
 }
 
 /* =========================
-   🔥 TYLKO PEWNE POLSKIE LINKI
+   🔥 FIX STREAM RESOLVER (REAL AUDIO ONLY)
+========================= */
+async function resolveStream(name){
+
+if(cache[name]){
+return cache[name];
+}
+
+if(manualStreams[name]){
+cache[name] = manualStreams[name];
+saveCache();
+return manualStreams[name];
+}
+
+try{
+const res = await fetch(
+`https://de1.api.radio-browser.info/json/stations/search?name=${encodeURIComponent(name)}&limit=10`
+);
+const data = await res.json();
+
+/* 🔥 TYLKO PRAWDZIWE STREAMY AUDIO */
+const best = data.find(s =>
+s.url_resolved &&
+(
+s.url_resolved.endsWith(".mp3") ||
+s.url_resolved.endsWith(".aac") ||
+s.url_resolved.includes("stream") ||
+s.url_resolved.includes("radio")
+)
+);
+
+if(best){
+cache[name] = best.url_resolved;
+saveCache();
+return best.url_resolved;
+}
+
+}catch(e){}
+
+return null;
+}
+
+/* =========================
+   FIX LOGO (REAL IMAGE + FALLBACK)
+========================= */
+async function setLogo(name){
+try{
+const res = await fetch(
+`https://de1.api.radio-browser.info/json/stations/search?name=${encodeURIComponent(name)}&limit=1`
+);
+const data = await res.json();
+
+if(data[0]?.favicon && data[0].favicon.startsWith("http")){
+logo.src = data[0].favicon;
+return;
+}
+}catch(e){}
+
+/* fallback (zawsze coś pokaże) */
+logo.src = "https://upload.wikimedia.org/wikipedia/commons/3/3f/Logo_placeholder.png";
+}
+
+/* =========================
+   MANUAL STREAMS (NIE ZMIENIAM)
 ========================= */
 const manualStreams = {
 "Radio Plus":"https://www.radio-polska.pl/radio-plus-legnica",
@@ -173,67 +236,7 @@ const manualStreams = {
 "Muzyczne Radio":"https://www.muzyczneradio.pl/index.php/player/lo.html?type=lo"
 };
 
-/* =========================
-   LOGO (stabilne + fallback)
-========================= */
-async function setLogo(name){
-try{
-const res = await fetch(
-`https://de1.api.radio-browser.info/json/stations/search?name=${encodeURIComponent(name)}&limit=1`
-);
-const data = await res.json();
-
-if(data[0]?.favicon){
-logo.src = data[0].favicon;
-return;
-}
-}catch(e){}
-
-logo.src = "";
-}
-
-/* =========================
-   STREAM RESOLVER (FIX: NIE NADPISUJE MANUALI)
-========================= */
-async function resolveStream(name){
-
-/* 🔥 HARD LOCK – Twoje linki ZAWSZE pierwsze */
-if(manualStreams[name]){
-cache[name] = manualStreams[name];
-saveCache();
-return manualStreams[name];
-}
-
-/* cache fallback */
-if(cache[name]){
-return cache[name];
-}
-
-try{
-const res = await fetch(
-`https://de1.api.radio-browser.info/json/stations/search?name=${encodeURIComponent(name)}&limit=5`
-);
-const data = await res.json();
-
-const best = data.find(s =>
-s.url_resolved &&
-s.url_resolved.startsWith("http")
-);
-
-if(best){
-cache[name] = best.url_resolved;
-saveCache();
-return best.url_resolved;
-}
-
-}catch(e){}
-
-return null;
-}
-
-/* =========================
-   LOAD
-========================= */
+/* LOAD */
 async function load(i){
 
 current = i;
@@ -251,7 +254,7 @@ return;
 }
 
 audio.src = url;
-audio.volume = 0.85; /* lekkie wyrównanie głośności */
+audio.volume = 0.85;
 
 audio.play()
 .then(()=>{
@@ -263,14 +266,12 @@ status.innerText = "⚠️ kliknij PLAY ręcznie";
 });
 }
 
-/* LIVE */
 function markLive(i){
 document.querySelectorAll(".station").forEach((el,idx)=>{
 el.classList.toggle("live", idx===i);
 });
 }
 
-/* FAVORITES */
 function toggleFav(name, el){
 if(favs.includes(name)){
 favs = favs.filter(f=>f!==name);
@@ -282,13 +283,11 @@ el.classList.add("fav");
 saveFavs();
 }
 
-/* AUTO CACHE CLEAN */
 setInterval(()=>{
 cache = {};
 localStorage.removeItem("radio_cache");
 }, 600000);
 
-/* SELF HEALING */
 setInterval(async ()=>{
 for(let i=0;i<stations.length;i++){
 const name = stations[i];
@@ -307,13 +306,11 @@ saveCache();
 }
 }, 300000);
 
-/* CLEAR CACHE */
 function clearCache(){
 cache = {};
 localStorage.removeItem("radio_cache");
 }
 
-/* UI */
 stations.forEach((s,i)=>{
 const div=document.createElement("div");
 div.className="station";
