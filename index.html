@@ -6,18 +6,20 @@
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700;800&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
 :root{
+  --cp-cyan:#00f0ff;
+  --cp-magenta:#ff003c;
+  --cp-yellow:#fcee09;
   --cp-red:#ff2a2a;
-  --cp-red-dark:#cc0000;
-  --cp-red-glow:#ff4444;
-  --cp-bg:#0a0000;
+  --cp-bg:#000014;
+  --cp-glow:0 0 4px var(--cp-cyan), 0 0 10px var(--cp-cyan), 0 0 20px var(--cp-magenta);
 }
 
 body{
   margin:0;
   background:var(--cp-bg);
   background-image:
-    linear-gradient(0deg, transparent 24%, rgba(255, 42, 42,.05) 25%, rgba(255, 42, 42,.05) 26%, transparent 27%, transparent 74%, rgba(255, 42, 42,.05) 75%, rgba(255, 42, 42,.05) 76%, transparent 77%, transparent),
-    linear-gradient(90deg, transparent 24%, rgba(204, 0, 0,.05) 25%, rgba(204, 0, 0,.05) 26%, transparent 27%, transparent 74%, rgba(204, 0, 0,.05) 75%, rgba(204, 0, 0,.05) 76%, transparent 77%, transparent);
+    linear-gradient(0deg, transparent 24%, rgba(0, 240, 255,.05) 25%, rgba(0, 240, 255,.05) 26%, transparent 27%, transparent 74%, rgba(0, 240, 255,.05) 75%, rgba(0, 240, 255,.05) 76%, transparent 77%, transparent),
+    linear-gradient(90deg, transparent 24%, rgba(255, 0, 60,.05) 25%, rgba(255, 0, 60,.05) 26%, transparent 27%, transparent 74%, rgba(255, 0, 60,.05) 75%, rgba(255, 0, 60,.05) 76%, transparent 77%, transparent);
   background-size:50px 50px;
   color:#fff;
   font-family:'Rajdhani', 'Orbitron', monospace;
@@ -38,20 +40,38 @@ body{
   font-size:88px;
   margin-top:50px;
   text-align:center;
-  color:var(--cp-red);
+  color:var(--cp-cyan);
   text-shadow:
-    0 0 5px var(--cp-red),
-    0 0 10px var(--cp-red),
-    0 0 20px var(--cp-red),
-    0 0 40px var(--cp-red-dark),
-    0 0 80px var(--cp-red-dark);
+    0 0 5px var(--cp-cyan),
+    0 0 10px var(--cp-cyan),
+    0 0 20px var(--cp-cyan),
+    0 0 40px var(--cp-magenta),
+    0 0 80px var(--cp-magenta);
+  position: relative;
+  animation: flicker 3s infinite alternate;
+}
+
+@keyframes flicker {
+  0%, 18%, 22%, 25%, 53%, 57%, 100% {
+    text-shadow:
+      0 0 5px var(--cp-cyan),
+      0 0 10px var(--cp-cyan),
+      0 0 20px var(--cp-cyan),
+      0 0 40px var(--cp-magenta),
+      0 0 80px var(--cp-magenta);
+    opacity: 1;
+  }
+  20%, 24%, 55% {
+    text-shadow: none;
+    opacity: 0.8;
+  }
 }
 
 #proEqualizer{
   margin-top:30px;
   margin-bottom:30px;
-  border:2px solid var(--cp-red);
-  box-shadow: 0 0 10px var(--cp-red), 0 0 20px var(--cp-red-dark), inset 0 0 20px rgba(255,42,42,0.2);
+  border:2px solid var(--cp-cyan);
+  box-shadow: var(--cp-glow), inset 0 0 20px rgba(0,240,255,0.2);
   width: 600px;
   height: 260px;
   display: block;
@@ -74,37 +94,48 @@ canvas{
   display:flex;
   align-items:center;
   justify-content:center;
-  background:#1a0000;
-  border:2px solid var(--cp-red);
-  box-shadow: 0 0 8px var(--cp-red), inset 0 0 8px rgba(255,42,42,0.3);
+  background:#0a0a1a;
+  border:2px solid var(--cp-cyan);
+  box-shadow: 0 0 8px var(--cp-cyan), inset 0 0 8px rgba(0,240,255,0.3);
+  position: relative;
+  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+  transition: all 0.2s ease;
+}
+
+.volumeWrapper.muted{
+  border-color: #444;
+  box-shadow: 0 0 4px #444, inset 0 0 4px rgba(68,68,68,0.3);
+  opacity: 0.5;
 }
 
 button{
   width:160px;
   height:45px;
-  background:#1a0000;
-  color:var(--cp-red);
+  background:#0a0a1a;
+  color:var(--cp-cyan);
   cursor:pointer;
-  border:2px solid var(--cp-red);
+  border:2px solid var(--cp-cyan);
   font-family:'Orbitron', sans-serif;
   font-weight: 700;
   font-size: 16px;
   letter-spacing: 3px;
   text-transform: uppercase;
-  box-shadow: 0 0 8px var(--cp-red), inset 0 0 8px rgba(255,42,42,0.2);
+  box-shadow: 0 0 8px var(--cp-cyan), inset 0 0 8px rgba(0,240,255,0.2);
   transition: all 0.15s ease;
+  position: relative;
+  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
 }
 
 button:hover{
-  background:var(--cp-red);
-  color:#000;
-  box-shadow: 0 0 15px var(--cp-red), 0 0 30px var(--cp-red-dark);
+  background:var(--cp-cyan);
+  color:#000014;
+  box-shadow: 0 0 15px var(--cp-cyan), 0 0 30px var(--cp-magenta);
   transform: translateY(-1px);
 }
 
 button:active{
   transform: translateY(1px);
-  box-shadow: 0 0 5px var(--cp-red);
+  box-shadow: 0 0 5px var(--cp-cyan);
 }
 
 #volume{
@@ -112,9 +143,10 @@ button:active{
   -webkit-appearance: none;
   appearance: none;
   height: 4px;
-  background: #1a0000;
-  border: 1px solid var(--cp-red);
+  background: #0a0a1a;
+  border: 1px solid var(--cp-cyan);
   outline: none;
+  transition: all 0.2s ease;
 }
 
 #volume::-webkit-slider-thumb{
@@ -122,79 +154,30 @@ button:active{
   appearance: none;
   width: 16px;
   height: 16px;
-  background: var(--cp-red-glow);
+  background: var(--cp-yellow);
   cursor: pointer;
-  border: 2px solid var(--cp-red);
-  box-shadow: 0 0 8px var(--cp-red-glow), 0 0 15px var(--cp-red);
-  border-radius: 2px;
+  border: 2px solid var(--cp-cyan);
+  box-shadow: 0 0 8px var(--cp-yellow), 0 0 15px var(--cp-cyan);
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+  transition: all 0.2s ease;
 }
 
 #volume::-moz-range-thumb{
   width: 16px;
   height: 16px;
-  background: var(--cp-red-glow);
+  background: var(--cp-yellow);
   cursor: pointer;
-  border: 2px solid var(--cp-red);
-  box-shadow: 0 0 8px var(--cp-red-glow), 0 0 15px var(--cp-red);
-  border-radius: 2px;
+  border: 2px solid var(--cp-cyan);
+  box-shadow: 0 0 8px var(--cp-yellow), 0 0 15px var(--cp-cyan);
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+  transition: all 0.2s ease;
 }
 
 #volume::-webkit-slider-runnable-track{
-  background: linear-gradient(90deg, var(--cp-red-dark), var(--cp-red));
+  background: linear-gradient(90deg, var(--cp-magenta), var(--cp-cyan));
   height: 4px;
+  transition: all 0.2s ease;
 }
 
 #volume::-moz-range-track{
-  background: linear-gradient(90deg, var(--cp-red-dark), var(--cp-red));
-  height: 4px;
-}
-
-.playActive{
-  color:#000!important;
-  background: var(--cp-red)!important;
-  box-shadow: 0 0 20px var(--cp-red), 0 0 40px var(--cp-red)!important;
-}
-.stopActive{
-  color:#000!important;
-  background: var(--cp-red-dark)!important;
-  border-color: var(--cp-red-dark)!important;
-  box-shadow: 0 0 20px var(--cp-red-dark), 0 0 40px var(--cp-red-dark)!important;
-}
-.muteActive{
-  color:#000!important;
-  background: var(--cp-red-glow)!important;
-  border-color: var(--cp-red-glow)!important;
-  box-shadow: 0 0 20px var(--cp-red-glow), 0 0 40px var(--cp-red-glow)!important;
-}
-
-#bottomLink{
-  margin-top:10px;
-}
-
-#bottomLink a{
-  color:var(--cp-red);
-  text-decoration:none;
-  font-family:'Orbitron', sans-serif;
-  text-shadow: 0 0 5px var(--cp-red);
-  transition: 0.2s;
-}
-
-#bottomLink a:hover{
-  color:var(--cp-red-glow);
-  text-shadow: 0 0 10px var(--cp-red-glow), 0 0 20px var(--cp-red);
-}
-</style>
-</head>
-
-<body>
-
-<div id="title">Muzyczne Radio</div>
-<canvas id="proEqualizer"></canvas>
-
-<div id="controls">
-  <button id="playBtn" onclick="playRadio()">PLAY</button>
-  <button id="stopBtn" onclick="stopRadio()">STOP</button>
-  <button id="muteBtn" onclick="muteRadio()">MUTE</button>
-
-  <div class="volumeWrapper">
-    <input id="volume" type="range" min="
+  background: linear-gradient(90deg, var(--
