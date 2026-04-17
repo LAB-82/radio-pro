@@ -131,7 +131,7 @@ const stations = [
 "Planeta FM",
 "Radio Kampus",
 "Radio Rodzina",
-"Twoje Radio"
+"Tok FM"
 ];
 
 const audio = document.getElementById("audio");
@@ -150,9 +150,7 @@ function saveFavs(){
 localStorage.setItem("radio_favs", JSON.stringify(favs));
 }
 
-/* =========================
-   STREAM RESOLVER
-========================= */
+/* STREAM RESOLVER */
 async function resolveStream(name){
 
 if(cache[name]){
@@ -181,9 +179,7 @@ return best.url_resolved;
 return null;
 }
 
-/* =========================
-   LOAD + SELF HEALING
-========================= */
+/* LOAD + SELF HEALING */
 async function load(i){
 
 current = i;
@@ -210,18 +206,14 @@ status.innerText = "⚠️ kliknij PLAY ręcznie";
 });
 }
 
-/* =========================
-   LIVE MARKER
-========================= */
+/* LIVE MARKER */
 function markLive(i){
 document.querySelectorAll(".station").forEach((el,idx)=>{
 el.classList.toggle("live", idx===i);
 });
 }
 
-/* =========================
-   FAVORITES
-========================= */
+/* FAVORITES */
 function toggleFav(name, el){
 if(favs.includes(name)){
 favs = favs.filter(f=>f!==name);
@@ -233,18 +225,14 @@ el.classList.add("fav");
 saveFavs();
 }
 
-/* =========================
-   AUTO CACHE CLEANER
-========================= */
+/* AUTO CACHE CLEANER */
 setInterval(()=>{
 cache = {};
 localStorage.removeItem("radio_cache");
 console.log("🧹 auto cache cleaned");
 }, 600000);
 
-/* =========================
-   SELF HEALING BACKGROUND CHECK
-========================= */
+/* SELF HEALING BACKGROUND CHECK */
 setInterval(async ()=>{
 for(let i=0;i<stations.length;i++){
 const name = stations[i];
@@ -263,18 +251,14 @@ saveCache();
 }
 }, 300000);
 
-/* =========================
-   CLEAR CACHE
-========================= */
+/* CLEAR CACHE */
 function clearCache(){
 cache = {};
 localStorage.removeItem("radio_cache");
 status.innerText = "CACHE WYCZYSZCZONY";
 }
 
-/* =========================
-   UI
-========================= */
+/* UI */
 stations.forEach((s,i)=>{
 const div=document.createElement("div");
 div.className="station";
