@@ -5,7 +5,7 @@
 <title>Muzyczne Radio PRO</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
 <style>
-/* 🔥 Cyberpunk 2077 Red Theme */
+/* 🔥 Cyberpunk 2077 Red Theme - BEZ BIAŁEGO TŁA */
 :root{
   --bg:#000;
   --red:#ff0000;
@@ -18,6 +18,65 @@
   --line:rgba(255,0,0,.35);
 }
 
-/* 🔌 oryginalne body zostaje, ale z dodatkowymi efektami */
+/* 🌌 Tło z czerwonym gradientem i neonem (bez białego tła!) */
 body{
-  ma
+  margin:0;
+  /* Usuwam białe tło! */
+  /* background:#000; */
+  background:
+    radial-gradient(circle at 20% 20%, rgba(255,0,0,.10), transparent 28%),
+    radial-gradient(circle at 70% 30%, rgba(255,0,0,.10), transparent 26%),
+    linear-gradient(180deg, #000 0%, #000 40%, #000 100%);
+  color:#fff;
+  font-family:'Orbitron',sans-serif;
+  /* Glitch efekt scanline */
+  position: relative;
+  overflow: hidden;
+}
+
+/* 🔌 Globalny glitch wizji CRT (bez zmian UI!) */
+body::before{
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    linear-gradient(180deg, rgba(255,0,0,.05) 0%, rgba(255,0,0,.00) 100%),
+    linear-gradient(90deg, rgba(255,0,0,.05) 0%, rgba(255,0,0,.00) 100%);
+  background-size: 20px 20px;
+  opacity:.1;
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+/* ✅ oryginalny kod CSS bez zmian (z nowym tłem zamiast białego!) */
+#title{
+  font-size:88px;
+  margin-top:50px;
+  text-align:center;
+  color:#ff2a2a;
+  text-shadow:
+    0 0 5px #ff2a2a,
+    0 0 15px #ff0000,
+    0 0 30px #ff0000,
+    0 0 60px #ff0000,
+    0 0 80px #ff0000;
+}
+#title::before,
+#title::after {
+  content: attr(data-text);
+  position:absolute;
+  inset:0;
+  mix-blend-mode: screen;
+  animation: glitch 2s infinite linear;
+}
+#title::before { color:#ff0000; opacity:.8; transform:translateX(2px); }
+#title::after { color:#ff0000; opacity:.5; transform:translateX(-2px); }
+
+/* Glitch tekstowy */
+@keyframes glitch {
+  0%   { transform: translateY(0); }
+  50%  { transform: translateY(-1px); }
+  100% { transform: translateY(0); }
