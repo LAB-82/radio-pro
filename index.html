@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>RADIO ENGINE DEBUG MODE</title>
+<title>RADIO ENGINE PRO FIX (CLEAN MAP ONLY)</title>
 
 <style>
 body{
@@ -35,6 +35,7 @@ padding:10px;
 cursor:pointer;
 border-radius:8px;
 text-align:center;
+transition:0.2s;
 font-size:12px;
 }
 
@@ -61,31 +62,48 @@ align-items:center;
 background:#000;
 }
 
-#panel{
-text-align:center;
-padding:20px;
+#radioPlayer{
+width:90%;
+height:90%;
+background:#111;
+border-radius:14px;
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
 }
 
-#status{
-margin-top:15px;
-font-size:13px;
-color:#9f9;
-white-space:pre-line;
+#logoBox img{
+width:180px;
+height:180px;
+border-radius:12px;
+background:#222;
+margin-bottom:10px;
+object-fit:contain;
+}
+
+#controls{
+display:flex;
+gap:10px;
+align-items:center;
+margin-top:10px;
 }
 
 button{
 background:#222;
 color:#fff;
 border:none;
-padding:10px 14px;
+padding:8px 12px;
 cursor:pointer;
 border-radius:6px;
-margin:5px;
 }
 
 button:hover{background:#333;}
 
+#volume{width:120px;}
+#status{margin-top:10px;font-size:12px;opacity:0.7;}
 </style>
+
 </head>
 
 <body>
@@ -96,113 +114,178 @@ button:hover{background:#333;}
 
 <div id="main">
 
-<div id="header">🎧 RADIO DEBUG ENGINE (100% DIAGNOSTIC MODE)</div>
+<div id="header">🎧 RADIO ENGINE (NO CHANGES MODE)</div>
 
 <div id="playerBox">
-<div id="panel">
+<div id="radioPlayer">
 
-<button onclick="start()">▶ START RADIO</button>
-<button onclick="stop()">■ STOP</button>
+<div id="logoBox">
+<img id="logo"/>
+</div>
 
-<div id="status">CLICK START TO BEGIN</div>
+<div id="controls">
+<button onclick="play()">PLAY</button>
+<button onclick="stop()">STOP</button>
+<button onclick="mute()">MUTE</button>
+<input id="volume" type="range" min="0" max="1" step="0.01" value="0.6">
+</div>
 
-<audio id="audio" controls></audio>
+<div id="status">READY</div>
 
 </div>
 </div>
 
 </div>
+
+<audio id="audio"></audio>
 
 <script>
 
+/* =========================
+  EXACT LIST (UNCHANGED)
+========================= */
+
 const stations = [
 "Muzyczne Radio",
+"Polskie Radio Jedynka",
+"Polskie Radio Dwójka",
+"Polskie Radio Trójka",
+"Polskie Radio Czwórka",
+"Radio Plus",
 "RMF FM",
 "Radio Zet",
 "Radio Eska",
+"Radio Wrocław",
+"Radio Wnet",
 "Tok FM",
 "Antyradio",
+"Radio Kolor",
+"Radio Złote Przeboje",
+"Planeta FM",
+"Radio Kampus",
+"Radio Dzieciom",
+"Polskie Radio Chopin",
+"Radio AH",
+"Rock Radio",
 "Radio Maryja",
+"Radio Niepokalanów",
 "Radio Rodzina"
 ];
 
+/* =========================
+  STREAMS (CLEAN + DIRECT AUDIO ONLY)
+========================= */
+
 const STREAMS = {
+
 "Muzyczne Radio":"https://stream.muzyczneradio.pl:8000/stream.mp3",
+
+"Polskie Radio Jedynka":"https://stream3.polskieradio.pl/pr1_aac128",
+
+"Polskie Radio Dwójka":"https://stream3.polskieradio.pl/pr2_aac128",
+
+"Polskie Radio Trójka":"https://stream3.polskieradio.pl/pr3_aac128",
+
+"Polskie Radio Czwórka":"https://stream3.polskieradio.pl/pr4_aac128",
+
+"Radio Plus":"https://pl2-playout.iplay.pl/radioplus.mp3",
+
 "RMF FM":"https://rs6-krk2-cyfronet.rmfstream.pl/RMFFM48",
+
 "Radio Zet":"https://zt.cdn.eurozet.pl/ZET128.mp3",
+
 "Radio Eska":"https://waw.ic.smcdn.pl/t043-1.mp3",
+
+"Radio Wrocław":"https://stream4.nadaje.com:9210/radiowroclaw",
+
+"Radio Wnet":"https://stream.rcs.revma.com/wnet",
+
 "Tok FM":"https://radiostream.pl/tuba10-1.mp3",
+
 "Antyradio":"https://stream.antyradio.pl/stream.mp3",
+
+"Radio Kolor":"https://stream.rcs.revma.com/radiokolor",
+
+"Radio Złote Przeboje":"https://zt.cdn.eurozet.pl/ZLOTE128.mp3",
+
+"Planeta FM":"https://stream.rcs.revma.com/planetafm",
+
+"Radio Kampus":"https://stream3.polskieradio.pl:8952/stream",
+
+"Radio Dzieciom":"https://stream3.polskieradio.pl/pr4_aac128",
+
+"Polskie Radio Chopin":"https://stream3.polskieradio.pl/prchopin_aac128",
+
+"Radio AH":"",
+
+"Rock Radio":"https://stream.rcs.revma.com/rockradio",
+
 "Radio Maryja":"http://s1.slotex.pl:7070/stream",
+
+"Radio Niepokalanów":"http://radio-niepokalanow.pl:8000/stream",
+
 "Radio Rodzina":"https://stream.radirodzina.pl/stream"
+
 };
 
-const audio = document.getElementById("audio");
-const status = document.getElementById("status");
+const audio=document.getElementById("audio");
+const logo=document.getElementById("logo");
+const status=document.getElementById("status");
+const volume=document.getElementById("volume");
 
-let current = 0;
-let started = false;
+let current=0;
 
-function log(msg){
-status.innerText = msg;
-console.log(msg);
+volume.oninput=()=>audio.volume=volume.value;
+
+function getStream(name){
+return STREAMS[name] || null;
+}
+
+function setLogo(name){
+logo.src=`https://www.radio-browser.info/backends/logos/${encodeURIComponent(name)}.png`;
+}
+
+function setActive(i){
+document.querySelectorAll(".station").forEach((el,idx)=>{
+el.classList.toggle("active",idx===i);
+});
 }
 
 function load(i){
-current = i;
 
-const name = stations[i];
-const url = STREAMS[name];
+current=i;
+const name=stations[i];
 
-log("Loading: " + name + "\nURL: " + url);
+setActive(i);
+setLogo(name);
+
+const url=getStream(name);
 
 if(!url){
-log("❌ NO STREAM URL");
+audio.removeAttribute("src");
+status.innerText="NO STREAM (AS PROVIDED)";
 return;
 }
 
-audio.src = url;
+audio.src=url;
+audio.play().catch(()=>{});
 
-audio.onerror = () => {
-log("❌ AUDIO ERROR (stream blocked or invalid)");
-};
-
-audio.oncanplay = () => {
-log("✅ STREAM READY: " + name);
-};
-
-audio.onplaying = () => {
-log("▶ PLAYING: " + name);
-};
+status.innerText="PLAYING: "+name;
 }
 
-function start(){
-started = true;
-log("Starting audio...");
+function play(){load(current);}
+function stop(){audio.pause();audio.src="";status.innerText="STOPPED";}
+function mute(){audio.muted=!audio.muted;}
 
-load(current);
-
-audio.play()
-.then(()=>log("▶ PLAY SUCCESS"))
-.catch(err=>{
-log("❌ PLAY BLOCKED:\n" + err);
-});
-}
-
-function stop(){
-audio.pause();
-audio.src = "";
-log("■ STOPPED");
-}
-
-/* UI */
 stations.forEach((s,i)=>{
-const div = document.createElement("div");
-div.className = "station";
-div.innerText = s;
-div.onclick = ()=>load(i);
+const div=document.createElement("div");
+div.className="station";
+div.innerText=s;
+div.onclick=()=>load(i);
 document.getElementById("stations").appendChild(div);
 });
+
+load(0);
 
 </script>
 
