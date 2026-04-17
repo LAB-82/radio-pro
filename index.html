@@ -3,9 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Muzyczne Radio PRO</title>
-
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
-
 <style>
 :root{
   --cp-cyan:#00f0ff;
@@ -45,7 +43,8 @@ body{
     0 0 5px var(--cp-cyan),
     0 0 10px var(--cp-cyan),
     0 0 20px var(--cp-cyan),
-    0 0 40px var(--cp-magenta);
+    0 0 40px var(--cp-magenta),
+    0 0 80px var(--cp-magenta);
   animation: flicker 3s infinite alternate;
 }
 
@@ -55,7 +54,8 @@ body{
       0 0 5px var(--cp-cyan),
       0 0 10px var(--cp-cyan),
       0 0 20px var(--cp-cyan),
-      0 0 40px var(--cp-magenta);
+      0 0 40px var(--cp-magenta),
+      0 0 80px var(--cp-magenta);
     opacity: 1;
   }
   20%, 24%, 55% {
@@ -67,22 +67,19 @@ body{
 #proEqualizer{
   margin-top:30px;
   margin-bottom:30px;
-  width:600px;
-  height:260px;
-  position:relative;
-  background:#000014;
+  width: 600px;
+  height: 260px;
+  position: relative;
+  background: #000014;
   border: 2px solid var(--cp-cyan);
   clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
   filter: drop-shadow(0 0 10px var(--cp-cyan)) drop-shadow(0 0 20px var(--cp-magenta));
 }
 
-/* 🔧 FIX tylko techniczny — nie wizualny */
 canvas{
   width:100%;
   height:100%;
   display:block;
-  position: relative;
-  z-index: 1;
 }
 
 #controls{
@@ -107,7 +104,6 @@ button{
   filter: drop-shadow(0 0 8px var(--cp-cyan));
   transition: all 0.15s ease;
   position: relative;
-  z-index: 1;
 }
 
 button:hover{
@@ -176,31 +172,4 @@ button:active{
 }
 
 #volume::-moz-range-track{
-  background: linear-gradient(90deg, var(--cp-magenta), var(--cp-cyan));
-  height: 4px;
-}
-
-/* DODANE: tylko klasy dla suwaka */
-#volume.center::-webkit-slider-thumb{
-  background: var(--cp-yellow);
-  box-shadow: 0 0 8px var(--cp-yellow), 0 0 15px var(--cp-cyan);
-}
-#volume.center::-moz-range-thumb{
-  background: var(--cp-yellow);
-  box-shadow: 0 0 8px var(--cp-yellow), 0 0 15px var(--cp-cyan);
-}
-#volume.changed::-webkit-slider-thumb{
-  background: var(--cp-red);
-  box-shadow: 0 0 8px var(--cp-red), 0 0 15px var(--cp-magenta);
-}
-#volume.changed::-moz-range-thumb{
-  background: var(--cp-red);
-  box-shadow: 0 0 8px var(--cp-red), 0 0 15px var(--cp-magenta);
-}
-
-/* DODANE: tylko link */
-#bottomLink{
-  margin-top:20px;
-}
-
-#bottom
+  background: linear-gradient(90deg
