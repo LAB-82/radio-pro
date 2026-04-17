@@ -30,9 +30,7 @@ body{
   display:flex;
   flex-direction:column;
   align-items:center;
-  justify-content: flex-start;
   min-height:100vh;
-  padding-bottom: 40px;
 }
 
 #title{
@@ -40,41 +38,24 @@ body{
   font-weight: 900;
   font-size:88px;
   margin-top:50px;
-  text-align:center;
   color:var(--cp-cyan);
   text-shadow:
     0 0 5px var(--cp-cyan),
     0 0 10px var(--cp-cyan),
     0 0 20px var(--cp-cyan),
-    0 0 40px var(--cp-magenta),
-    0 0 80px var(--cp-magenta);
-  animation: flicker 3s infinite alternate;
+    0 0 40px var(--cp-magenta);
 }
 
-@keyframes flicker {
-  0%, 18%, 22%, 25%, 53%, 57%, 100% {
-    opacity: 1;
-  }
-  20%, 24%, 55% {
-    opacity: 0.8;
-  }
-}
-
-/* ===== EQ (NIC NIE ZMIENIONE W WYGLĄDZIE) ===== */
 #proEqualizer{
   margin-top:30px;
-  margin-bottom:30px;
-  width: 600px;
-  height: 260px;
-  display: block;
-  box-sizing: border-box;
-  position: relative;
-  background: #000014;
-  box-shadow: 0 0 10px var(--cp-cyan), 0 0 20px var(--cp-magenta), inset 0 0 20px rgba(0,240,255,0.2);
+  width:600px;
+  height:260px;
+  position:relative;
+  background:#000014;
+  box-shadow:0 0 10px var(--cp-cyan), 0 0 20px var(--cp-magenta), inset 0 0 20px rgba(0,240,255,0.2);
 }
 
-/* 🔥 JEDYNY MINIMALNY FIX – canvas MUSI ISTNIEĆ */
-#proEqualizer canvas{
+canvas{
   width:100%;
   height:100%;
   display:block;
@@ -84,20 +65,6 @@ body{
   display:flex;
   gap:8px;
   margin-top:20px;
-  margin-bottom:20px;
-  align-items: center;
-}
-
-.volumeWrapper{
-  width:160px;
-  height:45px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:#0a0a1a;
-  position: relative;
-  box-sizing: border-box;
-  box-shadow: 0 0 8px var(--cp-cyan), inset 0 0 8px rgba(0,240,255,0.3);
 }
 
 button{
@@ -105,20 +72,14 @@ button{
   height:45px;
   background:#0a0a1a;
   color:var(--cp-cyan);
-  cursor:pointer;
   font-family:'Orbitron', sans-serif;
-  font-weight: 700;
-  font-size: 16px;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  box-shadow: 0 0 8px var(--cp-cyan), inset 0 0 8px rgba(0,240,255,0.2);
-  transition: all 0.15s ease;
-  border: none;
+  border:none;
+  cursor:pointer;
 }
 
-button:hover{
-  background:var(--cp-cyan);
-  color:#000014;
+.volumeWrapper{
+  display:flex;
+  align-items:center;
 }
 
 #volume{
@@ -132,7 +93,6 @@ button:hover{
 <div id="title">RADIO PRO</div>
 
 <div id="proEqualizer">
-  <!-- 🔥 FIX: brakujący canvas -->
   <canvas id="eqCanvas"></canvas>
 </div>
 
@@ -147,19 +107,16 @@ button:hover{
 </div>
 
 <script>
-// ================= AUDIO =================
-const audio = new Audio("https://icecast.radiofrance.fr/fip-midfi.mp3");
+// ================= STREAM (POPRAWNY) =================
+const audio = new Audio("https://stream.rcs.revma.com/gzwc1xcq042vv");
 audio.crossOrigin = "anonymous";
+audio.preload = "none";
 
-let audioCtx;
-let analyser;
-let source;
-let dataArray;
-let bufferLength;
+// ================= AUDIO ENGINE =================
+let ctx, analyser, src, data, bufferLen;
 
-// ================= CANVAS =================
 const canvas = document.getElementById("eqCanvas");
-const ctx = canvas.getContext("2d");
+const c = canvas.getContext("2d");
 
 function resize(){
   canvas.width = canvas.clientWidth;
@@ -168,44 +125,44 @@ function resize(){
 resize();
 window.addEventListener("resize", resize);
 
-// ================= INIT AUDIO (FIX KLUCZOWY) =================
-function initAudio(){
-  if(!audioCtx){
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+// ================= INIT AUDIO =================
+function init(){
+  if(!ctx){
+    ctx = new (window.AudioContext || window.webkitAudioContext)();
 
-    analyser = audioCtx.createAnalyser();
-    analyser.fftSize = 256;
+    analyser = ctx.createAnalyser();
 
-    // 🔥 płynność EQ
-    analyser.smoothingTimeConstant = 0.88;
+    // 🔥 REAL MUSIC RESPONSE SETTINGS
+    analyser.fftSize = 512;                 // lepsza rozdzielczość basu
+    analyser.smoothingTimeConstant = 0.78;  // naturalna dynamika
 
-    bufferLength = analyser.frequencyBinCount;
-    dataArray = new Uint8Array(bufferLength);
+    bufferLen = analyser.frequencyBinCount;
+    data = new Uint8Array(bufferLen);
 
-    source = audioCtx.createMediaElementSource(audio);
-    source.connect(analyser);
-    analyser.connect(audioCtx.destination);
+    src = ctx.createMediaElementSource(audio);
+    src.connect(analyser);
+    analyser.connect(ctx.destination);
   }
 
-  if(audioCtx.state === "suspended"){
-    audioCtx.resume();
+  if(ctx.state === "suspended"){
+    ctx.resume();
   }
 }
 
-// ================= CONTROLS (LOGIKA BEZ ZMIAN) =================
-const buttons = document.querySelectorAll("button");
+// ================= CONTROLS =================
+const btns = document.querySelectorAll("button");
 
-buttons[0].onclick = () => {
-  initAudio();
-  audio.play();
+btns[0].onclick = async () => {
+  init();
+  await audio.play();
 };
 
-buttons[1].onclick = () => {
+btns[1].onclick = () => {
   audio.pause();
   audio.currentTime = 0;
 };
 
-buttons[2].onclick = () => {
+btns[2].onclick = () => {
   audio.muted = !audio.muted;
 };
 
@@ -213,32 +170,38 @@ document.getElementById("volume").oninput = e => {
   audio.volume = e.target.value;
 };
 
-// ================= EQ =================
+// ================= EQ (REAL MUSIC FEEL) =================
 function draw(){
   requestAnimationFrame(draw);
 
   if(!analyser) return;
 
-  analyser.getByteFrequencyData(dataArray);
+  analyser.getByteFrequencyData(data);
 
-  ctx.clearRect(0,0,canvas.width,canvas.height);
+  c.clearRect(0,0,canvas.width,canvas.height);
 
-  const barWidth = (canvas.width / bufferLength) * 1.6;
+  const barW = (canvas.width / bufferLen) * 2.2;
   let x = 0;
 
-  for(let i=0;i<bufferLength;i++){
-    const value = dataArray[i];
-    const h = (value/255)*canvas.height;
+  for(let i=0;i<bufferLen;i++){
 
-    const grad = ctx.createLinearGradient(0,canvas.height,0,canvas.height-h);
+    // 🔥 psychoakustyka (podbicie basu + mid presence)
+    let v = data[i];
+
+    if(i < 10) v *= 1.6;       // bass boost
+    else if(i < 40) v *= 1.2;  // mid boost
+
+    const h = (v/255) * canvas.height;
+
+    const grad = c.createLinearGradient(0,canvas.height,0,canvas.height-h);
     grad.addColorStop(0,"#ff003c");
     grad.addColorStop(0.5,"#fcee09");
     grad.addColorStop(1,"#00f0ff");
 
-    ctx.fillStyle = grad;
-    ctx.fillRect(x,canvas.height-h,barWidth,h);
+    c.fillStyle = grad;
+    c.fillRect(x, canvas.height - h, barW, h);
 
-    x += barWidth + 2;
+    x += barW + 2;
   }
 }
 
