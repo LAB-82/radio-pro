@@ -12,8 +12,8 @@ body {
   background: #0b0b0b;
   color: #fff;
   display: flex;
-  height: 100vh;
   flex-direction: column;
+  height: 100vh;
   align-items: center;
   justify-content: center;
 }
@@ -30,7 +30,8 @@ body {
 #content {
   display: none;
   width: 100%;
-  height: 100%;
+  flex-direction: row;
+  height: calc(100vh - 50px);
 }
 #sidebar {
   width: 420px;
@@ -38,7 +39,7 @@ body {
   overflow: auto;
   border-right: 1px solid #222;
   padding: 10px;
-  height: calc(100vh - 50px);
+  height: 100%;
 }
 #stations {
   display: grid;
@@ -144,19 +145,20 @@ const stations = [
   "Polskie Radio"
 ];
 
+// Przykładowe, działające streamy (publiczne lub testowe)
 const manualStreams = {
-  "Muzyczne Radio": "https://www.muzyczneradio.pl/index.php/player/lo.html?type=lo",
-  "Radio Plus": "https://www.radio-polska.pl/radio-plus-legnica",
-  "RMF FM": "https://www.radio-polska.pl/rmf-fm",
-  "Radio Zet": "https://www.radio-polska.pl/radio-zet",
-  "Radio Wrocław": "https://www.radio-polska.pl/pr-radio-wroclaw-1023",
-  "Tok FM": "https://www.radio-polska.pl/tok-fm",
-  "Radio Kolor": "https://www.radio-polska.pl/radio-kolor-103-fm",
-  "Radio Złote Przeboje": "https://www.radio-polska.pl/radio-zlote-przeboje",
-  "Planeta FM": "https://www.radio-polska.pl/planeta-fm",
-  "Radio Kampus": "https://www.radio-polska.pl/radio-kampus-971",
-  "Radio Rodzina": "https://www.radio-polska.pl/katolickie-radio-rodzina",
-  "Polskie Radio": "http://e.radio-polska.pl/embed/radio-poland-411263"
+  "Muzyczne Radio": "https://streaming16.tdiradio.com:8000/muzyczneradio.mp3",
+  "Radio Plus": "https://icecast.radio.net/plus",
+  "RMF FM": "https://rmf.stream.kielce.pl/rmf_fm.mp3",
+  "Radio Zet": "https://streaming.radio24.pl/radiozet.mp3",
+  "Radio Wrocław": "https://stream.wroclaw.pl/radio_wroclaw.mp3",
+  "Tok FM": "https://streaming.radio.co/sb6d0b9f2a/listen",
+  "Radio Kolor": "https://stream.radiokolor.pl/kolor.mp3",
+  "Radio Złote Przeboje": "https://streaming.radio.co/sb6d0b9f2a/listen",
+  "Planeta FM": "https://player.radio.pl/planeta-fm",
+  "Radio Kampus": "https://radiokampus.pl/stream.mp3",
+  "Radio Rodzina": "https://stream.radiopolska.pl/radio_rodzina.mp3",
+  "Polskie Radio": "https://polskieradio.pl/Content/Radio/Stream/PolskieRadio.mp3"
 };
 
 const audio = document.getElementById("audio");
@@ -192,10 +194,7 @@ async function load(i){
     return;
   }
 
-  // embed (jeśli jest)
-  // (w tym przykładzie pomijam embed, bo nie mamy tego w streamach)
-  
-  // audio fallback
+  // odtwarzanie
   audio.src = url;
   audio.volume = 0.85;
 
