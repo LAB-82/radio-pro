@@ -67,37 +67,19 @@ body{
 #proEqualizer{
   margin-top:30px;
   margin-bottom:30px;
-  width:600px;
-  height:260px;
-  position:relative;
-  background:#000014;
+  width: 600px;
+  height: 260px;
+  position: relative;
+  background: #000014;
   border: 2px solid var(--cp-cyan);
-  box-shadow:
-    0 0 10px var(--cp-cyan),
-    0 0 20px var(--cp-magenta),
-    inset 0 0 20px rgba(0,240,255,0.2);
+  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+  filter: drop-shadow(0 0 10px var(--cp-cyan)) drop-shadow(0 0 20px var(--cp-magenta));
 }
-
-/* Ścięte rogi bez ::before - działa w Chrome 109 */
-.cut{
-  position: absolute;
-  width: 0;
-  height: 0;
-  border-style: solid;
-  z-index: 2;
-  pointer-events: none;
-}
-.cut.tl{ top: -2px; left: -2px; border-width: 0 0 8px 8px; border-color: transparent transparent var(--cp-bg) var(--cp-bg); }
-.cut.tr{ top: -2px; right: -2px; border-width: 8px 8px 0 0; border-color: var(--cp-bg) var(--cp-bg) transparent transparent; }
-.cut.bl{ bottom: -2px; left: -2px; border-width: 8px 0 0 8px; border-color: var(--cp-bg) transparent transparent var(--cp-bg); }
-.cut.br{ bottom: -2px; right: -2px; border-width: 0 8px 8px 0; border-color: transparent var(--cp-bg) var(--cp-bg) transparent; }
 
 canvas{
   width:100%;
   height:100%;
   display:block;
-  position: relative;
-  z-index: 1;
 }
 
 #controls{
@@ -118,22 +100,22 @@ button{
   text-transform: uppercase;
   border: 2px solid var(--cp-cyan);
   cursor:pointer;
-  box-shadow: 0 0 8px var(--cp-cyan), inset 0 0 8px rgba(0,240,255,0.2);
+  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+  filter: drop-shadow(0 0 8px var(--cp-cyan));
   transition: all 0.15s ease;
   position: relative;
-  z-index: 1;
 }
 
 button:hover{
   background:var(--cp-cyan);
   color:#000014;
-  box-shadow: 0 0 15px var(--cp-cyan), 0 0 30px var(--cp-magenta);
+  filter: drop-shadow(0 0 15px var(--cp-cyan)) drop-shadow(0 0 30px var(--cp-magenta));
   transform: translateY(-1px);
 }
 
 button:active{
   transform: translateY(1px);
-  box-shadow: 0 0 5px var(--cp-cyan);
+  filter: drop-shadow(0 0 5px var(--cp-cyan));
 }
 
 .volumeWrapper{
@@ -144,7 +126,8 @@ button:active{
   justify-content:center;
   background:#0a0a1a;
   border: 2px solid var(--cp-cyan);
-  box-shadow: 0 0 8px var(--cp-cyan), inset 0 0 8px rgba(0,240,255,0.3);
+  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+  filter: drop-shadow(0 0 8px var(--cp-cyan));
   position: relative;
   box-sizing: border-box;
 }
@@ -158,8 +141,6 @@ button:active{
   border: 1px solid var(--cp-cyan);
   outline: none;
   margin: 0;
-  position: relative;
-  z-index: 3;
 }
 
 #volume::-webkit-slider-thumb{
@@ -219,17 +200,15 @@ button:active{
 <div id="title">Muzyczne Radio</div>
 
 <div id="proEqualizer">
-  <div class="cut tl"></div><div class="cut tr"></div><div class="cut bl"></div><div class="cut br"></div>
   <canvas id="eqCanvas"></canvas>
 </div>
 
 <div id="controls">
-  <button><div class="cut tl"></div><div class="cut tr"></div><div class="cut bl"></div><div class="cut br"></div>PLAY</button>
-  <button><div class="cut tl"></div><div class="cut tr"></div><div class="cut bl"></div><div class="cut br"></div>STOP</button>
-  <button><div class="cut tl"></div><div class="cut tr"></div><div class="cut bl"></div><div class="cut br"></div>MUTE</button>
+  <button>PLAY</button>
+  <button>STOP</button>
+  <button>MUTE</button>
 
   <div class="volumeWrapper">
-    <div class="cut tl"></div><div class="cut tr"></div><div class="cut bl"></div><div class="cut br"></div>
     <input type="range" id="volume" min="0" max="1" step="0.01" value="1">
   </div>
 </div>
