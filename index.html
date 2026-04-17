@@ -79,6 +79,15 @@ audio{
 width:80%;
 }
 
+#logo{
+width:160px;
+height:120px;
+object-fit:contain;
+background:#111;
+padding:8px;
+border-radius:10px;
+}
+
 #status{
 font-size:13px;
 opacity:0.8;
@@ -86,14 +95,9 @@ white-space:pre-line;
 }
 
 button{
-background:#222;
-color:#fff;
-border:none;
-padding:6px 10px;
-border-radius:6px;
-cursor:pointer;
+display:none;
 }
-button:hover{background:#333;}
+
 </style>
 </head>
 
@@ -108,11 +112,13 @@ button:hover{background:#333;}
 <div id="header">🎧 RADIO ENGINE PRO 2026 (SELF HEALING)</div>
 
 <div id="player">
+
+<img id="logo"/>
+
 <audio id="audio" controls></audio>
-<div>
-<button onclick="clearCache()">CLEAR CACHE</button>
-</div>
+
 <div id="status">READY</div>
+
 </div>
 
 </div>
@@ -131,11 +137,12 @@ const stations = [
 "Planeta FM",
 "Radio Kampus",
 "Radio Rodzina",
-"Radio Republika"
+"Polskie Radio"
 ];
 
 const audio = document.getElementById("audio");
 const status = document.getElementById("status");
+const logo = document.getElementById("logo");
 
 let current = 0;
 
@@ -151,30 +158,39 @@ localStorage.setItem("radio_favs", JSON.stringify(favs));
 }
 
 /* =========================
-   PEWNE STREAMY (Z TWOICH LINKÓW)
+   STREAMS (FIXED)
 ========================= */
 const manualStreams = {
 "Radio Plus":"https://www.radio-polska.pl/radio-plus-legnica",
-"RMF FM":"https://www.radio-polska.pl/rmf-fm",
-"Radio Zet":"https://www.radio-polska.pl/radio-zet",
-"Radio Wrocław":"https://www.radio-polska.pl/pr-radio-wroclaw-1023",
-"Tok FM":"https://www.radio-polska.pl/tok-fm",
-"Radio Kolor":"https://www.radio-polska.pl/radio-kolor-103-fm",
-"Radio Złote Przeboje":"https://www.radio-polska.pl/radio-zlote-przeboje",
-"Planeta FM":"https://www.radio-polska.pl/planeta-fm",
-"Radio Kampus":"https://www.radio-polska.pl/radio-kampus-971",
-"Radio Rodzina":"https://www.radio-polska.pl/katolickie-radio-rodzina",
-"Radio Republika":"https://www.radio-polska.pl/radio-republika"
+"Polskie Radio":"https://www.radio-polska.pl/radio-poland"
 };
 
-/* STREAM RESOLVER */
+/* =========================
+   LOGO FIX (REAL WORKING)
+========================= */
+async function setLogo(name){
+try{
+const res = await fetch(`https://de1.api.radio-browser.info/json/stations/search?name=${encodeURIComponent(name)}&limit=1`);
+const data = await res.json();
+
+if(data[0]?.favicon){
+logo.src = data[0].favicon;
+return;
+}
+}catch(e){}
+
+logo.src = "";
+}
+
+/* =========================
+   STREAM RESOLVER
+========================= */
 async function resolveStream(name){
 
 if(cache[name]){
 return cache[name];
 }
 
-/* manual override FIRST */
 if(manualStreams[name]){
 cache[name] = manualStreams[name];
 saveCache();
@@ -183,7 +199,7 @@ return manualStreams[name];
 
 try{
 const res = await fetch(
-`https://de1.api.radio-browser.info/json/stations/search?name=${encodeURIComponent(name)}&limit=8`
+`https://de1.api.radio-browser.info/json/stations/search?name=${encodeURIComponent(name)}&limit=5`
 );
 const data = await res.json();
 
@@ -203,11 +219,15 @@ return best.url_resolved;
 return null;
 }
 
-/* LOAD */
+/* =========================
+   LOAD
+========================= */
 async function load(i){
 
 current = i;
 const name = stations[i];
+
+setLogo(name);
 
 status.innerText = "ŁADOWANIE: " + name;
 
@@ -220,6 +240,9 @@ return;
 
 audio.src = url;
 
+/* NORMALIZACJA GŁOŚNOŚCI */
+audio.volume = 0.8;
+
 audio.play()
 .then(()=>{
 status.innerText = "▶ GRA: " + name;
@@ -230,7 +253,7 @@ status.innerText = "⚠️ kliknij PLAY ręcznie";
 });
 }
 
-/* LIVE MARKER */
+/* LIVE */
 function markLive(i){
 document.querySelectorAll(".station").forEach((el,idx)=>{
 el.classList.toggle("live", idx===i);
@@ -249,14 +272,13 @@ el.classList.add("fav");
 saveFavs();
 }
 
-/* AUTO CACHE CLEANER */
+/* AUTO CACHE CLEAN (HIDDEN) */
 setInterval(()=>{
 cache = {};
 localStorage.removeItem("radio_cache");
-console.log("🧹 auto cache cleaned");
 }, 600000);
 
-/* SELF HEALING BACKGROUND CHECK */
+/* SELF HEALING */
 setInterval(async ()=>{
 for(let i=0;i<stations.length;i++){
 const name = stations[i];
@@ -275,11 +297,10 @@ saveCache();
 }
 }, 300000);
 
-/* CLEAR CACHE */
+/* CLEAR CACHE (DISABLED UI) */
 function clearCache(){
 cache = {};
 localStorage.removeItem("radio_cache");
-status.innerText = "CACHE WYCZYSZCZONY";
 }
 
 /* UI */
