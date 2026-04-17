@@ -11,6 +11,7 @@
   --cp-yellow:#fcee09;
   --cp-red:#ff2a2a;
   --cp-bg:#000014;
+  --cut: 8px;
 }
 
 body{
@@ -74,28 +75,14 @@ body{
   box-sizing: border-box;
   position: relative;
   background: #000014;
-  box-shadow: 0 0 10px var(--cp-cyan), 0 0 20px var(--cp-magenta), inset 0 0 20px rgba(0,240,255,0.2);
-}
-
-#proEqualizer::before{
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
   border: 2px solid var(--cp-cyan);
-  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
-  pointer-events: none;
-  z-index: 1;
+  box-shadow: 0 0 10px var(--cp-cyan), 0 0 20px var(--cp-magenta), inset 0 0 20px rgba(0,240,255,0.2);
 }
 
 canvas{
   display: block;
   width: 100%;
   height: 100%;
-  position: relative;
-  z-index: 0;
 }
 
 #controls{
@@ -113,22 +100,9 @@ canvas{
   align-items:center;
   justify-content:center;
   background:#0a0a1a;
-  position: relative;
   box-sizing: border-box;
-  box-shadow: 0 0 8px var(--cp-cyan), inset 0 0 8px rgba(0,240,255,0.3);
-}
-
-.volumeWrapper::before{
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
   border: 2px solid var(--cp-cyan);
-  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
-  pointer-events: none;
-  z-index: 1;
+  box-shadow: 0 0 8px var(--cp-cyan), inset 0 0 8px rgba(0,240,255,0.3);
 }
 
 button{
@@ -145,20 +119,7 @@ button{
   box-shadow: 0 0 8px var(--cp-cyan), inset 0 0 8px rgba(0,240,255,0.2);
   transition: all 0.15s ease;
   box-sizing: border-box;
-  position: relative;
-  border: none;
-}
-
-button::before{
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
   border: 2px solid var(--cp-cyan);
-  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
-  pointer-events: none;
 }
 
 button:hover{
@@ -182,8 +143,6 @@ button:active{
   border: 1px solid var(--cp-cyan);
   outline: none;
   margin: 0;
-  position: relative;
-  z-index: 2;
 }
 
 #volume::-webkit-slider-thumb{
@@ -230,160 +189,4 @@ button:active{
 }
 
 #volume.changed::-webkit-slider-thumb{
-  background: var(--cp-red);
-  box-shadow: 0 0 8px var(--cp-red), 0 0 15px var(--cp-magenta);
-}
-
-#volume.changed::-moz-range-thumb{
-  background: var(--cp-red);
-  box-shadow: 0 0 8px var(--cp-red), 0 0 15px var(--cp-magenta);
-}
-
-.playActive{
-  color:#000014!important;
-  background: var(--cp-cyan)!important;
-  box-shadow: 0 0 20px var(--cp-cyan), 0 0 40px var(--cp-cyan)!important;
-}
-.stopActive{
-  color:#000014!important;
-  background: var(--cp-magenta)!important;
-  box-shadow: 0 0 20px var(--cp-magenta), 0 0 40px var(--cp-magenta)!important;
-}
-.stopActive::before{
-  border-color: var(--cp-magenta)!important;
-}
-.muteActive{
-  color:#000014!important;
-  background: var(--cp-yellow)!important;
-  box-shadow: 0 0 20px var(--cp-yellow), 0 0 40px var(--cp-yellow)!important;
-}
-.muteActive::before{
-  border-color: var(--cp-yellow)!important;
-}
-
-#bottomLink{
-  margin-top:10px;
-}
-
-#bottomLink a{
-  color:var(--cp-cyan);
-  text-decoration:none;
-  font-family:'Orbitron', sans-serif;
-  text-shadow: 0 0 5px var(--cp-cyan);
-  transition: 0.2s;
-}
-
-#bottomLink a:hover{
-  color:var(--cp-yellow);
-  text-shadow: 0 0 10px var(--cp-yellow), 0 0 20px var(--cp-magenta);
-}
-</style>
-</head>
-
-<body>
-
-<div id="title">Muzyczne Radio</div>
-<div id="proEqualizer"><canvas id="eqCanvas"></canvas></div>
-
-<div id="controls">
-  <button id="playBtn">PLAY</button>
-  <button id="stopBtn">STOP</button>
-  <button id="muteBtn">MUTE</button>
-
-  <div class="volumeWrapper">
-    <input id="volume" type="range" min="0" max="1" step="0.01" value="0.5">
-  </div>
-</div>
-
-<div id="bottomLink">
-  <a href="https://www.muzyczneradio.pl" target="_blank">www.muzyczneradio.pl</a>
-</div>
-
-<audio id="audio" preload="none" src="https://stream.rcs.revma.com/gzwc1xcq042vv"></audio>
-
-<script>
-const audio = document.getElementById("audio");
-const volume = document.getElementById("volume");
-const playBtn = document.getElementById("playBtn");
-const stopBtn = document.getElementById("stopBtn");
-const muteBtn = document.getElementById("muteBtn");
-const canvas = document.getElementById("eqCanvas");
-const ctx = canvas.getContext("2d");
-
-audio.volume = parseFloat(volume.value);
-
-let isPlaying = false;
-let animationId;
-let peaks = [];
-let bars = [];
-
-for(let i = 0; i < 80; i++){
-  peaks[i] = 0;
-  bars[i] = 0;
-}
-
-playBtn.addEventListener("click", () => {
-  if (isPlaying) return;
-  audio.play().then(() => {
-    isPlaying = true;
-    playBtn.classList.add("playActive");
-    stopBtn.classList.remove("stopActive");
-    if (!animationId) draw();
-  }).catch(() => {
-    playBtn.classList.remove("playActive");
-  });
-});
-
-stopBtn.addEventListener("click", () => {
-  audio.pause();
-  audio.currentTime = 0;
-  isPlaying = false;
-
-  stopBtn.classList.add("stopActive");
-  playBtn.classList.remove("playActive");
-
-  setTimeout(() => {
-    stopBtn.classList.remove("stopActive");
-  }, 1000);
-
-  cancelAnimationFrame(animationId);
-  animationId = null;
-});
-
-muteBtn.addEventListener("click", () => {
-  audio.muted =!audio.muted;
-  muteBtn.classList.toggle("muteActive");
-  updateVolumeThumb();
-});
-
-volume.addEventListener("input", () => {
-  let val = parseFloat(volume.value);
-  audio.volume = val;
-
-  if (audio.muted && val > 0) {
-    audio.muted = false;
-    muteBtn.classList.remove("muteActive");
-  }
-
-  updateVolumeThumb();
-});
-
-function updateVolumeThumb() {
-  let val = parseFloat(volume.value);
-  volume.classList.remove("center", "changed");
-
-  if (audio.muted) return;
-
-  if (Math.abs(val - 0.5) < 0.02) {
-    volume.classList.add("center");
-  } else {
-    volume.classList.add("changed");
-  }
-}
-
-function resizeCanvas() {
-  let dpr = window.devicePixelRatio || 1;
-  let width = 600;
-  let height = 260;
-
-  canvas.width = width * dpr;
+  background
