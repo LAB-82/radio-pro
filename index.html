@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="pl">
 <head>
 <meta charset="UTF-8" />
@@ -75,7 +75,7 @@ flex-direction:column;
 gap:10px;
 }
 
-/* 🔥 LOGO */
+/* LOGO */
 #logo{
 width:180px;
 height:120px;
@@ -148,7 +148,7 @@ const stations = [
 "Radio Kampus",
 "Radio Rodzina",
 "Radio Republika",
-"Polskie Radio Czwórka",
+"Polskie Radio Czwórka"
 ];
 
 const audio = document.getElementById("audio");
@@ -160,6 +160,14 @@ let current = 0;
 let cache = JSON.parse(localStorage.getItem("radio_cache") || "{}");
 let favs = JSON.parse(localStorage.getItem("radio_favs") || "[]");
 
+/* 🔊 NORMALIZACJA GŁOŚNOŚCI */
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+const source = audioCtx.createMediaElementSource(audio);
+const gainNode = audioCtx.createGain();
+gainNode.gain.value = 0.9; // lekka normalizacja
+
+source.connect(gainNode).connect(audioCtx.destination);
+
 function saveCache(){
 localStorage.setItem("radio_cache", JSON.stringify(cache));
 }
@@ -168,14 +176,20 @@ function saveFavs(){
 localStorage.setItem("radio_favs", JSON.stringify(favs));
 }
 
-/* 🔥 POPRAWIONE STREAMY */
+/* 🔥 MANUAL STREAMS */
 const manualStreams = {
-"Polskie Radio Czwórka":"https://stream3.polskieradio.pl/pr4_aac128"
+"Radio Plus":"https://www.radio-polska.pl/radio-plus-polska",
+"Radio Republika":"https://stream.republika.pl/live.mp3",
+"Polskie Radio Czwórka":"https://stream.polskieradio.pl/pr4_mp3"
 };
 
-/* LOGO */
+/* LOGO (fallback system) */
 function setLogo(name){
 logo.src = `https://www.radio-browser.info/backends/logos/${encodeURIComponent(name)}.png`;
+
+logo.onerror = () => {
+logo.src = `https://via.placeholder.com/180x120?text=${encodeURIComponent(name)}`;
+};
 }
 
 /* STREAM RESOLVER */
@@ -185,6 +199,7 @@ if(cache[name]){
 return cache[name];
 }
 
+/* manual first */
 if(manualStreams[name]){
 cache[name] = manualStreams[name];
 saveCache();
