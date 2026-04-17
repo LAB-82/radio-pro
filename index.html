@@ -92,6 +92,17 @@ font-size:13px;
 opacity:0.8;
 white-space:pre-line;
 }
+
+#startButton {
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #00aa66;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 20px;
+}
 </style>
 </head>
 
@@ -107,6 +118,7 @@ white-space:pre-line;
 <img id="logo"/>
 <audio id="audio" controls></audio>
 <div id="status">READY</div>
+<button id="startButton">Kliknij, aby uruchomić radio</button>
 </div>
 </div>
 
@@ -129,6 +141,7 @@ const stations = [
 const audio = document.getElementById("audio");
 const status = document.getElementById("status");
 const logo = document.getElementById("logo");
+const startBtn = document.getElementById("startButton");
 
 let current = 0;
 
@@ -187,13 +200,6 @@ return;
 frame.style.display = "none";
 audio.src = url;
 audio.volume = 0.85;
-
-try {
-  await audio.play();
-  status.innerText = "▶ GRA: " + name;
-} catch(e) {
-  status.innerText = "⚠️ Kliknij odtwarzanie ręcznie.";
-}
 }
 
 /* Funkcja ustawiania logo */
@@ -218,7 +224,6 @@ favs = favs.filter(f=>f!==s);
 star.classList.remove("fav");
 } else {
 favs.push(s);
-star.classList.add("fav");
 }
 localStorage.setItem("radio_favs", JSON.stringify(favs));
 };
@@ -228,10 +233,12 @@ div.onclick=()=>load(i);
 document.getElementById("stations").appendChild(div);
 });
 
-// Załaduj domyślnie pierwszą stację i odtwórz ją automatycznie po załadowaniu
-window.onload = () => {
+/* Obsługa przycisku start */
+startBtn.onclick = () => {
   load(0);
+  startBtn.style.display = "none"; // ukryj przycisk po kliknięciu
 };
+
 </script>
 
 </body>
