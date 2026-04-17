@@ -41,7 +41,6 @@ transition:0.2s;
 }
 
 .station:hover{background:#2a2a2a;}
-.station.active{background:#00aa66;}
 .station.live{background:#1f7a3a;}
 
 .star{
@@ -93,17 +92,6 @@ font-size:13px;
 opacity:0.8;
 white-space:pre-line;
 }
-
-button{ display:none; }
-
-iframe{
-width:80%;
-height:120px;
-border:none;
-border-radius:10px;
-background:#000;
-}
-
 </style>
 </head>
 
@@ -114,24 +102,15 @@ background:#000;
 </div>
 
 <div id="main">
-
 <div id="header">🎧 RADIO ENGINE PRO 2026 (SELF HEALING)</div>
-
 <div id="player">
-
 <img id="logo"/>
-
 <audio id="audio" controls></audio>
-<iframe id="frame" style="display:none"></iframe>
-
 <div id="status">READY</div>
-
 </div>
-
 </div>
 
 <script>
-
 const stations = [
 "Muzyczne Radio",
 "Radio Plus",
@@ -148,26 +127,13 @@ const stations = [
 ];
 
 const audio = document.getElementById("audio");
-const frame = document.getElementById("frame");
 const status = document.getElementById("status");
 const logo = document.getElementById("logo");
 
 let current = 0;
 
-let cache = JSON.parse(localStorage.getItem("radio_cache") || "{}");
 let favs = JSON.parse(localStorage.getItem("radio_favs") || "[]");
 
-function saveCache(){
-localStorage.setItem("radio_cache", JSON.stringify(cache));
-}
-
-function saveFavs(){
-localStorage.setItem("radio-favs", JSON.stringify(favs));
-}
-
-/* =========================
-   TYLKO TWOJE LINKI
-========================= */
 const manualStreams = {
 "Muzyczne Radio":"https://www.muzyczneradio.pl/index.php/player/lo.html?type=lo",
 "Radio Plus":"https://www.radio-polska.pl/radio-plus-legnica",
@@ -183,18 +149,13 @@ const manualStreams = {
 "Polskie Radio":"http://e.radio-polska.pl/embed/radio-poland-411263"
 };
 
-/* =========================
-   LOGO FIX (STABILNY)
-========================= */
+/* Funkcja ustawiająca logo */
 async function setLogo(name){
 logo.src = "https://via.placeholder.com/160x120?text=" + encodeURIComponent(name);
 }
 
-/* =========================
-   LOAD (KLUCZOWA POPRAWKA)
-========================= */
+/* Funkcja ładowania stacji */
 async function load(i){
-
 current = i;
 const name = stations[i];
 
@@ -203,69 +164,42 @@ status.innerText = "ŁADOWANIE: " + name;
 /* reset */
 audio.pause();
 audio.src = "";
-frame.style.display = "none";
-frame.src = "";
+document.querySelectorAll(".station").forEach(el => el.classList.remove("live"));
+const stationDivs = document.querySelectorAll(".station");
+if(stationDivs[i]) stationDivs[i].classList.add("live");
 
 const url = manualStreams[name];
 
 if(!url){
 status.innerText = "❌ BRAK LINKU: " + name;
-return;
+ return;
 }
 
-/* 🔥 jeśli to radio-polska lub embed → iframe */
+/* embed */
 if(url.includes("radio-polska.pl") || url.includes("radio-poland") || url.includes("muzyczneradio.pl")){
 frame.style.display = "block";
 frame.src = url;
-
 status.innerText = "▶ GRA (EMBED): " + name;
-markLive(i);
 return;
 }
 
-/* fallback audio */
+/* audio fallback */
+frame.style.display = "none";
 audio.src = url;
 audio.volume = 0.85;
 
-audio.play()
-.then(()=>{
-status.innerText = "▶ GRA: " + name;
-markLive(i);
-})
-.catch(()=>{
-status.innerText = "⚠️ kliknij PLAY ręcznie";
-});
+try {
+  await audio.play();
+  status.innerText = "▶ GRA: " + name;
+} catch(e) {
+  status.innerText = "⚠️ Kliknij odtwarzanie ręcznie.";
+}
 }
 
-/* LIVE */
-function markLive(i){
-document.querySelectorAll(".station").forEach((el,idx)=>{
-el.classList.toggle("live", idx===i);
-});
-}
+/* Funkcja ustawiania logo */
+setLogo(stations[0]);
 
-/* FAVORITES */
-function toggleFav(name, el){
-if(favs.includes(name)){
-favs = favs.filter(f=>f!==name);
-el.classList.remove("fav");
-}else{
-favs.push(name);
-el.classList.add("fav");
-}
-saveFavs();
-}
-
-/* CACHE (pozostawione, ale nie używane aktywnie) */
-setInterval(()=>{
-cache = {};
-localStorage.removeItem("radio_cache");
-}, 600000);
-
-/* SELF HEALING (wyłączone ryzyko psucia) */
-setInterval(()=>{}, 300000);
-
-/* UI */
+/* Tworzenie elementów stacji */
 stations.forEach((s,i)=>{
 const div=document.createElement("div");
 div.className="station";
@@ -279,20 +213,25 @@ if(favs.includes(s)) star.classList.add("fav");
 
 star.onclick=(e)=>{
 e.stopPropagation();
-toggleFav(s, star);
+if(favs.includes(s)){
+favs = favs.filter(f=>f!==s);
+star.classList.remove("fav");
+} else {
+favs.push(s);
+star.classList.add("fav");
+}
+localStorage.setItem("radio_favs", JSON.stringify(favs));
 };
 
 div.appendChild(star);
 div.onclick=()=>load(i);
-
 document.getElementById("stations").appendChild(div);
 });
 
-// Automatyczne odtwarzanie domyślnej stacji po załadowaniu strony
+// Załaduj domyślnie pierwszą stację i odtwórz ją automatycznie po załadowaniu
 window.onload = () => {
-  load(0); // Załaduj pierwszą stację jako domyślną i odtwórz ją
+  load(0);
 };
-
 </script>
 
 </body>
