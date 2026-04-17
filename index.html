@@ -1,92 +1,122 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Radio - Test</title>
-<style>
-  body {
-    margin: 0; font-family: Arial; background:#000; color:#fff; display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh;
-  }
-  #startBtn {
-    padding: 15px 30px; font-size:16px; background:#222; border:none; border-radius:8px; cursor:pointer;
-  }
-  #content {
-    display:none; width:100%; flex-direction:row; height: calc(100vh - 50px);
-  }
-  #sidebar {
-    width:300px; background:#111; overflow:auto; padding:10px; height:100%;
-  }
-  #stations {
-    display:grid; grid-template-columns:repeat(2,1fr); gap:10px;
-  }
-  .station {
-    background:#222; padding:10px; border-radius:8px; cursor:pointer; text-align:center;
-  }
-  .station:hover {
-    background:#333;
-  }
-  #player {
-    flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:10px;
-  }
-  #logo { width:160px; height:120px; background:#333; margin-bottom:10px; }
-  #status { margin-top:10px; }
-</style>
+    <meta charset="UTF-8" />
+    <title>Odtwarzacz Radiowy</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+        }
+        .station {
+            background-color: #fff;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+        }
+        .station h2 {
+            margin-top: 0;
+        }
+        audio {
+            width: 100%;
+            margin-top: 10px;
+        }
+    </style>
 </head>
 <body>
+    <h1>Odtwarzacz Radia</h1>
 
-<button id="startBtn">Kliknij, aby uruchomić radio</button>
-<div id="content">
-  <div id="sidebar">
-    <div id="stations"></div>
-  </div>
-  <div id="player">
-    <div id="logo"></div>
-    <audio id="audio" controls></audio>
-    <div id="status">Oczekiwanie...</div>
-  </div>
-</div>
+    <div class="station">
+        <h2>Muzyczne Radio</h2>
+        <p>Brak oficjalnego linku. Spróbuj z własnym źródłem.</p>
+        <audio controls>
+            <source src="http://stream.muzynaseradio.pl:8000/stream.mp3" type="audio/mpeg" />
+            Twój przeglądarka nie obsługuje odtwarzania audio.
+        </audio>
+    </div>
 
-<script>
-const stations = [
-  {name:"RMF FM", stream:"https://rmf.stream.kielce.pl/rmf_fm.mp3"},
-  {name:"Radio Zet", stream:"https://streaming.radiozet.pl/RadioZet.mp3"},
-  {name:"Radio Plus", stream:"https://icecast.radio.net/radioplus"},
-  {name:"Polskie Radio", stream:"https://polskieradio.pl/Content/Radio/Stream/PolskieRadio.mp3"}
-];
+    <div class="station">
+        <h2>Radio Plus</h2>
+        <audio controls>
+            <source src="https://icecast.radio.net/radioplus" type="audio/mpeg" />
+            Twój przeglądarka nie obsługuje odtwarzania audio.
+        </audio>
+    </div>
 
-const audio = document.getElementById("audio");
-const status = document.getElementById("status");
+    <div class="station">
+        <h2>RMF FM</h2>
+        <audio controls>
+            <source src="https://rmf.stream.kielce.pl/rmf_fm.mp3" type="audio/mpeg" />
+            Twój przeglądarka nie obsługuje odtwarzania audio.
+        </audio>
+    </div>
 
-document.getElementById("startBtn").onclick = () => {
-  document.getElementById("startBtn").style.display="none";
-  document.getElementById("content").style.display="flex";
-  initStations();
-  loadStation(0);
-};
+    <div class="station">
+        <h2>Radio Zet</h2>
+        <audio controls>
+            <source src="https://streaming.radiozet.pl/RadioZet.mp3" type="audio/mpeg" />
+            Twój przeglądarka nie obsługuje odtwarzania audio.
+        </audio>
+    </div>
 
-function initStations() {
-  const container = document.getElementById("stations");
-  stations.forEach((s, i) => {
-    const div = document.createElement("div");
-    div.className="station";
-    div.innerText=s.name;
-    div.onclick= ()=> loadStation(i);
-    container.appendChild(div);
-  });
-}
+    <div class="station">
+        <h2>Radio Wrocław</h2>
+        <audio controls>
+            <source src="https://stream.wroclaw.pl/radio_wroclaw.mp3" type="audio/mpeg" />
+            Twój przeglądarka nie obsługuje odtwarzania audio.
+        </audio>
+    </div>
 
-function loadStation(i) {
-  const s=stations[i];
-  status.innerText="Ładowanie: "+s.name;
-  audio.src=s.stream;
-  audio.play().then(() => {
-    status.innerText="Graj: "+s.name;
-  }).catch(()=> {
-    status.innerText="Kliknij odtwarzanie ręcznie.";
-  });
-}
-</script>
+    <div class="station">
+        <h2>Tok FM</h2>
+        <audio controls>
+            <source src="https://streaming.radio.co/sb6d0b9f2a/listen" type="audio/mpeg" />
+            Twój przeglądarka nie obsługuje odtwarzania audio.
+        </audio>
+    </div>
 
+    <div class="station">
+        <h2>Radio Kolor</h2>
+        <audio controls>
+            <source src="https://stream.radiokolor.pl/kolor.mp3" type="audio/mpeg" />
+            Twój przeglądarka nie obsługuje odtwarzania audio.
+        </audio>
+    </div>
+
+    <div class="station">
+        <h2>Złote Przeboje</h2>
+        <audio controls>
+            <source src="https://streaming.radio.co/sb6d0b9f2a/listen" type="audio/mpeg" />
+            Twój przeglądarka nie obsługuje odtwarzania audio.
+        </audio>
+    </div>
+
+    <div class="station">
+        <h2>Radio Kampus</h2>
+        <audio controls>
+            <source src="https://radiokampus.pl/stream.mp3" type="audio/mpeg" />
+            Twój przeglądarka nie obsługuje odtwarzania audio.
+        </audio>
+    </div>
+
+    <div class="station">
+        <h2>Radio Rodzina</h2>
+        <audio controls>
+            <source src="https://stream.radiopolska.pl/radio_rodzina.mp3" type="audio/mpeg" />
+            Twój przeglądarka nie obsługuje odtwarzania audio.
+        </audio>
+    </div>
+
+    <div class="station">
+        <h2>Polskie Radio Program 1</h2>
+        <audio controls>
+            <source src="https://polskieradio.pl/Content/Radio/Stream/PolskieRadio.mp3" type="audio/mpeg" />
+            Twój przeglądarka nie obsługuje odtwarzania audio.
+        </audio>
+    </div>
 </body>
 </html>
