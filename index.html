@@ -180,3 +180,184 @@ body{background:linear-gradient(180deg,#1c1c1c 0%,#101010 100%)}
 
 @media (max-width: 1200px){
   #stations{grid-template-columns:repeat(6,minmax(0,1fr))}
+}
+@media (max-width: 900px){
+  #stations{grid-template-columns:repeat(4,minmax(0,1fr))}
+}
+@media (max-width: 640px){
+  #title{font-size:15px}
+  #stations{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="topbar">
+    <div id="menu-btn">☰</div>
+    <div id="title">Radio online</div>
+    <div id="clock">00:00</div>
+  </div>
+
+  <div id="grid-wrap">
+    <div id="stations"></div>
+  </div>
+
+  <div id="status">Gotowy</div>
+
+  <div id="playerbar">
+    <button id="playbtn">▶</button>
+    <input id="seek" type="range" min="0" max="100" value="50">
+    <div id="vol-wrap">
+      <span>🔊</span>
+      <input id="vol" type="range" min="0" max="1" step="0.01" value="0.85">
+    </div>
+  </div>
+</div>
+
+<script>
+const stations = [
+  "RMF FM",
+  "Złote Przeboje",
+  "Antyradio",
+  "Radio Wrocław",
+  "Radio Kampus",
+  "Czwórka",
+  "Radio Chopin",
+  "Polskie Radio Dzieciom"
+];
+
+const streams = {
+  "RMF FM":"https://rs6-krk2.rmfstream.pl/rmf_fm",
+  "Złote Przeboje":"https://stream.open.fm/201",
+  "Antyradio":"https://player.antyradio.pl",
+  "Radio Wrocław":"https://stream4.nadaje.com:8176/prw",
+  "Radio Kampus":"https://stream.radiokampus.fm/kampus.mp3",
+  "Czwórka":"https://stream3.polskieradio.pl/pr4_aac128",
+  "Radio Chopin":"https://stream3.polskieradio.pl/pr2_aac128",
+  "Polskie Radio Dzieciom":"https://stream3.polskieradio.pl/prd_aac128"
+};
+
+const stationsEl = document.getElementById("stations");
+const audio = new Audio();
+audio.preload = "none";
+
+const playbtn = document.getElementById("playbtn");
+const seek = document.getElementById("seek");
+const vol = document.getElementById("vol");
+const status = document.getElementById("status");
+const clock = document.getElementById("clock");
+
+let current = null;
+let playing = false;
+
+function updateClock(){
+  const d = new Date();
+  clock.textContent = d.toLocaleTimeString('pl-PL',{hour:'2-digit',minute:'2-digit'});
+}
+setInterval(updateClock,1000);
+updateClock();
+
+function setBar(el, value, key){
+  el.style.setProperty(key, value + '%');
+}
+setBar(seek, 50, '--p');
+setBar(vol, 85, '--v');
+
+function setActive(name){
+  document.querySelectorAll('.station').forEach(el => el.classList.toggle('active', el.dataset.name === name));
+}
+
+function render(){
+  stationsEl.innerHTML = '';
+  stations.forEach(name => {
+    const tile = document.createElement('div');
+    tile.className = 'station';
+    tile.dataset.name = name;
+
+    const img = document.createElement('img');
+    img.alt = name;
+    img.src = `https://www.radio-browser.info/backends/logos/${encodeURIComponent(name)}.png?${Date.now()}`;
+    img.onerror = () => {
+      img.remove();
+      const label = document.createElement('div');
+      label.className = 'label';
+      label.textContent = name;
+      tile.appendChild(label);
+    };
+
+    tile.appendChild(img);
+    tile.addEventListener('click', () => selectStation(name));
+    stationsEl.appendChild(tile);
+  });
+}
+
+async function selectStation(name){
+  current = name;
+  setActive(name);
+  status.textContent = 'Ładowanie: ' + name;
+  const url = streams[name];
+  if(!url){
+    status.textContent = 'Brak streamu: ' + name;
+    return;
+  }
+  try{
+    audio.src = url;
+    audio.volume = parseFloat(vol.value);
+    await audio.play();
+    playing = true;
+    playbtn.textContent = '❚❚';
+    status.textContent = 'Gra: ' + name;
+  }catch(e){
+    playing = false;
+    playbtn.textContent = '▶';
+    status.textContent = 'Kliknij ▶ aby uruchomić: ' + name;
+  }
+}
+
+playbtn.addEventListener('click', async () => {
+  if(!current){
+    await selectStation(stations[0]);
+    return;
+  }
+  if(playing){
+    audio.pause();
+    playing = false;
+    playbtn.textContent = '▶';
+    status.textContent = 'Wstrzymane';
+  }else{
+    try{
+      await audio.play();
+      playing = true;
+      playbtn.textContent = '❚❚';
+      status.textContent = 'Gra: ' + current;
+    }catch(e){
+      status.textContent = 'Nie można uruchomić odtwarzania';
+    }
+  }
+});
+
+seek.addEventListener('input', () => setBar(seek, seek.value, '--p'));
+vol.addEventListener('input', () => {
+  audio.volume = vol.value;
+  setBar(vol, Math.round(vol.value * 100), '--v');
+});
+
+audio.addEventListener('waiting', () => status.textContent = 'Buforowanie...');
+audio.addEventListener('playing', () => {
+  playing = true;
+  playbtn.textContent = '❚❚';
+  if(current) status.textContent = 'Gra: ' + current;
+});
+audio.addEventListener('pause', () => {
+  playing = false;
+  playbtn.textContent = '▶';
+});
+audio.addEventListener('error', () => {
+  status.textContent = 'Błąd streamu';
+});
+
+render();
+setActive(stations[0]);
+</script>
+</body>
+</html>
