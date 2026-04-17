@@ -67,13 +67,21 @@ body{
 #proEqualizer{
   margin-top:30px;
   margin-bottom:30px;
-  width: 600px;
-  height: 260px;
-  position: relative;
-  background: #000014;
+  width:600px;
+  height:260px;
+  position:relative;
+  background:
+    linear-gradient(135deg, transparent 8px, var(--cp-bg) 8px) top left,
+    linear-gradient(225deg, transparent 8px, var(--cp-bg) 8px) top right,
+    linear-gradient(315deg, transparent 8px, var(--cp-bg) 8px) bottom right,
+    linear-gradient(45deg, transparent 8px, var(--cp-bg) 8px) bottom left;
+  background-size: 51% 51%;
+  background-repeat: no-repeat;
   border: 2px solid var(--cp-cyan);
-  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
-  filter: drop-shadow(0 0 10px var(--cp-cyan)) drop-shadow(0 0 20px var(--cp-magenta));
+  box-shadow:
+    0 0 10px var(--cp-cyan),
+    0 0 20px var(--cp-magenta),
+    inset 0 0 20px rgba(0,240,255,0.2);
 }
 
 canvas{
@@ -91,7 +99,13 @@ canvas{
 button{
   width:160px;
   height:45px;
-  background:#0a0a1a;
+  background:
+    linear-gradient(135deg, transparent 8px, #0a0a1a 8px) top left,
+    linear-gradient(225deg, transparent 8px, #0a0a1a 8px) top right,
+    linear-gradient(315deg, transparent 8px, #0a0a1a 8px) bottom right,
+    linear-gradient(45deg, transparent 8px, #0a0a1a 8px) bottom left;
+  background-size: 51% 51%;
+  background-repeat: no-repeat;
   color:var(--cp-cyan);
   font-family:'Orbitron', sans-serif;
   font-weight: 700;
@@ -100,22 +114,27 @@ button{
   text-transform: uppercase;
   border: 2px solid var(--cp-cyan);
   cursor:pointer;
-  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
-  filter: drop-shadow(0 0 8px var(--cp-cyan));
+  box-shadow: 0 0 8px var(--cp-cyan), inset 0 0 8px rgba(0,240,255,0.2);
   transition: all 0.15s ease;
   position: relative;
 }
 
 button:hover{
-  background:var(--cp-cyan);
+  background:
+    linear-gradient(135deg, transparent 8px, var(--cp-cyan) 8px) top left,
+    linear-gradient(225deg, transparent 8px, var(--cp-cyan) 8px) top right,
+    linear-gradient(315deg, transparent 8px, var(--cp-cyan) 8px) bottom right,
+    linear-gradient(45deg, transparent 8px, var(--cp-cyan) 8px) bottom left;
+  background-size: 51% 51%;
+  background-repeat: no-repeat;
   color:#000014;
-  filter: drop-shadow(0 0 15px var(--cp-cyan)) drop-shadow(0 0 30px var(--cp-magenta));
+  box-shadow: 0 0 15px var(--cp-cyan), 0 0 30px var(--cp-magenta);
   transform: translateY(-1px);
 }
 
 button:active{
   transform: translateY(1px);
-  filter: drop-shadow(0 0 5px var(--cp-cyan));
+  box-shadow: 0 0 5px var(--cp-cyan);
 }
 
 .volumeWrapper{
@@ -124,10 +143,15 @@ button:active{
   display:flex;
   align-items:center;
   justify-content:center;
-  background:#0a0a1a;
+  background:
+    linear-gradient(135deg, transparent 8px, #0a0a1a 8px) top left,
+    linear-gradient(225deg, transparent 8px, #0a0a1a 8px) top right,
+    linear-gradient(315deg, transparent 8px, #0a0a1a 8px) bottom right,
+    linear-gradient(45deg, transparent 8px, #0a0a1a 8px) bottom left;
+  background-size: 51% 51%;
+  background-repeat: no-repeat;
   border: 2px solid var(--cp-cyan);
-  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
-  filter: drop-shadow(0 0 8px var(--cp-cyan));
+  box-shadow: 0 0 8px var(--cp-cyan), inset 0 0 8px rgba(0,240,255,0.3);
   position: relative;
   box-sizing: border-box;
 }
@@ -172,4 +196,167 @@ button:active{
 }
 
 #volume::-moz-range-track{
-  background: linear-gradient(90deg
+  background: linear-gradient(90deg, var(--cp-magenta), var(--cp-cyan));
+  height: 4px;
+}
+
+#volume.center::-webkit-slider-thumb{
+  background: var(--cp-yellow);
+  box-shadow: 0 0 8px var(--cp-yellow), 0 0 15px var(--cp-cyan);
+}
+#volume.center::-moz-range-thumb{
+  background: var(--cp-yellow);
+  box-shadow: 0 0 8px var(--cp-yellow), 0 0 15px var(--cp-cyan);
+}
+#volume.changed::-webkit-slider-thumb{
+  background: var(--cp-red);
+  box-shadow: 0 0 8px var(--cp-red), 0 0 15px var(--cp-magenta);
+}
+#volume.changed::-moz-range-thumb{
+  background: var(--cp-red);
+  box-shadow: 0 0 8px var(--cp-red), 0 0 15px var(--cp-magenta);
+}
+
+#bottomLink{
+  margin-top:20px;
+}
+
+#bottomLink a{
+  color:var(--cp-cyan);
+  text-decoration:none;
+  font-family:'Orbitron', sans-serif;
+  text-shadow: 0 0 5px var(--cp-cyan);
+  transition: 0.2s;
+}
+
+#bottomLink a:hover{
+  color:var(--cp-yellow);
+  text-shadow: 0 0 10px var(--cp-yellow), 0 0 20px var(--cp-magenta);
+}
+</style>
+</head>
+
+<body>
+
+<div id="title">Muzyczne Radio</div>
+
+<div id="proEqualizer">
+  <canvas id="eqCanvas"></canvas>
+</div>
+
+<div id="controls">
+  <button>PLAY</button>
+  <button>STOP</button>
+  <button>MUTE</button>
+
+  <div class="volumeWrapper">
+    <input type="range" id="volume" min="0" max="1" step="0.01" value="0.5" class="center">
+  </div>
+</div>
+
+<div id="bottomLink">
+  <a href="https://www.muzyczneradio.pl/" target="_blank">www.muzyczneradio.pl</a>
+</div>
+
+<script>
+// ================= STREAM (ORYGINAŁ) =================
+const audio = new Audio("https://stream.rcs.revma.com/gzwc1xcq042vv");
+audio.crossOrigin = "anonymous";
+
+// ================= AUDIO ENGINE =================
+let ctx, analyser, src, data, bufferLen;
+
+const canvas = document.getElementById("eqCanvas");
+const c = canvas.getContext("2d");
+
+function resize(){
+  canvas.width = canvas.clientWidth;
+  canvas.height = canvas.clientHeight;
+}
+resize();
+window.addEventListener("resize", resize);
+
+// ================= INIT =================
+function init(){
+  if(!ctx){
+    ctx = new (window.AudioContext || window.webkitAudioContext)();
+
+    analyser = ctx.createAnalyser();
+    analyser.fftSize = 256;
+
+    // stabilne, naturalne audio
+    analyser.smoothingTimeConstant = 0.82;
+
+    bufferLen = analyser.frequencyBinCount;
+    data = new Uint8Array(bufferLen);
+
+    src = ctx.createMediaElementSource(audio);
+    src.connect(analyser);
+    analyser.connect(ctx.destination);
+  }
+
+  if(ctx.state === "suspended"){
+    ctx.resume();
+  }
+}
+
+// ================= CONTROLS (BEZ ZMIAN LOGIKI) =================
+const btns = document.querySelectorAll("button");
+
+btns[0].onclick = () => { init(); audio.play().catch(e => console.error(e)); };
+btns[1].onclick = () => { audio.pause(); audio.currentTime = 0; };
+btns[2].onclick = () => { audio.muted =!audio.muted; };
+
+const volumeSlider = document.getElementById("volume");
+audio.volume = parseFloat(volumeSlider.value);
+
+volumeSlider.oninput = e => {
+  audio.volume = e.target.value;
+  volumeSlider.classList.remove("center");
+  volumeSlider.classList.add("changed");
+};
+
+// ================= EQ (FIX: CLAMP + BEZ WYSKAKIWANIA) =================
+function draw(){
+  requestAnimationFrame(draw);
+
+  if(!analyser) return;
+
+  analyser.getByteFrequencyData(data);
+
+  c.clearRect(0,0,canvas.width,canvas.height);
+
+  const barW = (canvas.width / bufferLen) * 1.8;
+  let x = 0;
+
+  for(let i=0;i<bufferLen;i++){
+
+    let v = data[i];
+
+    // 🔧 FIX KLUCZOWY: brak „wystrzału poza ramkę”
+    const normalized = v / 255;
+    const h = Math.min(canvas.height, normalized * canvas.height * 0.92);
+
+    const grad = c.createLinearGradient(0,canvas.height,0,canvas.height-h);
+    grad.addColorStop(0,"#ff003c");
+    grad.addColorStop(0.5,"#fcee09");
+    grad.addColorStop(1,"#00f0ff");
+
+    c.fillStyle = grad;
+
+    c.fillRect(
+      x,
+      canvas.height - h,
+      barW,
+      h
+    );
+
+    x += barW + 2;
+  }
+}
+
+draw();
+</script>
+
+</body>
+</html>
