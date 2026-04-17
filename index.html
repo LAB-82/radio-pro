@@ -151,10 +151,6 @@ const stations = [
 "technofm",
 "house-nation-uk",
 "your-trance-radio",
-"rewind-2000s",
-"res-fm2",
-"frisky-radio",
-"Radio Heaven"
 ];
 
 const audio = document.getElementById("audio");
@@ -174,15 +170,11 @@ function saveFavs(){
 localStorage.setItem("radio_favs", JSON.stringify(favs));
 }
 
-/* 🔥 MANUAL STREAMS (radio-polska) */
+/* 🔥 POPRAWIONE STREAMY (REALNE AUDIO) */
 const manualStreams = {
 "technofm":"https://stream.rcs.revma.com/technofm",
 "house-nation-uk":"https://stream.rcs.revma.com/housenation",
-"your-trance-radio":"https://stream.rcs.revma.com/trance",
-"rewind-2000s":"https://stream.rcs.revma.com/rewind2000s",
-"res-fm2":"https://stream.rcs.revma.com/resfm2",
-"frisky-radio":"https://stream.rcs.revma.com/frisky",
-"Radio Heaven":"https://stream.rcs.revma.com/radioheaven"
+"your-trance-radio":"https://stream.rcs.revma.com/trance"
 };
 
 /* LOGO */
@@ -197,7 +189,7 @@ if(cache[name]){
 return cache[name];
 }
 
-/* 🔥 najpierw manual */
+/* manual */
 if(manualStreams[name]){
 cache[name] = manualStreams[name];
 saveCache();
