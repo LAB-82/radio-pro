@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>RADIO ENGINE V2 AUTO FIX</title>
+<title>RADIO ENGINE V3 2026</title>
 
 <style>
 body{
@@ -37,7 +37,6 @@ border-radius:8px;
 text-align:center;
 font-size:12px;
 }
-
 .station:hover{background:#2a2a2a;}
 .station.active{background:#00aa66;}
 
@@ -53,22 +52,24 @@ background:#1a1a1a;
 font-weight:bold;
 }
 
-#playerBox{
+#player{
 flex:1;
 display:flex;
 justify-content:center;
 align-items:center;
-background:#000;
-}
-
-#status{
-padding:10px;
-font-size:13px;
-opacity:0.8;
+flex-direction:column;
+gap:10px;
 }
 
 audio{
-width:90%;
+width:80%;
+}
+
+#status{
+font-size:13px;
+opacity:0.8;
+text-align:center;
+white-space:pre-line;
 }
 </style>
 </head>
@@ -81,13 +82,11 @@ width:90%;
 
 <div id="main">
 
-<div id="header">🎧 RADIO ENGINE V2 (AUTO STREAM FIX)</div>
+<div id="header">🎧 RADIO ENGINE V3 (2026 AUTO STREAM)</div>
 
-<div id="playerBox">
-<div>
+<div id="player">
 <audio id="audio" controls></audio>
 <div id="status">READY</div>
-</div>
 </div>
 
 </div>
@@ -126,44 +125,43 @@ const status = document.getElementById("status");
 
 let current = 0;
 
-/* 🔥 KLUCZ: AUTOMATYCZNE SZUKANIE DZIAŁAJĄCEGO STREAMU */
-async function findStream(name){
-try{
-const res = await fetch(`https://de1.api.radio-browser.info/json/stations/search?name=${encodeURIComponent(name)}&limit=5`);
-const data = await res.json();
+/* 🔥 CORE ENGINE: szuka działających streamów */
+async function resolveStream(name){
+status.innerText = "🔎 SZUKAM STREAMU: " + name;
 
-for(const s of data){
-if(s.url_resolved && (s.codec === "MP3" || s.codec === "AAC" || !s.hls)){
-return s.url_resolved;
-}
-}
+const urls = await fetch(
+`https://de1.api.radio-browser.info/json/stations/search?name=${encodeURIComponent(name)}&limit=8`
+).then(r=>r.json()).catch(()=>[]);
 
-return data?.[0]?.url_resolved || null;
+/* filtr tylko działających audio streamów */
+const valid = urls.find(s =>
+s.url_resolved &&
+!s.url_resolved.includes(".m3u8") &&   // HLS out
+!s.hls
+);
 
-}catch(e){
-return null;
-}
+return valid?.url_resolved || urls?.[0]?.url_resolved || null;
 }
 
 async function load(i){
 current = i;
 const name = stations[i];
 
-status.innerText = "SZUKAM: " + name;
+status.innerText = "⏳ ŁADOWANIE: " + name;
 
-const url = await findStream(name);
+const url = await resolveStream(name);
 
 if(!url){
-status.innerText = "BRAK STREAMU: " + name;
+status.innerText = "❌ BRAK DZIAŁAJĄCEGO STREAMU";
 return;
 }
 
 audio.src = url;
 
 audio.play()
-.then(()=>status.innerText = "GRA: " + name)
+.then(()=>status.innerText = "▶ GRA: " + name)
 .catch(err=>{
-status.innerText = "BLOKADA ODTWARZANIA - kliknij PLAY";
+status.innerText = "⚠️ BLOKADA ODTWARZANIA (kliknij PLAY)";
 console.log(err);
 });
 }
