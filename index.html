@@ -4,198 +4,119 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Muzyczne Radio PRO</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
 <style>
 :root{
+  --bg:#0a0000;
+  --panel:rgba(30,5,5,.82);
+  --panel2:rgba(40,10,10,.92);
   --red:#ff0033;
+  --red2:#ff4066;
   --pink:#ff6699;
+  --white:#fafafa;
   --text:#ffffff;
   --muted:#cccccc;
+  --line:rgba(255,0,33,.35);
 }
-body{
+
+*{box-sizing:border-box}
+html,body{
   margin:0;
-  background:#0a0000;
-  color:var(--text);
-  font-family:system-ui;
-  text-align:center;
-}
-canvas{
-  display:block;
   width:100%;
-  height:260px;
-  background:#110101;
-}
-button{
-  margin:4px;
-  padding:8px 16px;
-  background:#220202;
-  border:1px solid rgba(255,0,33,.4);
+  height:100%;
+  overflow:hidden;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(255,102,153,.10), transparent 28%),
+    radial-gradient(circle at 80% 30%, rgba(255,0,33,.12), transparent 26%),
+    radial-gradient(circle at 50% 80%, rgba(255,230,240,.08), transparent 30%),
+    linear-gradient(180deg,#080000 0%, #120303 40%, #060000 100%);
   color:var(--text);
-  cursor:pointer;
-}
-input{
-  width:200px;
-}
-</style>
-</head>
-<body>
-
-<div id="title">Muzyczne Radio</div>
-
-<div id="proEqualizer">
-  <canvas id="eqCanvas"></canvas>
-</div>
-
-<div id="controls">
-  <button id="playBtn" onclick="playRadio()">PLAY</button>
-  <button id="stopBtn" onclick="stopRadio()">STOP</button>
-  <button id="muteBtn" onclick="muteRadio()">MUTE 🔊</button>
-  <input id="volume" type="range" min="0" max="1" step="0.01" value="0.5">
-</div>
-
-<div id="status">Gotowy do nadawania</div>
-
-<audio id="audio" crossorigin="anonymous"></audio>
-
-<script>
-const STREAM_URL = "https://stream.rcs.revma.com/gzwc1xcq042vv";
-const audio = document.getElementById("audio");
-const volume = document.getElementById("volume");
-const playBtn = document.getElementById("playBtn");
-const stopBtn = document.getElementById("stopBtn");
-const muteBtn = document.getElementById("muteBtn");
-const title = document.getElementById("title");
-const canvas = document.getElementById("eqCanvas");
-const ctx = canvas.getContext("2d");
-const statusEl = document.getElementById("status");
-
-audio.volume = parseFloat(volume.value);
-
-let audioCtx, analyser, source, dataArray;
-let peaks = [];
-let animationStarted = false;
-
-function setupAudio(){
-  if(audioCtx) return;
-  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  source = audioCtx.createMediaElementSource(audio);
-  analyser = audioCtx.createAnalyser();
-  analyser.fftSize = 512;
-  analyser.smoothingTimeConstant = 0.55;
-  source.connect(analyser);
-  analyser.connect(audioCtx.destination);
-  dataArray = new Uint8Array(analyser.frequencyBinCount);
-  for(let i = 0; i < 300; i++) peaks[i] = 0;
+  font-family:'Orbitron',sans-serif;
 }
 
-async function playRadio(){
-  setupAudio();
-  if(audioCtx.state === "suspended") await audioCtx.resume();
-  audio.muted = false;
-  audio.src = STREAM_URL;
-  try{
-    await audio.play();
-    playBtn.classList.add("playActive");
-    stopBtn.classList.remove("stopActive");
-    statusEl.textContent = "Transmisja aktywna";
-    if(!animationStarted){
-      animationStarted = true;
-      draw();
-    }
-  }catch(e){
-    statusEl.textContent = "Nie udało się uruchomić streamu: " + e.message;
-  }
+#app{
+  height:100%;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding:24px 18px 18px;
 }
 
-function stopRadio(){
-  audio.pause();
-  stopBtn.classList.add("stopActive");
-  playBtn.classList.remove("playActive");
-  statusEl.textContent = "Transmisja zatrzymana";
-  setTimeout(() => stopBtn.classList.remove("stopActive"), 800);
-  for(let i = 0; i < peaks.length; i++) peaks[i] = 0;
+#shell{
+  width:min(1120px,100%);
+  height:100%;
+  display:flex;
+  flex-direction:column;
+  gap:16px;
 }
 
-function muteRadio(){
-  audio.muted = !audio.muted;
-  muteBtn.classList.toggle("muteActive");
-  muteBtn.textContent = audio.muted ? "MUTE 🔇" : "MUTE 🔊";
-  statusEl.textContent = audio.muted ? "Wyciszono" : "Dźwięk włączony";
+#title{
+  position:relative;
+  font-size:clamp(34px,6vw,86px);
+  line-height:1;
+  text-align:center;
+  margin-top:8px;
+  color:var(--red);
+  letter-spacing:2px;
+  text-transform:uppercase;
+  text-shadow:
+    0 0 6px rgba(255,0,33,.95),
+    0 0 18px rgba(255,0,33,.65),
+    0 0 36px rgba(255,102,153,.35);
+  filter:drop-shadow(0 0 12px rgba(255,0,33,.18));
 }
 
-volume.addEventListener("input", () => {
-  const val = parseFloat(volume.value);
-  audio.volume = val;
-  volume.classList.toggle("active", Math.abs(val - 0.5) >= 0.02);
-});
-volume.dispatchEvent(new Event("input"));
-
-function resizeCanvas(){
-  const dpr = window.devicePixelRatio || 1;
-  const width = title.offsetWidth;
-  const height = 260;
-  canvas.width = width * dpr;
-  canvas.height = height * dpr;
-  canvas.style.width = width + "px";
-  canvas.style.height = height + "px";
-  ctx.setTransform(1, 0, 0, 1, 0, 0);
-  ctx.scale(dpr, dpr);
-}
-window.addEventListener("load", resizeCanvas);
-window.addEventListener("resize", resizeCanvas);
-
-function draw(){
-  requestAnimationFrame(draw);
-  if(!analyser || !dataArray) return;
-  analyser.getByteFrequencyData(dataArray);
-  drawEQ();
+#title::before,
+#title::after{
+  content:attr(data-text);
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  mix-blend-mode:screen;
 }
 
-function drawEQ(){
-  const dpr = window.devicePixelRatio || 1;
-  const width = canvas.width / dpr;
-  const height = canvas.height / dpr;
-  ctx.clearRect(0, 0, width, height);
-
-  const bars = Math.max(1, Math.floor(width / 8));
-  const barWidth = width / bars;
-  const step = Math.max(1, Math.floor(dataArray.length / bars));
-  const maxHeight = height * 0.9;
-  const yOffset = 5;
-
-  for(let i = 0; i < bars; i++){
-    const index = i * step;
-    const value = dataArray[index] || 0;
-    const percent = value / 255;
-    const h = Math.min(maxHeight, height * percent);
-    const x = i * barWidth;
-    const y = height - h + yOffset;
-
-    const gradient = ctx.createLinearGradient(0, height, 0, 0);
-    gradient.addColorStop(0, "#ff0033");
-    gradient.addColorStop(0.45, "#ff6699");
-    gradient.addColorStop(1, "#ffffff");
-
-    ctx.fillStyle = gradient;
-    ctx.shadowBlur = 10;
-    ctx.shadowColor = "rgba(255,0,33,.9)";
-    ctx.fillRect(x, y, barWidth - 1, h);
-    ctx.shadowBlur = 0;
-
-    if(h > peaks[i]) peaks[i] = h;
-    else peaks[i] -= 1.8;
-    if(peaks[i] < 0) peaks[i] = 0;
-
-    const peakY = height - peaks[i] + yOffset;
-    ctx.fillStyle = "#ffd0d0";
-    ctx.fillRect(x, peakY, barWidth - 1, 3);
-  }
-
-  ctx.fillStyle = "rgba(255,255,255,.05)";
-  for(let i = 0; i < 8; i++){
-    const y = (height / 8) * i;
-    ctx.fillRect(0, y, width, 1);
-  }
+#title::before{
+  transform:translate(2px,0);
+  color:var(--pink);
+  opacity:.72;
+  clip-path:inset(0 0 55% 0);
 }
-</script>
-</body>
-</html>
+#title::after{
+  transform:translate(-2px,0);
+  color:var(--red);
+  opacity:.5;
+  clip-path:inset(45% 0 0 0);
+}
+
+#subline{
+  text-align:center;
+  font-size:12px;
+  color:var(--muted);
+  letter-spacing:3px;
+  text-transform:uppercase;
+  margin-top:-4px;
+}
+
+#proEqualizer{
+  width:100%;
+  border-radius:18px;
+  overflow:hidden;
+  background:
+    linear-gradient(180deg, rgba(255,0,33,.10), transparent 35%),
+    linear-gradient(180deg, rgba(255,102,153,.10), transparent 75%),
+    var(--panel);
+  border:1px solid var(--line);
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,.04) inset,
+    0 0 18px rgba(255,0,33,.20),
+    0 0 48px rgba(255,102,153,.10);
+  position:relative;
+}
+
+#proEqualizer::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:
+    linear-gradient(transparent 0%, rgba(255,255,255,.04) 50%, transparent 100%);
+  poi
