@@ -80,6 +80,8 @@ canvas{
   width:100%;
   height:100%;
   display:block;
+  position: relative;
+  z-index: 1;
 }
 
 #controls{
@@ -104,6 +106,7 @@ button{
   filter: drop-shadow(0 0 8px var(--cp-cyan));
   transition: all 0.15s ease;
   position: relative;
+  z-index: 1;
 }
 
 button:hover{
@@ -176,6 +179,24 @@ button:active{
   height: 4px;
 }
 
+/* NOWE: tylko te 2 klasy dla suwaka */
+#volume.center::-webkit-slider-thumb{
+  background: var(--cp-yellow);
+  box-shadow: 0 0 8px var(--cp-yellow), 0 0 15px var(--cp-cyan);
+}
+#volume.center::-moz-range-thumb{
+  background: var(--cp-yellow);
+  box-shadow: 0 0 8px var(--cp-yellow), 0 0 15px var(--cp-cyan);
+}
+#volume.changed::-webkit-slider-thumb{
+  background: var(--cp-red);
+  box-shadow: 0 0 8px var(--cp-red), 0 0 15px var(--cp-magenta);
+}
+#volume.changed::-moz-range-thumb{
+  background: var(--cp-red);
+  box-shadow: 0 0 8px var(--cp-red), 0 0 15px var(--cp-magenta);
+}
+
 #bottomLink{
   margin-top:20px;
 }
@@ -209,7 +230,7 @@ button:active{
   <button>MUTE</button>
 
   <div class="volumeWrapper">
-    <input type="range" id="volume" min="0" max="1" step="0.01" value="1">
+    <input type="range" id="volume" min="0" max="1" step="0.01" value="0.5" class="center">
   </div>
 </div>
 
@@ -235,82 +256,4 @@ function resize(){
 resize();
 window.addEventListener("resize", resize);
 
-// ================= INIT =================
-function init(){
-  if(!ctx){
-    ctx = new (window.AudioContext || window.webkitAudioContext)();
-
-    analyser = ctx.createAnalyser();
-    analyser.fftSize = 256;
-
-    // stabilne, naturalne audio
-    analyser.smoothingTimeConstant = 0.82;
-
-    bufferLen = analyser.frequencyBinCount;
-    data = new Uint8Array(bufferLen);
-
-    src = ctx.createMediaElementSource(audio);
-    src.connect(analyser);
-    analyser.connect(ctx.destination);
-  }
-
-  if(ctx.state === "suspended"){
-    ctx.resume();
-  }
-}
-
-// ================= CONTROLS (BEZ ZMIAN LOGIKI) =================
-const btns = document.querySelectorAll("button");
-
-btns[0].onclick = () => { init(); audio.play(); };
-btns[1].onclick = () => { audio.pause(); audio.currentTime = 0; };
-btns[2].onclick = () => { audio.muted =!audio.muted; };
-
-document.getElementById("volume").oninput = e => {
-  audio.volume = e.target.value;
-};
-
-// ================= EQ (FIX: CLAMP + BEZ WYSKAKIWANIA) =================
-function draw(){
-  requestAnimationFrame(draw);
-
-  if(!analyser) return;
-
-  analyser.getByteFrequencyData(data);
-
-  c.clearRect(0,0,canvas.width,canvas.height);
-
-  const barW = (canvas.width / bufferLen) * 1.8;
-  let x = 0;
-
-  for(let i=0;i<bufferLen;i++){
-
-    let v = data[i];
-
-    // 🔧 FIX KLUCZOWY: brak „wystrzału poza ramkę”
-    const normalized = v / 255;
-    const h = Math.min(canvas.height, normalized * canvas.height * 0.92);
-
-    const grad = c.createLinearGradient(0,canvas.height,0,canvas.height-h);
-    grad.addColorStop(0,"#ff003c");
-    grad.addColorStop(0.5,"#fcee09");
-    grad.addColorStop(1,"#00f0ff");
-
-    c.fillStyle = grad;
-
-    c.fillRect(
-      x,
-      canvas.height - h,
-      barW,
-      h
-    );
-
-    x += barW + 2;
-  }
-}
-
-draw();
-</script>
-
-</body>
-</html>
+// ================= INIT
