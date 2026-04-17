@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>RADIO ENGINE V3 2026</title>
+<title>RADIO ENGINE PRO 2026 FULL</title>
 
 <style>
 body{
@@ -36,9 +36,21 @@ cursor:pointer;
 border-radius:8px;
 text-align:center;
 font-size:12px;
+position:relative;
 }
+
 .station:hover{background:#2a2a2a;}
 .station.active{background:#00aa66;}
+
+.star{
+position:absolute;
+top:4px;
+right:6px;
+font-size:12px;
+cursor:pointer;
+opacity:0.5;
+}
+.star.fav{opacity:1;color:gold;}
 
 #main{
 flex:1;
@@ -68,9 +80,18 @@ width:80%;
 #status{
 font-size:13px;
 opacity:0.8;
-text-align:center;
 white-space:pre-line;
 }
+
+button{
+background:#222;
+color:#fff;
+border:none;
+padding:6px 10px;
+border-radius:6px;
+cursor:pointer;
+}
+button:hover{background:#333;}
 </style>
 </head>
 
@@ -82,10 +103,13 @@ white-space:pre-line;
 
 <div id="main">
 
-<div id="header">🎧 RADIO ENGINE V3 (2026 AUTO STREAM)</div>
+<div id="header">🎧 RADIO ENGINE PRO 2026 (FULL LIST)</div>
 
 <div id="player">
 <audio id="audio" controls></audio>
+<div>
+<button onclick="clearCache()">CLEAR CACHE</button>
+</div>
 <div id="status">READY</div>
 </div>
 
@@ -120,39 +144,70 @@ const stations = [
 "Radio Rodzina"
 ];
 
+/* =========================
+   PRO ENGINE
+========================= */
+
 const audio = document.getElementById("audio");
 const status = document.getElementById("status");
 
 let current = 0;
 
-/* 🔥 CORE ENGINE: szuka działających streamów */
-async function resolveStream(name){
-status.innerText = "🔎 SZUKAM STREAMU: " + name;
+let cache = JSON.parse(localStorage.getItem("radio_cache") || "{}");
+let favs = JSON.parse(localStorage.getItem("radio_favs") || "[]");
 
-const urls = await fetch(
-`https://de1.api.radio-browser.info/json/stations/search?name=${encodeURIComponent(name)}&limit=8`
-).then(r=>r.json()).catch(()=>[]);
-
-/* filtr tylko działających audio streamów */
-const valid = urls.find(s =>
-s.url_resolved &&
-!s.url_resolved.includes(".m3u8") &&   // HLS out
-!s.hls
-);
-
-return valid?.url_resolved || urls?.[0]?.url_resolved || null;
+function saveCache(){
+localStorage.setItem("radio_cache", JSON.stringify(cache));
 }
 
+function saveFavs(){
+localStorage.setItem("radio_favs", JSON.stringify(favs));
+}
+
+/* STREAM RESOLVER */
+async function resolveStream(name){
+
+if(cache[name]){
+status.innerText = "⚡ CACHE: " + name;
+return cache[name];
+}
+
+status.innerText = "🔎 SZUKAM: " + name;
+
+try{
+const res = await fetch(
+`https://de1.api.radio-browser.info/json/stations/search?name=${encodeURIComponent(name)}&limit=8`
+);
+const data = await res.json();
+
+const best = data.find(s =>
+s.url_resolved &&
+s.url_resolved.startsWith("http")
+);
+
+if(best){
+cache[name] = best.url_resolved;
+saveCache();
+return best.url_resolved;
+}
+
+}catch(e){}
+
+return null;
+}
+
+/* LOAD */
 async function load(i){
+
 current = i;
 const name = stations[i];
 
-status.innerText = "⏳ ŁADOWANIE: " + name;
+status.innerText = "ŁADOWANIE: " + name;
 
-const url = await resolveStream(name);
+const url = cache[name] || await resolveStream(name);
 
 if(!url){
-status.innerText = "❌ BRAK DZIAŁAJĄCEGO STREAMU";
+status.innerText = "❌ BRAK STREAMU: " + name;
 return;
 }
 
@@ -161,9 +216,28 @@ audio.src = url;
 audio.play()
 .then(()=>status.innerText = "▶ GRA: " + name)
 .catch(err=>{
-status.innerText = "⚠️ BLOKADA ODTWARZANIA (kliknij PLAY)";
+status.innerText = "⚠️ kliknij PLAY ręcznie";
 console.log(err);
 });
+}
+
+/* FAVORITES */
+function toggleFav(name, el){
+if(favs.includes(name)){
+favs = favs.filter(f=>f!==name);
+el.classList.remove("fav");
+}else{
+favs.push(name);
+el.classList.add("fav");
+}
+saveFavs();
+}
+
+/* CLEAR CACHE */
+function clearCache(){
+cache = {};
+localStorage.removeItem("radio_cache");
+status.innerText = "CACHE WYCZYSZCZONY";
 }
 
 /* UI */
@@ -171,7 +245,22 @@ stations.forEach((s,i)=>{
 const div=document.createElement("div");
 div.className="station";
 div.innerText=s;
+
+const star=document.createElement("div");
+star.className="star";
+star.innerText="★";
+
+if(favs.includes(s)) star.classList.add("fav");
+
+star.onclick=(e)=>{
+e.stopPropagation();
+toggleFav(s, star);
+};
+
+div.appendChild(star);
+
 div.onclick=()=>load(i);
+
 document.getElementById("stations").appendChild(div);
 });
 
