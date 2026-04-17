@@ -156,48 +156,45 @@ logo.src = "https://via.placeholder.com/160x120?text=" + encodeURIComponent(name
 
 /* Funkcja ładowania stacji */
 async function load(i){
-current = i;
-const name = stations[i];
+  current = i;
+  const name = stations[i];
 
-status.innerText = "ŁADOWANIE: " + name;
+  status.innerText = "ŁADOWANIE: " + name;
 
-/* reset */
-audio.pause();
-audio.src = "";
-document.querySelectorAll(".station").forEach(el => el.classList.remove("live"));
-const stationDivs = document.querySelectorAll(".station");
-if(stationDivs[i]) stationDivs[i].classList.add("live");
+  /* reset */
+  audio.pause();
+  audio.src = "";
+  document.querySelectorAll(".station").forEach(el => el.classList.remove("live"));
+  const stationDivs = document.querySelectorAll(".station");
+  if(stationDivs[i]) stationDivs[i].classList.add("live");
 
-const url = manualStreams[name];
+  const url = manualStreams[name];
 
-if(!url){
-status.innerText = "❌ BRAK LINKU: " + name;
- return;
-}
+  if(!url){
+    status.innerText = "❌ BRAK LINKU: " + name;
+    return;
+  }
 
-/* embed */
-if(url.includes("radio-polska.pl") || url.includes("radio-poland") || url.includes("muzyczneradio.pl")){
-frame.style.display = "block";
-frame.src = url;
-status.innerText = "▶ GRA (EMBED): " + name;
-return;
-}
+  /* embed */
+  if(url.includes("radio-polska.pl") || url.includes("radio-poland") || url.includes("muzyczneradio.pl")){
+    frame.style.display = "block";
+    frame.src = url;
+    status.innerText = "▶ GRA (EMBED): " + name;
+    return;
+  }
 
-/* audio fallback */
-frame.style.display = "none";
-audio.src = url;
-audio.volume = 0.85;
+  /* audio fallback */
+  frame.style.display = "none";
+  audio.src = url;
+  audio.volume = 0.85;
 
-/* Próba odtworzenia bez autoplay */
-try {
-  audio.muted = true; // najpierw wyciszamy
-  await audio.play(); // próbujemy odtworzyć
-  // jeśli się uda, odblokuj dźwięk
-  audio.muted = false;
-  status.innerText = "▶ GRA: " + name;
-} catch(e) {
-  status.innerText = "⚠️ Kliknij odtwarzanie ręcznie.";
-}
+  /* Próba automatycznego odtworzenia (bez mutowania) */
+  try {
+    await audio.play();
+    status.innerText = "▶ GRA: " + name;
+  } catch(e) {
+    status.innerText = "⚠️ Kliknij odtwarzanie ręcznie.";
+  }
 }
 
 /* Funkcja ustawiania logo */
@@ -205,33 +202,33 @@ setLogo(stations[0]);
 
 /* Tworzenie elementów stacji */
 stations.forEach((s,i)=>{
-const div=document.createElement("div");
-div.className="station";
-div.innerText=s;
+  const div=document.createElement("div");
+  div.className="station";
+  div.innerText=s;
 
-const star=document.createElement("div");
-star.className="star";
-star.innerText="★";
+  const star=document.createElement("div");
+  star.className="star";
+  star.innerText="★";
 
-if(favs.includes(s)) star.classList.add("fav");
+  if(favs.includes(s)) star.classList.add("fav");
 
-star.onclick=(e)=>{
-e.stopPropagation();
-if(favs.includes(s)){
-favs = favs.filter(f=>f!==s);
-star.classList.remove("fav");
-} else {
-favs.push(s);
-}
-localStorage.setItem("radio_favs", JSON.stringify(favs));
-};
+  star.onclick=(e)=>{
+    e.stopPropagation();
+    if(favs.includes(s)){
+      favs = favs.filter(f=>f!==s);
+      star.classList.remove("fav");
+    } else {
+      favs.push(s);
+    }
+    localStorage.setItem("radio_favs", JSON.stringify(favs));
+  };
 
-div.appendChild(star);
-div.onclick=()=>load(i);
-document.getElementById("stations").appendChild(div);
+  div.appendChild(star);
+  div.onclick=()=>load(i);
+  document.getElementById("stations").appendChild(div);
 });
 
-// Automatyczne próby odtworzenia na starcie (jeśli przeglądarka to pozwala)
+/* Automatyczne próby odtworzenia na starcie */
 window.onload = () => {
   load(0);
 };
