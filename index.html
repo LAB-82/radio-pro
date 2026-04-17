@@ -3,15 +3,29 @@
 <head>
 <meta charset="UTF-8">
 <title>Muzyczne Radio PRO</title>
-<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700;800&family=OCR-A&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700;800&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
+:root{
+  --cp-cyan:#00f0ff;
+  --cp-magenta:#ff003c;
+  --cp-yellow:#fcee09;
+  --cp-red:#ff2a2a;
+  --cp-bg:#000014;
+  --cp-glow:0 0 4px var(--cp-cyan), 0 0 10px var(--cp-cyan), 0 0 20px var(--cp-magenta);
+}
+
 body{
   margin:0;
-  background:#000;
+  background:var(--cp-bg);
+  background-image:
+    linear-gradient(0deg, transparent 24%, rgba(0, 240, 255,.05) 25%, rgba(0, 240, 255,.05) 26%, transparent 27%, transparent 74%, rgba(0, 240, 255,.05) 75%, rgba(0, 240, 255,.05) 76%, transparent 77%, transparent),
+    linear-gradient(90deg, transparent 24%, rgba(255, 0, 60,.05) 25%, rgba(255, 0, 60,.05) 26%, transparent 27%, transparent 74%, rgba(255, 0, 60,.05) 75%, rgba(255, 0, 60,.05) 76%, transparent 77%, transparent);
+  background-size:50px 50px;
   color:#fff;
-  font-family:'Rajdhani', 'OCR-A', monospace;
-  font-weight: 500;
-  letter-spacing: 1px;
+  font-family:'Rajdhani', 'Orbitron', monospace;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
   display:flex;
   flex-direction:column;
   align-items:center;
@@ -22,61 +36,53 @@ body{
 }
 
 #title{
-  font-family: 'Rajdhani', 'OCR-A', monospace;
-  font-weight: 800;
+  font-family:'Orbitron', sans-serif;
+  font-weight: 900;
   font-size:88px;
   margin-top:50px;
   text-align:center;
-  color:#ff2a2a;
-  text-shadow:0 0 5px #ff2a2a,0 0 15px #ff0000, 0 0 30px #ff0000, 0 0 60px #ff0000,
-               0 0 10px rgba(255,255,255,0.2);
-  animation: cyberpunk-title 4s ease-in-out infinite alternate;
-  filter: drop-shadow(0 0 8px rgba(255,255,255,0.15));
-  letter-spacing: 4px;
-  text-transform: uppercase;
+  color:var(--cp-cyan);
+  text-shadow:
+    0 0 5px var(--cp-cyan),
+    0 0 10px var(--cp-cyan),
+    0 0 20px var(--cp-cyan),
+    0 0 40px var(--cp-magenta),
+    0 0 80px var(--cp-magenta);
+  position: relative;
+  animation: flicker 3s infinite alternate;
 }
 
-@keyframes cyberpunk-title {
-  0% { text-shadow:0 0 5px #ff2a2a,0 0 15px #ff0000,0 0 30px #ff0000; }
-  100% { text-shadow:0 0 8px #ff2a2a,0 0 20px #ff0000,0 0 40px #ff0000,0 0 15px rgba(255,255,255,0.3); }
+@keyframes flicker {
+  0%, 18%, 22%, 25%, 53%, 57%, 100% {
+    text-shadow:
+      0 0 5px var(--cp-cyan),
+      0 0 10px var(--cp-cyan),
+      0 0 20px var(--cp-cyan),
+      0 0 40px var(--cp-magenta),
+      0 0 80px var(--cp-magenta);
+  }
+  20%, 24%, 55% {
+    text-shadow: none;
+  }
 }
 
 #proEqualizer{
-  display:block;
-  margin:0 auto;
   margin-top:30px;
   margin-bottom:30px;
-  border-radius:8px;
-  overflow:hidden;
-  box-shadow:0 0 20px rgba(255,42,42,0.45),
-              inset 0 0 15px rgba(255,255,255,0.08),
-              inset 0 0 1px rgba(255,255,255,0.15);
-  position: relative;
-  border: 2px solid rgba(255,42,42,0.65);
-  background: #000000;
+  border:2px solid var(--cp-cyan);
+  box-shadow: var(--cp-glow), inset 0 0 20px rgba(0,240,255,0.2);
 }
 
 canvas{
-  display:block;
   height:260px;
-  border-radius:6px;
-  filter: drop-shadow(0 0 12px rgba(255,0,0,0.45)) brightness(1.04);
-  animation: canvas-flicker 3s ease-in-out infinite alternate;
+  display: block;
 }
 
-@keyframes canvas-flicker {
-  0% { filter: drop-shadow(0 0 12px rgba(255,0,0,0.45)) brightness(1.04); }
-  100% { filter: drop-shadow(0 0 18px rgba(255,0,0,0.65)) brightness(1.07); }
-}
 #controls{
   display:flex;
   gap:8px;
   margin-top:20px;
   margin-bottom:20px;
-  align-items:center;
-  justify-content:space-between;
-  position: relative;
-  z-index: 20;
 }
 
 .volumeWrapper{
@@ -85,183 +91,145 @@ canvas{
   display:flex;
   align-items:center;
   justify-content:center;
-  background:#111;
-  border:2px solid #ff2a2a;
-  border-radius: 4px;
-  box-shadow:0 0 15px #ff2a2a, inset 0 0 10px rgba(255,255,255,0.1);
+  background:#0a0a1a;
+  border:2px solid var(--cp-cyan);
+  box-shadow: 0 0 8px var(--cp-cyan), inset 0 0 8px rgba(0,240,255,0.3);
   position: relative;
+  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
 }
 
-/* etykieta VOL */
-.volumeWrapper::before {
-  content: 'VOL';
-  position: absolute;
-  font-family: 'Rajdhani', monospace;
-  font-weight: 700;
-  font-size: 10px;
-  top: -20px;
-  left: 50%;
-  transform: translateX(-50%);
-  color: #ff2a2a;
-  background: rgba(0,0,0,0.9);
-  padding: 2px 6px;
-  border-radius: 3px;
-  border: 1px solid rgba(255,42,42,0.5);
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  text-shadow: 0 0 3px rgba(255,255,255,0.3);
-}
-
-/* przyciski */
 button{
   width:160px;
   height:45px;
-  background:#111111;
-  color:#ffffff;
+  background:#0a0a1a;
+  color:var(--cp-cyan);
   cursor:pointer;
-  font-family:'Rajdhani', 'OCR-A', monospace;
+  border:2px solid var(--cp-cyan);
+  font-family:'Orbitron', sans-serif;
   font-weight: 700;
-  font-size: 14px;
+  font-size: 16px;
   letter-spacing: 3px;
   text-transform: uppercase;
-  transition: all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  border:2px solid #ff2a2a;
-  border-radius: 4px;
-  box-shadow:0 0 15px #ff2a2a, 0 0 24px rgba(255,255,255,0.18),
-              inset 0 0 10px rgba(255,255,255,0.08),
-              inset 0 0 1px rgba(255,255,255,0.15);
+  box-shadow: 0 0 8px var(--cp-cyan), inset 0 0 8px rgba(0,240,255,0.2);
+  transition: all 0.15s ease;
   position: relative;
-  overflow: hidden;
-  text-shadow: 0 0 5px rgba(0,0,0,0.5);
+  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
 }
 
-/* pulsujący gradient */
-button::before {
-  content: '';
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: conic-gradient(transparent, rgba(255,255,255,0.3), transparent 30%);
-  animation: cyberpunk-shine 2s linear infinite;
-  opacity: 0;
-  transition: opacity 0.3s;
+button:hover{
+  background:var(--cp-cyan);
+  color:#000014;
+  box-shadow: 0 0 15px var(--cp-cyan), 0 0 30px var(--cp-magenta);
+  transform: translateY(-1px);
 }
 
-button:hover::before {
-  opacity: 1;
+button:active{
+  transform: translateY(1px);
+  box-shadow: 0 0 5px var(--cp-cyan);
 }
 
-@keyframes cyberpunk-shine {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-/* biegający przyciemniony gradient przy hover */
-button::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-  transition: left 0.6s;
-}
-
-button:hover::after {
-  left: 100%;
-}
-
-/* efekt „naciśnięcie” */
-button:active {
-  transform: scale(0.97);
-  box-shadow: 0 0 30px #ff2a2a, inset 0 0 20px rgba(0,0,0,0.35);
-}
-
-button:hover {
-  transform: translateY(-1.5px);
-  box-shadow: 0 0 25px #ff2a2a, 0 0 35px rgba(255,255,255,0.3),
-               inset 0 0 12px rgba(255,255,255,0.12);
-}
-
-/* style aktywności */
-.playActive{
-  color:#00ff00 !important;
-  text-shadow:0 0 15px #00ff00, 0 0 25px rgba(255,255,255,0.3) !important;
-  box-shadow:0 0 25px #00ff00, 0 0 40px rgba(255,255,255,0.35) !important;
-  background: rgba(0,255,0,0.15) !important;
-  border-color: #00ff00 !important;
-  animation: pulse-play 1.4s ease-in-out infinite;
-}
-
-@keyframes pulse-play {
-  0%   { box-shadow:0 0 25px #00ff00, 0 0 40px rgba(255,255,255,0.35); }
-  50%  { box-shadow:0 0 40px #00ff00, 0 0 55px rgba(255,255,255,0.45); }
-  100% { box-shadow:0 0 25px #00ff00, 0 0 40px rgba(255,255,255,0.35); }
-}
-
-.stopActive{
-  color:#ff4444 !important;
-  text-shadow:0 0 15px #ff4444, 0 0 25px rgba(255,255,255,0.2) !important;
-  box-shadow:0 0 25px #ff4444, 0 0 35px rgba(255,255,255,0.18) !important;
-  background: rgba(255,68,68,0.13) !important;
-  border-color: #ff4444 !important;
-}
-
-.muteActive{
-  color:#ffaa00 !important;
-  text-shadow:0 0 15px #ffaa00, 0 0 25px rgba(255,255,255,0.3) !important;
-  box-shadow:0 0 25px #ffaa00, 0 0 35px rgba(255,255,255,0.25) !important;
-  background: rgba(255,170,0,0.15) !important;
-  border-color: #ffaa00 !important;
-  animation: cybermute 1s ease-in-out infinite alternate;
-}
-
-@keyframes cybermute {
-  0% { transform: scale(1); box-shadow: 0 0 18px #ffaa00, 0 0 28px rgba(255,255,255,0.2); }
-  100% { transform: scale(1.06); box-shadow: 0 0 28px #ffaa00, 0 0 40px rgba(255,255,255,0.4); }
-}
-
-/* suwak głośności */
-input[type="range"]{
-  -webkit-appearance: none;
+#volume{
   width:120px;
-  height:10px;
-  border-radius:8px;
-  outline:none;
-  background: linear-gradient(to right, #111, #333, #111);
-  border: 1.8px solid #ff2a2a;
-  box-shadow: 0 0 12px #ff2a2a, inset 0 0 8px rgba(255,255,255,0.1);
-  position: relative;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  background: #0a0a1a;
+  border: 1px solid var(--cp-cyan);
+  outline: none;
 }
 
-input[type="range"]::-webkit-slider-thumb{
-  -webkit-appearance:none;
-  width:18px;
-  height:18px;
-  border-radius:50%;
-  background: radial-gradient(circle, #ff0000, #ff4444);
-  box-shadow: 0 0 15px #ff0000, 0 0 25px rgba(255,255,255,0.5), 0 2px 4px rgba(0,0,0,0.5);
-  border: 2px solid rgba(255,255,255,0.35);
-  cursor:pointer;
-  transition: all 0.2s ease;
+#volume::-webkit-slider-thumb{
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  background: var(--cp-yellow);
+  cursor: pointer;
+  border: 2px solid var(--cp-cyan);
+  box-shadow: 0 0 8px var(--cp-yellow), 0 0 15px var(--cp-cyan);
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
 }
 
-input[type="range"]::-webkit-slider-thumb:hover {
-  box-shadow: 0 0 25px #ff0000, 0 0 35px rgba(255,255,255,0.65);
-  transform: scale(1.15);
+#volume::-moz-range-thumb{
+  width: 16px;
+  height: 16px;
+  background: var(--cp-yellow);
+  cursor: pointer;
+  border: 2px solid var(--cp-cyan);
+  box-shadow: 0 0 8px var(--cp-yellow), 0 0 15px var(--cp-cyan);
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
 }
 
-input[type="range"]::-moz-range-thumb{
-  width:18px;
-  height:18px;
-  border:none;
-  border-radius:50%;
-  background: radial-gradient(circle, #ff0000, #ff4444);
-  box-shadow: 0 0 15px #ff0000, 
-  const STREAM_URL = "https://stream.rcs.revma.com/gzwc1xcq042vv";
+#volume::-webkit-slider-runnable-track{
+  background: linear-gradient(90deg, var(--cp-magenta), var(--cp-cyan));
+  height: 4px;
+}
+
+#volume::-moz-range-track{
+  background: linear-gradient(90deg, var(--cp-magenta), var(--cp-cyan));
+  height: 4px;
+}
+
+.playActive{
+  color:#000014!important;
+  background: var(--cp-cyan)!important;
+  box-shadow: 0 0 20px var(--cp-cyan), 0 0 40px var(--cp-cyan)!important;
+}
+.stopActive{
+  color:#000014!important;
+  background: var(--cp-magenta)!important;
+  border-color: var(--cp-magenta)!important;
+  box-shadow: 0 0 20px var(--cp-magenta), 0 0 40px var(--cp-magenta)!important;
+}
+.muteActive{
+  color:#000014!important;
+  background: var(--cp-yellow)!important;
+  border-color: var(--cp-yellow)!important;
+  box-shadow: 0 0 20px var(--cp-yellow), 0 0 40px var(--cp-yellow)!important;
+}
+
+#bottomLink{
+  margin-top:10px;
+}
+
+#bottomLink a{
+  color:var(--cp-cyan);
+  text-decoration:none;
+  font-family:'Orbitron', sans-serif;
+  text-shadow: 0 0 5px var(--cp-cyan);
+  transition: 0.2s;
+}
+
+#bottomLink a:hover{
+  color:var(--cp-yellow);
+  text-shadow: 0 0 10px var(--cp-yellow), 0 0 20px var(--cp-magenta);
+}
+</style>
+</head>
+
+<body>
+
+<div id="title">Muzyczne Radio</div>
+<canvas id="proEqualizer"></canvas>
+
+<div id="controls">
+  <button id="playBtn" onclick="playRadio()">PLAY</button>
+  <button id="stopBtn" onclick="stopRadio()">STOP</button>
+  <button id="muteBtn" onclick="muteRadio()">MUTE</button>
+
+  <div class="volumeWrapper">
+    <input id="volume" type="range" min="0" max="1" step="0.01" value="0.5">
+  </div>
+</div>
+
+<div id="bottomLink">
+  <a href="https://www.muzyczneradio.pl" target="_blank">www.muzyczneradio.pl</a>
+</div>
+
+<audio id="audio" crossorigin="anonymous"></audio>
+
+<script>
+const STREAM_URL = "https://stream.rcs.revma.com/gzwc1xcq042vv";
 
 const audio = document.getElementById("audio");
 const volume = document.getElementById("volume");
@@ -279,37 +247,35 @@ let animationStarted = false;
 
 function setupAudio() {
   if (audioCtx) return;
-  
+
   audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   source = audioCtx.createMediaElementSource(audio);
-  
+
   analyser = audioCtx.createAnalyser();
   analyser.fftSize = 1024;
   analyser.smoothingTimeConstant = 0.8;
-  
+
   source.connect(analyser);
   analyser.connect(audioCtx.destination);
-  
-  dataArray = new Uint8Array(analyser.frequencyBinCount
 
   dataArray = new Uint8Array(analyser.frequencyBinCount);
-  
+
   for(let i = 0; i < 300; i++) peaks[i] = 0;
 }
 
 function playRadio() {
   setupAudio();
-  
+
   if (audioCtx.state === "suspended") {
     audioCtx.resume();
   }
-  
+
   audio.src = STREAM_URL;
   audio.play();
-  
+
   playBtn.classList.add("playActive");
   stopBtn.classList.remove("stopActive");
-  
+
   if (!animationStarted) {
     animationStarted = true;
     draw();
@@ -318,38 +284,47 @@ function playRadio() {
 
 function stopRadio() {
   audio.pause();
-  
+
   stopBtn.classList.add("stopActive");
   playBtn.classList.remove("playActive");
-  
+
   setTimeout(() => {
     stopBtn.classList.remove("stopActive");
   }, 1000);
-  
+
   for(let i = 0; i < peaks.length; i++) {
     peaks[i] = 0;
   }
 }
 
 function muteRadio() {
-  audio.muted = !audio.muted;
+  audio.muted =!audio.muted;
   muteBtn.classList.toggle("muteActive");
 }
 
 volume.addEventListener("input", () => {
   let val = parseFloat(volume.value);
   audio.volume = val;
+
+  if (Math.abs(val - 0.5) < 0.02) {
+    volume.classList.remove("active");
+  } else {
+    volume.classList.add("active");
+  }
 });
+
+volume.dispatchEvent(new Event("input"));
 
 function resizeCanvas() {
   let dpr = window.devicePixelRatio || 1;
   let width = 600;
-  
+
   canvas.width = width * dpr;
   canvas.height = 260 * dpr;
+
   canvas.style.width = width + "px";
   canvas.style.height = "260px";
-  
+
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.scale(dpr, dpr);
 }
@@ -359,9 +334,9 @@ window.addEventListener("resize", resizeCanvas);
 
 function draw() {
   requestAnimationFrame(draw);
-  
-  if (!analyser || !dataArray) return;
-  
+
+  if (!analyser ||!dataArray) return;
+
   analyser.getByteFrequencyData(dataArray);
   drawEQ();
 }
@@ -370,24 +345,62 @@ function drawEQ() {
   const dpr = window.devicePixelRatio || 1;
   const width = canvas.width / dpr;
   const heightCanvas = canvas.height / dpr;
-  
-  ctx.fillStyle = '#000';
+
+  ctx.fillStyle = '#000014';
   ctx.fillRect(0, 0, width, heightCanvas);
-  
+
   const bars = 80;
   const barWidth = width / bars;
   const step = Math.floor(dataArray.length / bars * 1.5);
-  
+
+  const yOffset = 8;
+  const maxHeight = heightCanvas * 0.92;
+
+  // Gradient dla słupków
+  const barGradient = ctx.createLinearGradient(0, heightCanvas, 0, 0);
+  barGradient.addColorStop(0, '#ff003c');
+  barGradient.addColorStop(0.5, '#00f0ff');
+  barGradient.addColorStop(1, '#fcee09');
+
   for (let i = 0; i < bars; i++) {
-    let value = dataArray[i] || 0;
-    let h = (value / 255) * heightCanvas;
-    
-    ctx.fillStyle = "#ff0000";
-    ctx.fillRect(i * barWidth, heightCanvas - h, barWidth - 2, h);
+    const index = i * step;
+
+    let value = dataArray[index] || 0;
+    let percent = value / 255;
+    let h = Math.pow(percent, 0.6) * maxHeight;
+
+    const x = i * barWidth;
+    const y = heightCanvas - h + yOffset;
+
+    // Główny słupek z gradientem
+    ctx.fillStyle = barGradient;
+    ctx.shadowColor = '#00f0ff';
+    ctx.shadowBlur = 10;
+    ctx.fillRect(x + 1, y, barWidth - 2, h);
+    ctx.shadowBlur = 0;
+
+    if (!peaks[i]) peaks[i] = 0;
+
+    if (h > peaks[i]) {
+      peaks[i] = h;
+    } else {
+      peaks[i] *= 0.92;
+    }
+
+    if (peaks[i] < 2) peaks[i] = 0;
+
+    // Peak z glow
+    const peakY = heightCanvas - peaks[i] + yOffset;
+    ctx.fillStyle = "#fcee09";
+    ctx.shadowColor = '#fcee09';
+    ctx.shadowBlur = 15;
+    ctx.fillRect(x + 2, peakY, barWidth - 4, 4);
+    ctx.shadowBlur = 0;
   }
 }
 
 resizeCanvas();
 </script>
+
 </body>
 </html>
