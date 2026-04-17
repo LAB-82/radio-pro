@@ -160,14 +160,6 @@ let current = 0;
 let cache = JSON.parse(localStorage.getItem("radio_cache") || "{}");
 let favs = JSON.parse(localStorage.getItem("radio_favs") || "[]");
 
-/* 🔊 NORMALIZACJA GŁOŚNOŚCI */
-const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-const source = audioCtx.createMediaElementSource(audio);
-const gainNode = audioCtx.createGain();
-gainNode.gain.value = 0.9; // lekka normalizacja
-
-source.connect(gainNode).connect(audioCtx.destination);
-
 function saveCache(){
 localStorage.setItem("radio_cache", JSON.stringify(cache));
 }
@@ -176,19 +168,20 @@ function saveFavs(){
 localStorage.setItem("radio_favs", JSON.stringify(favs));
 }
 
-/* 🔥 MANUAL STREAMS */
+/* 🔥 POPRAWNE STREAMY (AUDIO, NIE STRONY) */
 const manualStreams = {
-"Radio Plus":"https://www.radio-polska.pl/radio-plus-polska",
+"Radio Plus":"https://pl-play.adtonos.com/radio-plus",
 "Radio Republika":"https://stream.republika.pl/live.mp3",
 "Polskie Radio Czwórka":"https://stream.polskieradio.pl/pr4_mp3"
 };
 
-/* LOGO (fallback system) */
+/* LOGO + fallback */
 function setLogo(name){
 logo.src = `https://www.radio-browser.info/backends/logos/${encodeURIComponent(name)}.png`;
 
-logo.onerror = () => {
-logo.src = `https://via.placeholder.com/180x120?text=${encodeURIComponent(name)}`;
+logo.onerror = function(){
+this.onerror=null;
+this.src = `https://via.placeholder.com/180x120?text=${encodeURIComponent(name)}`;
 };
 }
 
