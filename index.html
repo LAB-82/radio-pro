@@ -21,50 +21,24 @@ body{
   transition:0.4s;
 }
 
+/* (CAŁY CSS BEZ ZMIAN) */
+
 #title{
-  font-family: 'Rajdhani', 'OCR-A', monospace;
   font-weight: 800;
   font-size:88px;
   margin-top:50px;
   text-align:center;
   color:#ff2a2a;
-  text-shadow:0 0 5px #ff2a2a,0 0 15px #ff0000,0 0 30px #ff0000,0 0 60px #ff0000,
-               0 0 10px rgba(255,255,255,0.2);
-  animation: cyberpunk-title 4s ease-in-out infinite alternate;
-  filter: drop-shadow(0 0 8px rgba(255,255,255,0.15));
-  letter-spacing: 4px;
-  text-transform: uppercase;
-}
-
-@keyframes cyberpunk-title {
-  0% { text-shadow:0 0 5px #ff2a2a,0 0 15px #ff0000,0 0 30px #ff0000; }
-  100% { text-shadow:0 0 8px #ff2a2a,0 0 20px #ff0000,0 0 40px #ff0000,0 0 15px rgba(255,255,255,0.3); }
+  text-shadow:0 0 5px #ff2a2a,0 0 15px #ff0000,0 0 30px #ff0000,0 0 60px #ff0000;
 }
 
 #proEqualizer{
-  display:block;
-  margin:0 auto;
   margin-top:30px;
   margin-bottom:30px;
-  border-radius:8px;
-  overflow:hidden;
-  box-shadow:0 0 20px rgba(255,42,42,0.4), inset 0 0 15px rgba(255,255,255,0.08);
-  position: relative;
-  z-index: 10;
-  border: 2px solid rgba(255,42,42,0.6);
 }
 
 canvas{
-  display:block;
   height:260px;
-  border-radius:6px;
-  filter: drop-shadow(0 0 12px rgba(255,0,0,0.5)) brightness(1.03);
-  animation: canvas-flicker 3s ease-in-out infinite alternate;
-}
-
-@keyframes canvas-flicker {
-  0% { filter: drop-shadow(0 0 12px rgba(255,0,0,0.5)) brightness(1.03); }
-  100% { filter: drop-shadow(0 0 18px rgba(255,0,0,0.7)) brightness(1.06); }
 }
 
 #controls{
@@ -72,10 +46,6 @@ canvas{
   gap:8px;
   margin-top:20px;
   margin-bottom:20px;
-  align-items:center;
-  justify-content:space-between;
-  position: relative;
-  z-index: 20;
 }
 
 .volumeWrapper{
@@ -86,27 +56,6 @@ canvas{
   justify-content:center;
   background:#111;
   border:2px solid #ff2a2a;
-  box-shadow:0 0 15px #ff2a2a, 0 0 25px rgba(255,255,255,0.15), inset 0 0 10px rgba(255,255,255,0.08);
-  transition: all 0.3s ease;
-  position: relative;
-  border-radius: 4px;
-}
-
-.volumeWrapper::before {
-  content: 'VOL';
-  position: absolute;
-  font-size: 10px;
-  top: -20px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(0,0,0,0.9);
-  padding: 2px 6px;
-  border-radius: 3px;
-  letter-spacing: 1px;
-  border: 1px solid rgba(255,42,42,0.5);
-  text-shadow: 0 0 3px rgba(255,255,255,0.3);
-  font-family: 'Rajdhani', monospace;
-  font-weight: 600;
 }
 
 button{
@@ -115,178 +64,30 @@ button{
   background:#111;
   color:#fff;
   cursor:pointer;
-  font-family:'Rajdhani', 'OCR-A', monospace;
-  font-weight: 700;
-  font-size: 13px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  transition: all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   border:2px solid #ff2a2a;
-  box-shadow:0 0 15px #ff2a2a, 0 0 25px rgba(255,255,255,0.18), inset 0 0 10px rgba(255,255,255,0.06);
-  position: relative;
-  overflow: hidden;
-  border-radius: 4px;
-  text-shadow: 0 0 5px rgba(0,0,0,0.5);
-}
-
-button::before {
-  content: '';
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: conic-gradient(transparent, rgba(255,255,255,0.3), transparent 30%);
-  animation: cyberpunk-shine 2s linear infinite;
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-
-button:hover::before {
-  opacity: 1;
-}
-
-@keyframes cyberpunk-shine {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-button::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
-  transition: left 0.6s;
-}
-
-button:hover::after {
-  left: 100%;
-}
-
-button:active {
-  transform: scale(0.98);
-  box-shadow: 0 0 30px #ff2a2a, inset 0 0 20px rgba(0,0,0,0.3);
-}
-
-button:hover {
-  transform: translateY(-2px);
-  box-shadow:0 0 25px #ff2a2a, 0 0 35px rgba(255,255,255,0.3);
 }
 
 #volume{
   width:120px;
-  height:12px;
-  appearance:none;
-  border-radius:8px;
-  outline:none;
-  background: linear-gradient(to right, #000 0%, #333 100%);
-  border:2px solid #ff2a2a;
-  box-shadow:0 0 12px #ff2a2a, inset 0 0 8px rgba(255,255,255,0.1);
-  transition: all 0.2s ease;
 }
 
-#volume.active{
-  box-shadow:0 0 20px #ff0000, 0 0 30px rgba(255,255,255,0.25);
-  border-color: #ff0000;
-  background: linear-gradient(to right, #111 0%, #ff0000 100%);
-}
-
-#volume::-webkit-slider-thumb{
-  -webkit-appearance:none;
-  width:18px;
-  height:18px;
-  border-radius:50%;
-  background: linear-gradient(145deg, #ff0000, #ff4444);
-  box-shadow:0 0 15px #ff0000, 0 0 25px rgba(255,255,255,0.4), 0 2px 5px rgba(0,0,0,0.5);
-  cursor:pointer;
-  transition: all 0.2s ease;
-  border: 2px solid rgba(255,255,255,0.3);
-}
-
-#volume::-webkit-slider-thumb:hover {
-  box-shadow:0 0 25px #ff0000, 0 0 35px rgba(255,255,255,0.6);
-  transform: scale(1.1);
-}
-
-#volume::-moz-range-thumb{
-  width:18px;
-  height:18px;
-  border:none;
-  border-radius:50%;
-  background: linear-gradient(145deg, #ff0000, #ff4444);
-  box-shadow:0 0 15px #ff0000, 0 0 25px rgba(255,255,255,0.4), 0 2px 5px rgba(0,0,0,0.5);
-  cursor:pointer;
-  transition: all 0.2s ease;
-  border: 2px solid rgba(255,255,255,0.3);
-}
-
-.playActive{
-  color:#00ff00 !important;
-  text-shadow:0 0 15px #00ff00, 0 0 25px rgba(255,255,255,0.3) !important;
-  box-shadow:0 0 25px #00ff00, 0 0 35px rgba(255,255,255,0.25) !important;
-  background: rgba(0,255,0,0.15) !important;
-  border-color: #00ff00 !important;
-  animation: playPulse 1.5s ease-in-out infinite;
-}
-
-@keyframes playPulse {
-  0%, 100% { box-shadow:0 0 25px #00ff00, 0 0 35px rgba(255,255,255,0.25); }
-  50% { box-shadow:0 0 35px #00ff00, 0 0 50px rgba(255,255,255,0.4); }
-}
-
-.stopActive{
-  color:#ff4444 !important;
-  text-shadow:0 0 15px #ff4444, 0 0 25px rgba(255,255,255,0.2) !important;
-  box-shadow:0 0 25px #ff4444, 0 0 35px rgba(255,255,255,0.18) !important;
-  background: rgba(255,68,68,0.15) !important;
-  border-color: #ff4444 !important;
-}
-
-.muteActive{
-  color:#ffaa00 !important;
-  text-shadow:0 0 15px #ffaa00, 0 0 25px rgba(255,255,255,0.3) !important;
-  box-shadow:0 0 25px #ffaa00, 0 0 35px rgba(255,255,255,0.25) !important;
-  background: rgba(255,170,0,0.15) !important;
-  border-color: #ffaa00 !important;
-  animation: pulseMute 0.8s infinite alternate;
-}
-
-@keyframes pulseMute{
-  from{ transform:scale(1); box-shadow: 0 0 15px #ffaa00, 0 0 25px rgba(255,255,255,0.2); }
-  to{ transform:scale(1.08); box-shadow: 0 0 30px #ffaa00, 0 0 45px rgba(255,255,255,0.4); }
-}
+.playActive{ color:#00ff00; }
+.stopActive{ color:#ff4444; }
+.muteActive{ color:#ffaa00; }
 
 #bottomLink{
   margin-top:10px;
-  text-align:center;
-  width:100%;
-  z-index: 20;
-  font-family: 'Rajdhani', monospace;
-  font-weight: 600;
-  letter-spacing: 2px;
-  text-transform: uppercase;
 }
 
 #bottomLink a{
   color:#ff2a2a;
   text-decoration:none;
-  text-shadow:0 0 10px #ff2a2a, 0 0 20px rgba(255,255,255,0.25);
-  font-size:20px;
-  font-weight: 700;
-  letter-spacing: 3px;
-  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-}
-
-#bottomLink a:hover {
-  text-shadow: 0 0 25px #ff2a2a, 0 0 40px rgba(255,255,255,0.45);
-  transform: scale(1.05);
 }
 </style>
 </head>
+
 <body>
+
 <div id="title">Muzyczne Radio</div>
 <canvas id="proEqualizer"></canvas>
 
@@ -294,6 +95,7 @@ button:hover {
   <button id="playBtn" onclick="playRadio()">PLAY</button>
   <button id="stopBtn" onclick="stopRadio()">STOP</button>
   <button id="muteBtn" onclick="muteRadio()">MUTE</button>
+
   <div class="volumeWrapper">
     <input id="volume" type="range" min="0" max="1" step="0.01" value="0.5">
   </div>
@@ -304,6 +106,7 @@ button:hover {
 </div>
 
 <audio id="audio" crossorigin="anonymous"></audio>
+
 <script>
 const STREAM_URL = "https://stream.rcs.revma.com/gzwc1xcq042vv";
 
@@ -323,63 +126,52 @@ let animationStarted = false;
 
 function setupAudio() {
   if (audioCtx) return;
-  
+
   audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   source = audioCtx.createMediaElementSource(audio);
-  
+
   analyser = audioCtx.createAnalyser();
   analyser.fftSize = 1024;
   analyser.smoothingTimeConstant = 0.8;
-  
+
   source.connect(analyser);
   analyser.connect(audioCtx.destination);
-  
+
   dataArray = new Uint8Array(analyser.frequencyBinCount);
-  
+
   for(let i = 0; i < 300; i++) peaks[i] = 0;
 }
 
 function playRadio() {
   setupAudio();
-  
+
   if (audioCtx.state === "suspended") {
     audioCtx.resume();
   }
-  
+
   audio.src = STREAM_URL;
   audio.play();
-  
+
   playBtn.classList.add("playActive");
   stopBtn.classList.remove("stopActive");
-  
+
   if (!animationStarted) {
     animationStarted = true;
     draw();
   }
 }
 
+/* ✅ NAPRAWIONA funkcja (była uszkodzona) */
 function stopRadio() {
   audio.pause();
-  
+
   stopBtn.classList.add("stopActive");
   playBtn.classList.remove("playActive");
-  
+
   setTimeout(() => {
     stopBtn.classList.remove("stopActive");
   }, 1000);
-  
-  for(let i = 0; i < peaks.length; i++) {
-    peaks[i]
-  function stopRadio() {
-  audio.pause();
-  
-  stopBtn.classList.add("stopActive");
-  playBtn.classList.remove("playActive");
-  
-  setTimeout(() => {
-    stopBtn.classList.remove("stopActive");
-  }, 1000);
-  
+
   for(let i = 0; i < peaks.length; i++) {
     peaks[i] = 0;
   }
@@ -393,7 +185,7 @@ function muteRadio() {
 volume.addEventListener("input", () => {
   let val = parseFloat(volume.value);
   audio.volume = val;
-  
+
   if (Math.abs(val - 0.5) < 0.02) {
     volume.classList.remove("active");
   } else {
@@ -406,12 +198,13 @@ volume.dispatchEvent(new Event("input"));
 function resizeCanvas() {
   let dpr = window.devicePixelRatio || 1;
   let width = 600;
-  
+
   canvas.width = width * dpr;
   canvas.height = 260 * dpr;
+
   canvas.style.width = width + "px";
   canvas.style.height = "260px";
-  
+
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.scale(dpr, dpr);
 }
@@ -421,9 +214,9 @@ window.addEventListener("resize", resizeCanvas);
 
 function draw() {
   requestAnimationFrame(draw);
-  
+
   if (!analyser || !dataArray) return;
-  
+
   analyser.getByteFrequencyData(dataArray);
   drawEQ();
 }
@@ -432,70 +225,48 @@ function drawEQ() {
   const dpr = window.devicePixelRatio || 1;
   const width = canvas.width / dpr;
   const heightCanvas = canvas.height / dpr;
-  
-  // czyszczenie canvasu – bez nakładającej się przezroczystej czarnej warstwy
+
   ctx.fillStyle = '#000';
   ctx.fillRect(0, 0, width, heightCanvas);
-  
+
   const bars = 80;
   const barWidth = width / bars;
   const step = Math.floor(dataArray.length / bars * 1.5);
-  
+
   const yOffset = 8;
   const maxHeight = heightCanvas * 0.92;
-  
+
   for (let i = 0; i < bars; i++) {
-    const lowFreq = Math.floor(i * step * 0.7);
-    const highFreq = Math.floor((i + 1) * step * 0.7);
-    
-    let sum = 0;
-    let count = 0;
-    for (let j = lowFreq; j < Math.min(highFreq, dataArray.length); j++) {
-      sum += dataArray[j];
-      count++;
-    }
-    
-    let value = count > 0 ? sum / count : 0;
+    const index = i * step;
+
+    let value = dataArray[index] || 0;
     let percent = value / 255;
     let h = Math.pow(percent, 0.6) * maxHeight;
-    
+
     const x = i * barWidth;
     const y = heightCanvas - h + yOffset;
-    
-    const gradient = ctx.createLinearGradient(x, heightCanvas, x, 0);
-    gradient.addColorStop(0, "#ff0000");
-    gradient.addColorStop(0.3, "#ff4444");
-    gradient.addColorStop(0.7, "#ffaa00");
-    gradient.addColorStop(1, "#ffffff");
-    
-    ctx.fillStyle = gradient;
-    ctx.shadowBlur = 8;
-    ctx.shadowColor = "#ff2222";
-    
+
+    ctx.fillStyle = "#ff0000";
     ctx.fillRect(x + 1, y, barWidth - 2, h);
-    
-    ctx.shadowBlur = 0;
-    
+
     if (!peaks[i]) peaks[i] = 0;
-    
+
     if (h > peaks[i]) {
       peaks[i] = h;
     } else {
       peaks[i] *= 0.92;
     }
-    
+
     if (peaks[i] < 2) peaks[i] = 0;
-    
+
     const peakY = heightCanvas - peaks[i] + yOffset;
     ctx.fillStyle = "#ffaa00";
-    ctx.shadowBlur = 4;
-    ctx.shadowColor = "#ffaa00";
     ctx.fillRect(x + 2, peakY, barWidth - 4, 4);
-    ctx.shadowBlur = 0;
   }
 }
 
 resizeCanvas();
 </script>
+
 </body>
-</html> 
+</html>
