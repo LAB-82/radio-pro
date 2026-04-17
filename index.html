@@ -5,12 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Radio Player</title>
 <style>
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
-
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         background: #0f0f0f;
@@ -18,7 +13,6 @@
         padding: 20px;
         min-height: 100vh;
     }
-
   .player {
         max-width: 480px;
         margin: 0 auto;
@@ -27,14 +21,12 @@
         overflow: hidden;
         box-shadow: 0 8px 32px rgba(0,0,0,0.5);
     }
-
   .header {
         padding: 24px;
         text-align: center;
         background: #242424;
         border-bottom: 1px solid #333;
     }
-
   .clock {
         font-size: 48px;
         font-weight: 300;
@@ -42,17 +34,12 @@
         margin-bottom: 8px;
         font-variant-numeric: tabular-nums;
     }
-
   .now-playing {
         font-size: 14px;
         color: #888;
         min-height: 20px;
     }
-
-  .now-playing.active {
-        color: #1db954;
-    }
-
+  .now-playing.active { color: #1db954; }
   .controls {
         padding: 24px;
         display: flex;
@@ -61,7 +48,6 @@
         gap: 20px;
         background: #1a1a1a;
     }
-
   .play-btn {
         width: 64px;
         height: 64px;
@@ -76,21 +62,9 @@
         justify-content: center;
         transition: transform 0.1s, background 0.2s;
     }
-
-  .play-btn:hover {
-        transform: scale(1.05);
-        background: #1ed760;
-    }
-
-  .play-btn:active {
-        transform: scale(0.95);
-    }
-
-  .stations {
-        max-height: 60vh;
-        overflow-y: auto;
-    }
-
+  .play-btn:hover { transform: scale(1.05); background: #1ed760; }
+  .play-btn:active { transform: scale(0.95); }
+  .stations { max-height: 60vh; overflow-y: auto; }
   .station {
         padding: 18px 24px;
         border-bottom: 1px solid #2a2a2a;
@@ -100,31 +74,15 @@
         justify-content: space-between;
         align-items: center;
     }
-
-  .station:hover {
-        background: #242424;
-    }
-
+  .station:hover { background: #242424; }
   .station.active {
         background: #282828;
         border-left: 3px solid #1db954;
         padding-left: 21px;
     }
-
-  .station.disabled {
-        opacity: 0.4;
-        cursor: not-allowed;
-    }
-
-  .station-name {
-        font-size: 16px;
-        font-weight: 500;
-    }
-
-  .station.active.station-name {
-        color: #1db954;
-    }
-
+  .station.disabled { opacity: 0.4; cursor: not-allowed; }
+  .station-name { font-size: 16px; font-weight: 500; }
+  .station.active .station-name { color: #1db954; }
   .playing-indicator {
         display: none;
         width: 4px;
@@ -132,10 +90,80 @@
         background: #1db954;
         animation: pulse 1s infinite;
     }
-
-  .station.active.playing-indicator {
-        display: block;
+  .station.active .playing-indicator { display: block; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+  .stations::-webkit-scrollbar { width: 8px; }
+  .stations::-webkit-scrollbar-track { background: #1a1a1a; }
+  .stations::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+  .section-title {
+        padding: 12px 24px;
+        font-size: 12px;
+        font-weight: 600;
+        color: #666;
+        background: #151515;
+        text-transform: uppercase;
+        letter-spacing: 1px;
     }
+</style>
+</head>
+<body>
 
-    @keyframes pulse {
-        0%, 100% {
+<div class="player">
+    <div class="header">
+        <div class="clock" id="clock">00:00:00</div>
+        <div class="now-playing" id="nowPlaying">Wybierz stację</div>
+    </div>
+
+    <div class="controls">
+        <button class="play-btn" id="playBtn">▶</button>
+    </div>
+
+    <div class="stations" id="stations"></div>
+</div>
+
+<audio id="audioPlayer"></audio>
+
+<script>
+    // Wszystkie stacje z Twojej listy. url: null = brak publicznego streamu 100%
+    const stations = [
+        { section: "GŁÓWNE" },
+        { name: "Muzyczne Radio Polska", url: "https://stream.muzyczneradio.pl:8443/mr_128.mp3" },
+        { name: "RMF FM", url: "https://rs101-krk.rmfstream.pl/rmf_fm" },
+        { name: "Radio ZET", url: "https://zt.cdn.eurozet.pl/zet-tun.mp3" },
+        { name: "Radio ESKA", url: "https://ic1.smcdn.pl/2330-1.mp3" },
+        { name: "Radio Plus", url: "https://plus.cdn.eurozet.pl/plus-tun.mp3" },
+        { name: "PR Radio Wrocław", url: "https://stream.rcs.revma.com/6l5xvqhz1tzuv" },
+        { name: "Radio Tok FM", url: "https://pl.cdn.eurozet.pl/tok.mp3" },
+        { name: "Radio Kolor FM", url: "https://stream.radiokolor.pl:8000/kolor" },
+        { name: "Planeta FM", url: "https://pla.cdn.eurozet.pl/pla-tun.mp3" },
+        { name: "Meloradio FM", url: "https://mel.cdn.eurozet.pl/mel-tun.mp3" },
+        { name: "Radio Kampus", url: "https://stream.radiokampus.fm:9000/radiokampus.mp3" },
+        { name: "Radio Rekord FM", url: "https://stream.radiorecord.pl:8000/live.mp3" },
+        { name: "Antyradio", url: "https://an.cdn.eurozet.pl/ant-waw.mp3" },
+        { name: "PR24 Polskie Radio 24", url: "https://stream.rcs.revma.com/n0xe83v14tzuv" },
+        { name: "PR Radio Kierowców", url: "https://stream.rcs.revma.com/7y4z5xhz1tzuv" },
+        { name: "Radio Rodzina", url: "https://stream.radiorodzina.pl:8000/radiorodzina.mp3" },
+        { name: "Polskie Radio - Dzieciom", url: "https://stream.rcs.revma.com/8q2x5yhz1tzuv" },
+        { name: "RMF - Bajkowe Piosenki", url: "https://rs201-krk.rmfstream.pl/rmf_bajkowe_piosenki" },
+        { name: "Radio Maryja", url: "https://radiomaryja.fastcast4u.com/proxy/radiomaryja?mp=/1" },
+
+        { section: "MUZYCZNE" },
+        { name: "CYBERStacja", url: "https://s3.slotex.pl:8080/" },
+        { name: "Disco Party - Polo", url: "https://stream.discoparty.pl:8000/polo" },
+        { name: "Radio Dobra Nuta", url: "https://s1.slotex.pl:7048/" },
+        { name: "Polmax 2", url: null },
+        { name: "Eska 2 - Dla Dzieci", url: "https://ic1.smcdn.pl/2370-1.mp3" },
+        { name: "Eska 2 - Kultowe Polskie", url: "https://ic1.smcdn.pl/2360-1.mp3" },
+        { name: "Hit Radio PL", url: null },
+        { name: "House of Fun K", url: null },
+        { name: "Kombinat Metal", url: null },
+        { name: "Metal Live Radio", url: null },
+        { name: "Bear Metal Radio", url: null },
+        { name: "Minimal Mix Radio", url: null },
+        { name: "Pure FM", url: null },
+        { name: "Radio Nowej Generacji", url: null },
+        { name: "Radio Tube - Drum and Bass", url: null },
+        { name: "MOD FM", url: null },
+        { name: "Sound FM", url: null },
+        { name: "Rave FM", url: null },
+        { name: "Radio FTB Trance
