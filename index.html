@@ -74,28 +74,14 @@ body{
   box-sizing: border-box;
   position: relative;
   background: #000014;
-  box-shadow: 0 0 10px var(--cp-cyan), 0 0 20px var(--cp-magenta), inset 0 0 20px rgba(0,240,255,0.2);
-}
-
-#proEqualizer::before{
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
   border: 2px solid var(--cp-cyan);
-  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
-  pointer-events: none;
-  z-index: 1;
+  box-shadow: 0 0 10px var(--cp-cyan), 0 0 20px var(--cp-magenta), inset 0 0 20px rgba(0,240,255,0.2);
 }
 
 canvas{
   display: block;
   width: 100%;
   height: 100%;
-  position: relative;
-  z-index: 0;
 }
 
 #controls{
@@ -115,20 +101,8 @@ canvas{
   background:#0a0a1a;
   position: relative;
   box-sizing: border-box;
-  box-shadow: 0 0 8px var(--cp-cyan), inset 0 0 8px rgba(0,240,255,0.3);
-}
-
-.volumeWrapper::before{
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
   border: 2px solid var(--cp-cyan);
-  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
-  pointer-events: none;
-  z-index: 1;
+  box-shadow: 0 0 8px var(--cp-cyan), inset 0 0 8px rgba(0,240,255,0.3);
 }
 
 button{
@@ -146,19 +120,7 @@ button{
   transition: all 0.15s ease;
   box-sizing: border-box;
   position: relative;
-  border: none;
-}
-
-button::before{
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
   border: 2px solid var(--cp-cyan);
-  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
-  pointer-events: none;
 }
 
 button:hover{
@@ -182,8 +144,6 @@ button:active{
   border: 1px solid var(--cp-cyan);
   outline: none;
   margin: 0;
-  position: relative;
-  z-index: 2;
 }
 
 #volume::-webkit-slider-thumb{
@@ -242,45 +202,4 @@ button:active{
 .playActive{
   color:#000014!important;
   background: var(--cp-cyan)!important;
-  box-shadow: 0 0 20px var(--cp-cyan), 0 0 40px var(--cp-cyan)!important;
-}
-.stopActive{
-  color:#000014!important;
-  background: var(--cp-magenta)!important;
-  box-shadow: 0 0 20px var(--cp-magenta), 0 0 40px var(--cp-magenta)!important;
-}
-.stopActive::before{
-  border-color: var(--cp-magenta)!important;
-}
-.muteActive{
-  color:#000014!important;
-  background: var(--cp-yellow)!important;
-  box-shadow: 0 0 20px var(--cp-yellow), 0 0 40px var(--cp-yellow)!important;
-}
-.muteActive::before{
-  border-color: var(--cp-yellow)!important;
-}
-
-#bottomLink{
-  margin-top:10px;
-}
-
-#bottomLink a{
-  color:var(--cp-cyan);
-  text-decoration:none;
-  font-family:'Orbitron', sans-serif;
-  text-shadow: 0 0 5px var(--cp-cyan);
-  transition: 0.2s;
-}
-
-#bottomLink a:hover{
-  color:var(--cp-yellow);
-  text-shadow: 0 0 10px var(--cp-yellow), 0 0 20px var(--cp-magenta);
-}
-</style>
-</head>
-
-<body>
-
-<div id="title">Muzyczne Radio</div>
-<div id="proEqualizer"><canvas id="eqCanvas"></canvas></div
+  box-shadow: 0 0 20px var(--cp-cyan), 0 0 
