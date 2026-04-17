@@ -5,119 +5,168 @@
 <title>Muzyczne Radio PRO</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
 <style>
-/* 🔥 Cyberpunk 2077 Red / Noir Theme – czerwony zamiast białego */
-:root{
-  --red:#ff0000;
-  --red2:#ff3333;
-  --red3:#ff6666;
-  --text:#ff2a2a;
-  --muted:#ff2a2a;
-  --accent:#ff2a2a;
-  --line:rgba(255,0,0,.35);
+:root {
+  --red: #ff0000;
+  --red2: #ff3333;
+  --red3: #ff6666;
+  --text: #ff2a2a;
+  --muted: #ff2a2a;
+  --accent: #ff2a2a;
+  --line: rgba(255, 0, 0, 0.35);
 }
 
-/* 🌌 Czarny tło z czerwonymi neonymi, zero białego */
-body{
-  margin:0;
-  background:#000;
-  color:#fff;
-  font-family:'Orbitron',sans-serif;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  height:100vh;
+/* 🌌 Czarny tło z czerwonymi neonymi */
+body {
+  margin: 0;
+  background: #000;
+  color: #fff;
+  font-family: 'Orbitron', sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100vh;
   position: relative;
   overflow: hidden;
 }
 
-/* 🌪️ Delikatny glitch / scanline nad całością (bez uszkodzenia UI) */
-body::before{
-  content:"";
-  position:fixed;
-  inset:0;
-  background:
-    radial-gradient(circle at 20% 20%, rgba(255,0,0,.08), transparent 28%),
-    radial-gradient(circle at 70% 20%, rgba(255,0,0,.06), transparent 28%),
-    linear-gradient(180deg, rgba(255,0,0,.05) 0%, transparent 100%);
-  background-size: 40px 40px;
-  mix-blend-mode: screen;
-  opacity:.12;
-  pointer-events: none;
-}
-
-/* 🔌 TYTUŁ – glitch tylko na tekście */
-#title{
-  font-size:88px;
-  margin-top:50px;
-  text-align:center;
-  color:#ff2a2a;
+/* 🔌 Tytuł – bez zmian, tylko lekko wyróżniony */
+#title {
+  font-size: 88px;
+  margin-top: 50px;
+  text-align: center;
+  color: #ff2a2a;
   text-shadow:
     0 0 5px #ff2a2a,
     0 0 15px #ff0000,
     0 0 30px #ff0000,
     0 0 60px #ff0000,
     0 0 80px #ff0000;
-  position:relative;
 }
-#title::before,
-#title::after{
-  content:attr(data-text);
-  position:absolute;
-  inset:0;
+
+/* 🔌 ProEqualizer – bez zmian */
+#proEqualizer {
+  display: block;
+  margin: 0 auto;
+  margin-top: 30px;
+  margin-bottom: 30px;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 0 10px rgba(255, 0, 0, 0.3);
+}
+
+canvas {
+  display: block;
+  height: 260px;
+  border-radius: 8px;
+}
+
+/* 🔌 Kontrolki – bez zmian, ale styl przycisków z Cyberpunk 2077 */
+#controls {
+  display: flex;
+  gap: 8px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* 🌟 Cyberpunk 2077 – efekt hover na przyciskach */
+button {
+  width: 160px;
+  height: 45px;
+  background: #000;
+  color: #ff0000;
+  font-family: 'Orbitron';
+  cursor: pointer;
+  border: 2px solid #ff0000;
+  border-radius: 6px;
+  position: relative;
+  overflow: hidden;
+  box-shadow:
+    0 0 0 1px #ff0000 inset,
+    0 0 10px rgba(255, 0, 0, 0.4);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+button:hover {
+  box-shadow:
+    0 0 0 1px #ff0000 inset,
+    0 0 10px rgba(255, 0, 0, 0.6),
+    0 0 20px rgba(255, 0, 0, 0.3) inset;
+  transform: translateY(-1px) scale(1.015);
+  border-color: #ff3333;
+}
+
+button:hover::before {
+  opacity: 0.8;
+  animation: glitchBorder 0.5s linear infinite alternate;
+}
+
+button:active {
+  transform: translateY(1px) scale(0.98);
+  box-shadow:
+    0 0 0 1px #ff0000 inset,
+    0 0 6px rgba(255, 0, 0, 0.3);
+}
+
+/* Glitch na krawędziach przycisku tylko przy hover */
+button::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 0, 0, 0.1),
+    rgba(255, 0, 0, 0.05),
+    rgba(255, 0, 0, 0.1)
+  );
+  background-size: 100px 10px;
   mix-blend-mode: screen;
-  animation:glitch 1.5s linear infinite alternate;
-  clip-path: polygon(0 0, 100% 0, 100% 30%, 0 30%);
-}
-#title::before{
-  color:#ff0000;
-  opacity:.8;
-  transform:translateX(1px);
-}
-#title::after{
-  color:#ff0000;
-  opacity:.5;
-  transform:translateX(-1px);
-}
-@keyframes glitch{
-  0%   { transform:translate(0,0); }
-  50%  { transform:translate(2px,-1px); }
-  100% { transform:translate(-1px,1px); }
+  opacity: 0;
+  z-index: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
 }
 
-/* 🔌 ProEqualizer – bez zmian, bez glitchu */
-#proEqualizer{
-  display:block;
-  margin:0 auto;
-  margin-top:30px;
-  margin-bottom:30px;
-  border-radius:8px;
-  overflow:hidden;
-  box-shadow:0 0 10px rgba(255,0,0,.3);
-}
-canvas{
-  display:block;
-  height:260px;
-  border-radius:8px;
+/* Animacja glitch tylko na hover */
+@keyframes glitchBorder {
+  0%   { background-position: 0 0; }
+  100% { background-position: 100px 0; }
 }
 
-/* 🔌 Kontrolki – bez zmian, tylko czerwony glitch tylko na krawędziach */
-#controls{
-  display:flex;
-  gap:8px;
-  margin-top:20px;
-  margin-bottom:20px;
-  align-items:center;
-  justify-content:space-between;
+/* 🎛 Suwak głośności (bez zmian) */
+.volumeWrapper {
+  width: 160px;
+  height: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000;
+  border: 2px solid #ff2a2a;
+  box-shadow: 0 0 10px #ff2a2a;
 }
-.volumeWrapper{
-  width:160px;
-  height:45px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:#000;
-  border:2px solid #ff2a2a;
-  box-shadow:0 0 10px #ff2a2a;
+
+#volume {
+  width: 120px;
+  height: 10px;
+  appearance: none;
+  border-radius: 10px;
+  outline: none;
+  background: #000;
+  border: 1px solid #ff2a2a;
+  box-shadow: 0 0 6px #ff2a2a;
 }
-button{
-  w
+
+#volume::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  background: #ff0000;
+  box-shadow: 0 0 10px #ff0000, 0 0 20px #ff0000;
+  cursor: pointer;
+}
+
+/* ❌ Aktualizacja: nie zmiany w aktywach, mute, stop itp. */
+.playActive { color: #00ff00; text-shadow: 0 0 10px #00ff00; }
+.stopActive { color: 
