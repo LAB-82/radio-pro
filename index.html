@@ -173,22 +173,12 @@ const stations = [
 ];
 
 /* =========================
-  STREAMS (FIXED LINKS)
+  STREAMS (MINIMAL WORKING SET)
 ========================= */
 
 const STREAMS = {
 
 "Muzyczne Radio":"https://stream.muzyczneradio.pl:8000/stream.mp3",
-
-"Polskie Radio Jedynka":"https://stream4.polskieradio.pl/PR1_AAC128",
-
-"Polskie Radio Dwójka":"https://stream4.polskieradio.pl/PR2_AAC128",
-
-"Polskie Radio Trójka":"https://stream4.polskieradio.pl/PR3_AAC128",
-
-"Polskie Radio Czwórka":"https://stream4.polskieradio.pl/PR4_AAC128",
-
-"Radio Plus":"https://pl2-playout.iplay.pl/radioplus.mp3",
 
 "RMF FM":"https://rs6-krk2-cyfronet.rmfstream.pl/RMFFM48",
 
@@ -196,29 +186,9 @@ const STREAMS = {
 
 "Radio Eska":"https://waw.ic.smcdn.pl/t043-1.mp3",
 
-"Radio Wrocław":"https://stream4.nadaje.com:9210/radiowroclaw",
-
-"Radio Wnet":"https://stream.rcs.revma.com/wnet",
-
-"Tok FM":"https://radiostream.pl/tuba10-1.mp3",
-
 "Antyradio":"https://stream.antyradio.pl/stream.mp3",
 
-"Radio Kolor":"https://stream.rcs.revma.com/radiokolor",
-
-"Radio Złote Przeboje":"https://zt.cdn.eurozet.pl/ZLOTE128.mp3",
-
-"Planeta FM":"https://stream.rcs.revma.com/planetafm",
-
-"Radio Kampus":"https://stream3.polskieradio.pl:8952/stream",
-
-"Radio Dzieciom":"https://stream3.polskieradio.pl/PR4_AAC128",
-
-"Polskie Radio Chopin":"https://stream3.polskieradio.pl/PRChopin_AAC128",
-
-"Radio AH":"",
-
-"Rock Radio":"https://stream.rcs.revma.com/rockradio",
+"Tok FM":"https://radiostream.pl/tuba10-1.mp3",
 
 "Radio Maryja":"http://s1.slotex.pl:7070/stream",
 
@@ -237,27 +207,20 @@ let current=0;
 
 volume.oninput=()=>audio.volume=volume.value;
 
-/* =========================
-  NO AI RESOLVER (DISABLED LOGIC)
-========================= */
-
 function getStream(name){
 return STREAMS[name] || null;
 }
 
-/* LOGO */
 function setLogo(name){
 logo.src=`https://www.radio-browser.info/backends/logos/${encodeURIComponent(name)}.png`;
 }
 
-/* ACTIVE */
 function setActive(i){
 document.querySelectorAll(".station").forEach((el,idx)=>{
 el.classList.toggle("active",idx===i);
 });
 }
 
-/* LOAD */
 function load(i){
 
 current=i;
@@ -284,7 +247,6 @@ function play(){load(current);}
 function stop(){audio.pause();audio.src="";status.innerText="STOPPED";}
 function mute(){audio.muted=!audio.muted;}
 
-/* BUILD UI */
 stations.forEach((s,i)=>{
 const div=document.createElement("div");
 div.className="station";
