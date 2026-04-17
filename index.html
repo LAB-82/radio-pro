@@ -28,7 +28,6 @@ body{
   display:flex;
   flex-direction:column;
   align-items:center;
-  justify-content: flex-start;
   min-height:100vh;
   padding-bottom: 40px;
 }
@@ -68,27 +67,30 @@ body{
 #proEqualizer{
   margin-top:30px;
   margin-bottom:30px;
-  width: 600px;
-  height: 260px;
-  display: block;
-  box-sizing: border-box;
-  position: relative;
-  background: #000014;
-  box-shadow: 0 0 10px var(--cp-cyan), 0 0 20px var(--cp-magenta), inset 0 0 20px rgba(0,240,255,0.2);
+  width:600px;
+  height:260px;
+  position:relative;
+  background:#000014;
+  border: 2px solid var(--cp-cyan);
+  box-shadow:
+    0 0 10px var(--cp-cyan),
+    0 0 20px var(--cp-magenta),
+    inset 0 0 20px rgba(0,240,255,0.2);
 }
 
-#proEqualizer::before{
-  content: '';
+/* Ścięte rogi bez ::before - działa w Chrome 109 */
+.cut{
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  border: 2px solid var(--cp-cyan);
-  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+  width: 0;
+  height: 0;
+  border-style: solid;
+  z-index: 2;
   pointer-events: none;
-  z-index: 0;
 }
+.cut.tl{ top: -2px; left: -2px; border-width: 0 0 8px 8px; border-color: transparent transparent var(--cp-bg) var(--cp-bg); }
+.cut.tr{ top: -2px; right: -2px; border-width: 8px 8px 0 0; border-color: var(--cp-bg) var(--cp-bg) transparent transparent; }
+.cut.bl{ bottom: -2px; left: -2px; border-width: 8px 0 0 8px; border-color: var(--cp-bg) transparent transparent var(--cp-bg); }
+.cut.br{ bottom: -2px; right: -2px; border-width: 0 8px 8px 0; border-color: transparent var(--cp-bg) var(--cp-bg) transparent; }
 
 canvas{
   width:100%;
@@ -102,33 +104,6 @@ canvas{
   display:flex;
   gap:8px;
   margin-top:20px;
-  margin-bottom:20px;
-  align-items: center;
-}
-
-.volumeWrapper{
-  width:160px;
-  height:45px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:#0a0a1a;
-  position: relative;
-  box-sizing: border-box;
-  box-shadow: 0 0 8px var(--cp-cyan), inset 0 0 8px rgba(0,240,255,0.3);
-}
-
-.volumeWrapper::before{
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  border: 2px solid var(--cp-cyan);
-  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
-  pointer-events: none;
-  z-index: 0;
 }
 
 button{
@@ -136,31 +111,17 @@ button{
   height:45px;
   background:#0a0a1a;
   color:var(--cp-cyan);
-  cursor:pointer;
   font-family:'Orbitron', sans-serif;
   font-weight: 700;
   font-size: 16px;
   letter-spacing: 3px;
   text-transform: uppercase;
+  border: 2px solid var(--cp-cyan);
+  cursor:pointer;
   box-shadow: 0 0 8px var(--cp-cyan), inset 0 0 8px rgba(0,240,255,0.2);
   transition: all 0.15s ease;
-  box-sizing: border-box;
   position: relative;
-  border: none;
   z-index: 1;
-}
-
-button::before{
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  border: 2px solid var(--cp-cyan);
-  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
-  pointer-events: none;
-  z-index: 0;
 }
 
 button:hover{
@@ -175,6 +136,19 @@ button:active{
   box-shadow: 0 0 5px var(--cp-cyan);
 }
 
+.volumeWrapper{
+  width:160px;
+  height:45px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#0a0a1a;
+  border: 2px solid var(--cp-cyan);
+  box-shadow: 0 0 8px var(--cp-cyan), inset 0 0 8px rgba(0,240,255,0.3);
+  position: relative;
+  box-sizing: border-box;
+}
+
 #volume{
   width:120px;
   -webkit-appearance: none;
@@ -185,7 +159,7 @@ button:active{
   outline: none;
   margin: 0;
   position: relative;
-  z-index: 2;
+  z-index: 3;
 }
 
 #volume::-webkit-slider-thumb{
@@ -198,4 +172,166 @@ button:active{
   border: 2px solid var(--cp-cyan);
   box-shadow: 0 0 8px var(--cp-yellow), 0 0 15px var(--cp-cyan);
   border-radius: 2px;
- 
+  margin-top: -7px;
+}
+
+#volume::-moz-range-thumb{
+  width: 16px;
+  height: 16px;
+  background: var(--cp-yellow);
+  cursor: pointer;
+  border: 2px solid var(--cp-cyan);
+  box-shadow: 0 0 8px var(--cp-yellow), 0 0 15px var(--cp-cyan);
+  border-radius: 2px;
+}
+
+#volume::-webkit-slider-runnable-track{
+  background: linear-gradient(90deg, var(--cp-magenta), var(--cp-cyan));
+  height: 4px;
+}
+
+#volume::-moz-range-track{
+  background: linear-gradient(90deg, var(--cp-magenta), var(--cp-cyan));
+  height: 4px;
+}
+
+#bottomLink{
+  margin-top:20px;
+}
+
+#bottomLink a{
+  color:var(--cp-cyan);
+  text-decoration:none;
+  font-family:'Orbitron', sans-serif;
+  text-shadow: 0 0 5px var(--cp-cyan);
+  transition: 0.2s;
+}
+
+#bottomLink a:hover{
+  color:var(--cp-yellow);
+  text-shadow: 0 0 10px var(--cp-yellow), 0 0 20px var(--cp-magenta);
+}
+</style>
+</head>
+
+<body>
+
+<div id="title">Muzyczne Radio</div>
+
+<div id="proEqualizer">
+  <div class="cut tl"></div><div class="cut tr"></div><div class="cut bl"></div><div class="cut br"></div>
+  <canvas id="eqCanvas"></canvas>
+</div>
+
+<div id="controls">
+  <button><div class="cut tl"></div><div class="cut tr"></div><div class="cut bl"></div><div class="cut br"></div>PLAY</button>
+  <button><div class="cut tl"></div><div class="cut tr"></div><div class="cut bl"></div><div class="cut br"></div>STOP</button>
+  <button><div class="cut tl"></div><div class="cut tr"></div><div class="cut bl"></div><div class="cut br"></div>MUTE</button>
+
+  <div class="volumeWrapper">
+    <div class="cut tl"></div><div class="cut tr"></div><div class="cut bl"></div><div class="cut br"></div>
+    <input type="range" id="volume" min="0" max="1" step="0.01" value="1">
+  </div>
+</div>
+
+<div id="bottomLink">
+  <a href="https://www.muzyczneradio.pl/" target="_blank">www.muzyczneradio.pl</a>
+</div>
+
+<script>
+// ================= STREAM (ORYGINAŁ) =================
+const audio = new Audio("https://stream.rcs.revma.com/gzwc1xcq042vv");
+audio.crossOrigin = "anonymous";
+
+// ================= AUDIO ENGINE =================
+let ctx, analyser, src, data, bufferLen;
+
+const canvas = document.getElementById("eqCanvas");
+const c = canvas.getContext("2d");
+
+function resize(){
+  canvas.width = canvas.clientWidth;
+  canvas.height = canvas.clientHeight;
+}
+resize();
+window.addEventListener("resize", resize);
+
+// ================= INIT =================
+function init(){
+  if(!ctx){
+    ctx = new (window.AudioContext || window.webkitAudioContext)();
+
+    analyser = ctx.createAnalyser();
+    analyser.fftSize = 256;
+
+    // stabilne, naturalne audio
+    analyser.smoothingTimeConstant = 0.82;
+
+    bufferLen = analyser.frequencyBinCount;
+    data = new Uint8Array(bufferLen);
+
+    src = ctx.createMediaElementSource(audio);
+    src.connect(analyser);
+    analyser.connect(ctx.destination);
+  }
+
+  if(ctx.state === "suspended"){
+    ctx.resume();
+  }
+}
+
+// ================= CONTROLS (BEZ ZMIAN LOGIKI) =================
+const btns = document.querySelectorAll("button");
+
+btns[0].onclick = () => { init(); audio.play(); };
+btns[1].onclick = () => { audio.pause(); audio.currentTime = 0; };
+btns[2].onclick = () => { audio.muted =!audio.muted; };
+
+document.getElementById("volume").oninput = e => {
+  audio.volume = e.target.value;
+};
+
+// ================= EQ (FIX: CLAMP + BEZ WYSKAKIWANIA) =================
+function draw(){
+  requestAnimationFrame(draw);
+
+  if(!analyser) return;
+
+  analyser.getByteFrequencyData(data);
+
+  c.clearRect(0,0,canvas.width,canvas.height);
+
+  const barW = (canvas.width / bufferLen) * 1.8;
+  let x = 0;
+
+  for(let i=0;i<bufferLen;i++){
+
+    let v = data[i];
+
+    // 🔧 FIX KLUCZOWY: brak „wystrzału poza ramkę”
+    const normalized = v / 255;
+    const h = Math.min(canvas.height, normalized * canvas.height * 0.92);
+
+    const grad = c.createLinearGradient(0,canvas.height,0,canvas.height-h);
+    grad.addColorStop(0,"#ff003c");
+    grad.addColorStop(0.5,"#fcee09");
+    grad.addColorStop(1,"#00f0ff");
+
+    c.fillStyle = grad;
+
+    c.fillRect(
+      x,
+      canvas.height - h,
+      barW,
+      h
+    );
+
+    x += barW + 2;
+  }
+}
+
+draw();
+</script>
+
+</body>
+</html>
