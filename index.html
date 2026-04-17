@@ -3,419 +3,410 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>RADIO ENGINE PRO 2026 SHORTWAVE STYLE</title>
-
+<title>RADIO ENGINE PRO 2026 GRID</title>
 <style>
-* { margin:0; padding:0; box-sizing:border-box; }
-
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: linear-gradient(135deg, #0c0c0c 0%, #1a1a1a 100%);
-  color: #fff;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Arial, Helvetica, sans-serif;
+  background:#1f1f1f;
+  color:#fff;
+  height:100vh;
+  overflow:hidden;
 }
 
-#header {
-  background: rgba(0,0,0,0.9);
-  backdrop-filter: blur(20px);
-  padding: 16px 24px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
-  position: sticky;
-  top: 0;
-  z-index: 10;
+#app{
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+  background:#262626;
 }
 
-#logo {
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
-  background: rgba(255,255,255,0.1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 20px;
+#topbar{
+  height:88px;
+  display:flex;
+  align-items:center;
+  gap:18px;
+  padding:0 18px;
+  background:#2a2a2a;
+  border-bottom:1px solid rgba(255,255,255,.08);
+  flex:0 0 auto;
 }
 
-#title {
-  font-size: 18px;
-  font-weight: 600;
-  letter-spacing: 0.5px;
+#menu-btn{
+  width:38px;
+  height:38px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:30px;
+  line-height:1;
+  color:#ddd;
+  user-select:none;
 }
 
-#now-playing {
-  flex: 1;
-  text-align: center;
-  font-size: 14px;
-  opacity: 0.8;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+#title{
+  font-size:30px;
+  font-weight:400;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  flex:1;
+  color:#f2f2f2;
 }
 
-#controls {
-  display: flex;
-  gap: 8px;
+#top-icons{
+  display:flex;
+  align-items:center;
+  gap:18px;
+  font-size:28px;
+  color:#eaeaea;
+  opacity:.95;
 }
 
-.btn {
-  background: rgba(255,255,255,0.1);
-  border: 1px solid rgba(255,255,255,0.2);
-  border-radius: 20px;
-  padding: 8px 16px;
-  color: #fff;
-  font-size: 13px;
-  cursor: pointer;
-  transition: all 0.2s;
-  backdrop-filter: blur(10px);
+.icon{
+  width:44px;
+  height:44px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:50%;
+  user-select:none;
 }
 
-.btn:hover { background: rgba(255,255,255,0.2); }
-.btn.active { background: #00aa66; border-color: #00ff88; }
-
-#main {
-  flex: 1;
-  display: flex;
-  overflow: hidden;
+#grid-wrap{
+  flex:1;
+  overflow:auto;
+  padding:18px 16px 140px;
 }
 
-#player {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 24px;
-  padding: 40px;
+#stations{
+  display:grid;
+  grid-template-columns:repeat(6, minmax(0, 1fr));
+  gap:16px;
 }
 
-#station-logo {
-  width: 120px;
-  height: 120px;
-  border-radius: 24px;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.1);
-  padding: 12px;
-  object-fit: contain;
+.station{
+  aspect-ratio:1/1;
+  background:#f6f6f6;
+  border-radius:22px;
+  color:#111;
+  box-shadow:0 2px 0 rgba(0,0,0,.12);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:12px;
+  cursor:pointer;
+  overflow:hidden;
+  border:3px solid transparent;
+  position:relative;
 }
 
-#audio-controls {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-  width: 100%;
-  max-width: 400px;
+.station:hover{
+  transform:translateY(-1px);
 }
 
-#player-audio {
-  width: 100%;
-  background: rgba(255,255,255,0.05);
-  border-radius: 16px;
-  border: 1px solid rgba(255,255,255,0.1);
-  outline: none;
+.station.active{
+  border-color:#28a7d8;
+  box-shadow:0 0 0 3px rgba(40,167,216,.22);
 }
 
-#volume-container {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-size: 13px;
-  opacity: 0.7;
+.station .label{
+  text-align:center;
+  font-size:28px;
+  line-height:1.05;
+  font-weight:500;
+  white-space:pre-line;
+  padding:8px;
+  width:100%;
 }
 
-#volume-slider {
-  flex: 1;
-  height: 4px;
-  background: rgba(255,255,255,0.1);
-  border-radius: 2px;
-  outline: none;
-  appearance: none;
+.station img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  display:block;
 }
 
-#volume-slider::-webkit-slider-thumb {
-  appearance: none;
-  width: 16px;
-  height: 16px;
-  background: #fff;
-  border-radius: 50%;
-  cursor: pointer;
+#playerbar{
+  position:fixed;
+  left:0;
+  right:0;
+  bottom:0;
+  height:160px;
+  background:#1d1d1d;
+  border-top:1px solid rgba(255,255,255,.08);
+  display:flex;
+  align-items:center;
+  padding:18px 18px 22px;
+  gap:18px;
 }
 
-#status {
-  text-align: center;
-  font-size: 14px;
-  opacity: 0.6;
-  max-width: 320px;
-  line-height: 1.4;
+#playbtn{
+  width:94px;
+  height:94px;
+  border-radius:50%;
+  border:none;
+  background:linear-gradient(180deg,#f7f7f7,#cfcfcf);
+  color:#222;
+  font-size:42px;
+  box-shadow:inset 0 2px 8px rgba(0,0,0,.18), 0 0 0 8px rgba(255,255,255,.08);
+  cursor:pointer;
 }
 
-#sidebar {
-  width: 340px;
-  background: rgba(0,0,0,0.95);
-  backdrop-filter: blur(20px);
-  border-left: 1px solid rgba(255,255,255,0.1);
-  overflow-y: auto;
-  padding: 24px 20px;
+#seek{
+  flex:1;
+  height:8px;
+  appearance:none;
+  background:linear-gradient(90deg,#4cb6e3 0%, #4cb6e3 var(--p,50%), #4c4c4c var(--p,50%), #4c4c4c 100%);
+  border-radius:999px;
+  outline:none;
 }
 
-#stations {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+#seek::-webkit-slider-thumb{
+  appearance:none;
+  width:30px;
+  height:30px;
+  border-radius:50%;
+  background:#4cb6e3;
+  border:4px solid #2b90b6;
+  box-shadow:0 0 0 4px rgba(76,182,227,.15);
+  cursor:pointer;
 }
 
-.station {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
-  border-radius: 12px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 500;
-  transition: all 0.2s;
-  border: 1px solid transparent;
-  position: relative;
+#controls-right{
+  display:flex;
+  align-items:center;
+  gap:14px;
 }
 
-.station:hover {
-  background: rgba(255,255,255,0.05);
-  border-color: rgba(255,255,255,0.2);
+.ctrl{
+  width:66px;
+  height:66px;
+  border-radius:18px;
+  background:#343434;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:28px;
+  color:#fff;
+  user-select:none;
 }
 
-.station.active {
-  background: rgba(0,170,102,0.3);
-  border-color: #00aa66;
+#clock{
+  min-width:92px;
+  text-align:center;
+  font-size:18px;
+  color:#eee;
+  font-family:monospace;
+  opacity:.9;
 }
 
-.station-icon {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  background: rgba(255,255,255,0.1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
+#status{
+  position:absolute;
+  left:18px;
+  bottom:168px;
+  font-size:13px;
+  color:#d8d8d8;
+  opacity:.75;
+  pointer-events:none;
 }
 
-.station-name {
-  flex: 1;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+@media (max-width: 1200px){
+  #stations{grid-template-columns:repeat(4, minmax(0, 1fr));}
+  #title{font-size:24px;}
 }
-
-.fav-btn {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  opacity: 0.5;
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-.fav-btn.active { 
-  opacity: 1; 
-  background: linear-gradient(45deg, #ffd700, #ffed4a);
-  color: #333;
-}
-
-@media (max-width: 768px) {
-  body { flex-direction: column; }
-  #sidebar { 
-    width: 100%; 
-    height: 200px;
-    border-left: none;
-    border-top: 1px solid rgba(255,255,255,0.1);
-  }
-  #main { flex-direction: column; }
+@media (max-width: 760px){
+  #topbar{height:74px;padding:0 12px;gap:12px;}
+  #title{font-size:18px;}
+  #top-icons{gap:8px;font-size:22px;}
+  #stations{grid-template-columns:repeat(2, minmax(0, 1fr));}
+  #playerbar{height:132px;padding:14px;gap:12px;}
+  #playbtn{width:72px;height:72px;font-size:32px;}
+  .ctrl{width:54px;height:54px;font-size:24px;border-radius:14px;}
+  #clock{min-width:72px;font-size:15px;}
+  #status{bottom:142px;}
 }
 </style>
 </head>
-
 <body>
 
-<div id="header">
-  <div id="logo">📻</div>
-  <div id="title">RADIO ENGINE PRO 2026</div>
-  <div id="now-playing">Wybierz stację</div>
-  <div id="controls">
-    <div class="btn" onclick="clearCache()">🗑️</div>
+<div id="app">
+  <div id="topbar">
+    <div id="menu-btn">☰</div>
+    <div id="title">Radio online</div>
+    <div id="top-icons">
+      <div class="icon" style="opacity:.15;">♡</div>
+      <div class="icon" id="clock">00:00</div>
+      <div class="icon" style="opacity:.15;">⌕</div>
+    </div>
+  </div>
+
+  <div id="grid-wrap">
+    <div id="stations"></div>
+  </div>
+
+  <div id="status">Gotowy</div>
+
+  <div id="playerbar">
+    <button id="playbtn">▶</button>
+    <input id="seek" type="range" min="0" max="100" value="50">
+    <div id="controls-right">
+      <div class="ctrl">☰</div>
+      <div class="ctrl">🔒</div>
+      <div class="ctrl" style="color:#f7d21b;">👍</div>
+    </div>
   </div>
 </div>
 
-<div id="main">
-  <div id="player">
-    <img id="station-logo" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjMjIyIiByeD0iMjQiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE2IiBmaWxsPSIjNjY2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSI+UkVBRHk8L3RleHQ+PC9zdmc+" alt="Logo"/>
-    
-    <div id="audio-controls">
-      <audio id="player-audio" controls preload="none"></audio>
-      
-      <div id="volume-container">
-        <span>🔊</span>
-        <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="0.8">
-        <span id="volume-value">80%</span>
-      </div>
-    </div>
-    
-    <div id="status">Gotowy do odtwarzania • Kliknij stację aby rozpocząć</div>
-  </div>
-  
-  <div id="sidebar">
-    <div id="stations"></div>
-  </div>
-</body>
-
 <script>
-
 const stations = [
-  {name: "RMF FM", icon: "🇵🇱"},
-  {name: "Radio Zet", icon: "⭐"},
-  {name: "Tok FM", icon: "🎙️"},
-  {name: "Radio Plus Legnica", icon: "✝️"},
-  {name: "Planeta FM", icon: "🌍"},
-  {name: "Muzyczne Radio", icon: "🎵"},
-  {name: "Radio Kolor", icon: "🌈"},
-  {name: "Radio Wrocław", icon: "🏰"},
-  {name: "Radio Złote Przeboje", icon: "⭐"},
-  {name: "Radio Kampus", icon: "🎓"},
-  {name: "Radio Rodzina", icon: "👨‍👩‍👧‍👦"}
+  "RMF FM",
+  "Radio Zet",
+  "Tok FM",
+  "Radio Plus Legnica",
+  "Planeta FM",
+  "Muzyczne Radio",
+  "Radio Kolor",
+  "Radio Wrocław",
+  "Radio Złote Przeboje",
+  "Radio Kampus",
+  "Radio Rodzina"
 ];
 
-const audio = document.getElementById("player-audio");
-const statusEl = document.getElementById("status");
-const nowPlayingEl = document.getElementById("now-playing");
-const stationLogo = document.getElementById("station-logo");
-const volumeSlider = document.getElementById("volume-slider");
-const volumeValue = document.getElementById("volume-value");
-
-let currentStation = null;
-let cache = JSON.parse(localStorage.getItem("radio_cache") || "{}");
-let favs = new Set(JSON.parse(localStorage.getItem("radio_favs") || "[]"));
-
-const manualStreams = {
-  "RMF FM": "https://rs6-krk2.rmfstream.pl/rmf_fm",
-  "Radio Zet": "https://zt03.cdn.eurozet.pl/zet-net.mp3",
-  "Tok FM": "https://radiostream.pl/tuba9-1.mp3",
-  "Radio Plus Legnica": "http://pla.cdn.eurozet.pl/pla-net.mp3",
-  "Planeta FM": "http://pla.cdn.eurozet.pl/pla-net.mp3",
-  "Muzyczne Radio": "http://stream.rcs.revma.com/gzwc1xcq042vv",
-  "Radio Kolor": "https://stream.rcs.revma.com/zbq79057xd3vv",
-  "Radio Wrocław": "https://stream4.nadaje.com:8176/prw",
-  "Radio Złote Przeboje": "https://zt02.cdn.eurozet.pl/zlote-przeboje.mp3",
-  "Radio Kampus": "https://stream.radiokampus.fm/kampus.mp3",
-  "Radio Rodzina": "https://stream3.nadaje.com:8400/radirodzina_mp3"
+const streams = {
+  "RMF FM":"https://rs6-krk2.rmfstream.pl/rmf_fm",
+  "Radio Zet":"https://zt03.cdn.eurozet.pl/zet-net.mp3",
+  "Tok FM":"https://radiostream.pl/tuba9-1.mp3",
+  "Radio Plus Legnica":"http://pla.cdn.eurozet.pl/pla-net.mp3",
+  "Planeta FM":"http://pla.cdn.eurozet.pl/pla-net.mp3",
+  "Muzyczne Radio":"http://stream.rcs.revma.com/gzwc1xcq042vv",
+  "Radio Kolor":"https://stream.rcs.revma.com/zbq79057xd3vv",
+  "Radio Wrocław":"https://stream4.nadaje.com:8176/prw",
+  "Radio Złote Przeboje":"https://zt02.cdn.eurozet.pl/zlote-przeboje.mp3",
+  "Radio Kampus":"https://stream.radiokampus.fm/kampus.mp3",
+  "Radio Rodzina":"https://stream3.nadaje.com:8400/radirodzina_mp3"
 };
 
-function saveCache() {
-  localStorage.setItem("radio_cache", JSON.stringify(cache));
-  localStorage.setItem("radio_favs", JSON.stringify(Array.from(favs)));
-}
+const stationsEl = document.getElementById("stations");
+const audio = new Audio();
+audio.preload = "none";
+audio.crossOrigin = "anonymous";
 
-function updateStatus(text, isError = false) {
-  statusEl.textContent = text;
-  statusEl.style.opacity = isError ? '1' : '0.6';
-  statusEl.style.color = isError ? '#ff6b6b' : '#fff';
-}
+const playbtn = document.getElementById("playbtn");
+const seek = document.getElementById("seek");
+const status = document.getElementById("status");
+const clock = document.getElementById("clock");
 
-function setNowPlaying(name) {
-  nowPlayingEl.textContent = name || "Wybierz stację";
-}
+let current = null;
+let playing = false;
 
-function loadLogo(name) {
-  stationLogo.src = `https://www.radio-browser.info/backends/logos/${encodeURIComponent(name)}.png?${Date.now()}`;
-  stationLogo.onerror = () => {
-    stationLogo.src = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjMjIyIiByeD0iMjQiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0IiBmaWxsPSIjNjY2IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSI+📻PC90ZXh0Pjwvc3ZnPg==";
-  };
+function updateClock(){
+  const d = new Date();
+  clock.textContent = d.toLocaleTimeString('pl-PL', {hour:'2-digit', minute:'2-digit'});
 }
+setInterval(updateClock, 1000);
+updateClock();
 
-async function playStation(station) {
-  try {
-    setNowPlaying(station.name);
-    loadLogo(station.name);
-    updateStatus("Ładowanie...");
-    
-    let url = manualStreams[station.name] || cache[station.name];
-    
-    if (!url) {
-      updateStatus("Brak streamu", true);
-      return;
-    }
-    
-    cache[station.name] = url;
-    saveCache();
-    
-    audio.src = url;
-    audio.volume = parseFloat(volumeSlider.value);
-    await audio.play();
-    
-    updateStatus("Odtwarzanie...");
-    currentStation = station;
-    
-  } catch (e) {
-    updateStatus("Błąd odtwarzania - kliknij ▶", true);
-  }
-}
+function render(){
+  stationsEl.innerHTML = "";
+  stations.forEach(name => {
+    const tile = document.createElement("div");
+    tile.className = "station";
+    tile.dataset.name = name;
 
-function toggleFav(stationName) {
-  if (favs.has(stationName)) {
-    favs.delete(stationName);
-  } else {
-    favs.add(stationName);
-  }
-  saveCache();
-  renderStations();
-}
+    const img = document.createElement("img");
+    img.alt = name;
+    img.src = `https://www.radio-browser.info/backends/logos/${encodeURIComponent(name)}.png`;
+    img.onerror = () => {
+      img.remove();
+      const label = document.createElement("div");
+      label.className = "label";
+      label.textContent = name;
+      tile.appendChild(label);
+    };
 
-function clearCache() {
-  cache = {};
-  localStorage.removeItem("radio_cache");
-  updateStatus("Cache wyczyszczony");
-}
+    tile.appendChild(img);
 
-function renderStations() {
-  const container = document.getElementById("stations");
-  container.innerHTML = "";
-  
-  stations.forEach((station, i) => {
-    const div = document.createElement("div");
-    div.className = `station ${currentStation?.name === station.name ? 'active' : ''}`;
-    div.onclick = () => playStation(station);
-    
-    div.innerHTML = `
-      <div class="station-icon">${station.icon}</div>
-      <div class="station-name">${station.name}</div>
-      <div class="fav-btn ${favs.has(station.name) ? 'active' : ''}" onclick="event.stopPropagation(); toggleFav('${station.name}')">★</div>
-    `;
-    
-    container.appendChild(div);
+    tile.addEventListener("click", async () => {
+      await selectStation(name);
+    });
+
+    stationsEl.appendChild(tile);
   });
 }
 
-// Events
-volumeSlider.oninput = (e) => {
-  audio.volume = e.target.value;
-  volumeValue.textContent = Math.round(e.target.value * 100) + "%";
-};
+function setActive(name){
+  document.querySelectorAll(".station").forEach(el => {
+    el.classList.toggle("active", el.dataset.name === name);
+  });
+}
 
-audio.addEventListener('play', () => updateStatus("Gra..."));
-audio.addEventListener('pause', () => updateStatus("Wstrzymane"));
-audio.addEventListener('error', () => updateStatus("Błąd streamu", true));
+async function selectStation(name){
+  current = name;
+  setActive(name);
+  status.textContent = "Ładowanie: " + name;
+  const url = streams[name];
+  if(!url){
+    status.textContent = "Brak streamu: " + name;
+    return;
+  }
+  try{
+    audio.src = url;
+    audio.volume = 0.85;
+    await audio.play();
+    playing = true;
+    playbtn.textContent = "❚❚";
+    status.textContent = "Gra: " + name;
+  }catch(e){
+    playing = false;
+    playbtn.textContent = "▶";
+    status.textContent = "Kliknij ▶ aby uruchomić: " + name;
+  }
+}
 
-renderStations();
-updateStatus("Gotowy");
+playbtn.addEventListener("click", async () => {
+  if(!current){
+    await selectStation(stations[0]);
+    return;
+  }
+  if(playing){
+    audio.pause();
+    playing = false;
+    playbtn.textContent = "▶";
+    status.textContent = "Wstrzymane";
+  }else{
+    try{
+      await audio.play();
+      playing = true;
+      playbtn.textContent = "❚❚";
+      status.textContent = "Gra: " + current;
+    }catch(e){
+      status.textContent = "Nie można uruchomić odtwarzania";
+    }
+  }
+});
+
+seek.addEventListener("input", () => {
+  const p = seek.value;
+  seek.style.setProperty('--p', p + '%');
+});
+seek.style.setProperty('--p', seek.value + '%');
+
+audio.addEventListener("waiting", () => status.textContent = "Buforowanie...");
+audio.addEventListener("playing", () => {
+  playing = true;
+  playbtn.textContent = "❚❚";
+  if(current) status.textContent = "Gra: " + current;
+});
+audio.addEventListener("pause", () => {
+  playing = false;
+  playbtn.textContent = "▶";
+});
+
+render();
+setActive(stations[0]);
 </script>
-
+</body>
 </html>
