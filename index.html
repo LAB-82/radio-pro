@@ -87,12 +87,15 @@ body{
   border: 2px solid var(--cp-cyan);
   clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
   pointer-events: none;
+  z-index: 1;
 }
 
 canvas{
   display: block;
   width: 100%;
   height: 100%;
+  position: relative;
+  z-index: 0;
 }
 
 #controls{
@@ -125,6 +128,7 @@ canvas{
   border: 2px solid var(--cp-cyan);
   clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
   pointer-events: none;
+  z-index: 1;
 }
 
 button{
@@ -178,6 +182,8 @@ button:active{
   border: 1px solid var(--cp-cyan);
   outline: none;
   margin: 0;
+  position: relative;
+  z-index: 2;
 }
 
 #volume::-webkit-slider-thumb{
@@ -285,4 +291,119 @@ button:active{
   <button id="muteBtn" onclick="muteRadio()">MUTE</button>
 
   <div class="volumeWrapper">
-   
+    <input id="volume" type="range" min="0" max="1" step="0.01" value="0.5">
+  </div>
+</div>
+
+<div id="bottomLink">
+  <a href="https://www.muzyczneradio.pl" target="_blank">www.muzyczneradio.pl</a>
+</div>
+
+<audio id="audio" preload="none"></audio>
+
+<script>
+const STREAM_URL = "https://stream.rcs.revma.com/gzwc1xcq042vv";
+
+const audio = document.getElementById("audio");
+const volume = document.getElementById("volume");
+const playBtn = document.getElementById("playBtn");
+const stopBtn = document.getElementById("stopBtn");
+const muteBtn = document.getElementById("muteBtn");
+const canvas = document.getElementById("eqCanvas");
+const ctx = canvas.getContext("2d");
+
+audio.volume = parseFloat(volume.value);
+
+let isPlaying = false;
+let animationId;
+let peaks = [];
+for(let i = 0; i < 80; i++) peaks[i] = 0;
+
+function playRadio() {
+  if (isPlaying) return;
+
+  audio.src = STREAM_URL;
+  audio.load();
+
+  audio.play().then(() => {
+    isPlaying = true;
+    playBtn.classList.add("playActive");
+    stopBtn.classList.remove("stopActive");
+    if (!animationId) draw();
+  }).catch(err => {
+    console.error("Błąd:", err);
+    playBtn.classList.remove("playActive");
+  });
+}
+
+function stopRadio() {
+  audio.pause();
+  audio.removeAttribute('src');
+  audio.load();
+  isPlaying = false;
+
+  stopBtn.classList.add("stopActive");
+  playBtn.classList.remove("playActive");
+
+  setTimeout(() => {
+    stopBtn.classList.remove("stopActive");
+  }, 1000);
+
+  cancelAnimationFrame(animationId);
+  animationId = null;
+  for(let i = 0; i < peaks.length; i++) peaks[i] = 0;
+  draw();
+}
+
+function muteRadio() {
+  audio.muted =!audio.muted;
+  muteBtn.classList.toggle("muteActive");
+  updateVolumeThumb();
+}
+
+function updateVolumeThumb() {
+  let val = parseFloat(volume.value);
+  volume.classList.remove("center", "changed");
+
+  if (audio.muted) return;
+
+  if (Math.abs(val - 0.5) < 0.02) {
+    volume.classList.add("center");
+  } else {
+    volume.classList.add("changed");
+  }
+}
+
+volume.addEventListener("input", () => {
+  let val = parseFloat(volume.value);
+  audio.volume = val;
+
+  if (audio.muted && val > 0) {
+    audio.muted = false;
+    muteBtn.classList.remove("muteActive");
+  }
+
+  updateVolumeThumb();
+});
+
+function resizeCanvas() {
+  let dpr = window.devicePixelRatio || 1;
+  let width = 600;
+  let height = 260;
+
+  canvas.width = width * dpr;
+  canvas.height = height * dpr;
+
+  canvas.style.width = width + "px";
+  canvas.style.height = height + "px";
+
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.scale(dpr, dpr);
+}
+
+window.addEventListener("load", () => {
+  resizeCanvas();
+  updateVolumeThumb();
+  draw();
+});
+window.addEventListener
