@@ -124,16 +124,16 @@ button{ display:none; }
 <script>
 
 const stations = [
-  "Muzyczne Radio",
   "RMF FM",
   "Radio Zet",
-  "Radio Wrocław",
   "Tok FM",
+  "Radio Plus Legnica",
+  "Planeta FM",
+  "Muzyczne Radio",
   "Radio Kolor",
+  "Radio Wrocław",
   "Radio Złote Przeboje",
-  "Radio Kampus",
-  "Radio Rodzina",
-  "Polskie Radio"
+  "Radio Kampus"
 ];
 
 const audio = document.getElementById("audio");
@@ -153,19 +153,26 @@ function saveFavs(){
   localStorage.setItem("radio_favs", JSON.stringify(favs));
 }
 
-/* ✅ STABILNE STRUMIENIE DLA KAŻDEJ STACJI */
+/* ✅ NOWE STABILNE STRUMIENIE 2026 */
 const manualStreams = {
 
-  "Muzyczne Radio": "http://stream.rcs.revma.com/mnyz64f5072vv",
   "RMF FM": "https://rs6-krk2.rmfstream.pl/rmf_fm",
   "Radio Zet": "https://zt03.cdn.eurozet.pl/zet-net.mp3",
-  "Radio Wrocław": "https://stream4.nadaje.com:8176/prw",
   "Tok FM": "https://radiostream.pl/tuba9-1.mp3",
-  "Radio Kolor": "https://stream.rcs.revma.com/nrfscb49xd3vv",
+  
+  "Radio Plus Legnica": "http://pla.cdn.eurozet.pl/pla-net.mp3",  // Eurozet stream dla sieci Plus [web:14][web:31]
+  
+  "Planeta FM": "http://pla.cdn.eurozet.pl/pla-net.mp3",           // Eurozet Planeta FM [web:14]
+  
+  "Muzyczne Radio": "http://stream.rcs.revma.com/gzwc1xcq042vv",   // 192kbps wyższa jakość [web:25]
+  
+  "Radio Kolor": "https://stream.rcs.revma.com/zbq79057xd3vv",     // AAC stream (lepszy) [web:26]
+  
+  "Radio Wrocław": "https://stream4.nadaje.com:8176/prw",
+  
   "Radio Złote Przeboje": "https://zt02.cdn.eurozet.pl/zlote-przeboje.mp3",
-  "Radio Kampus": "https://stream.radiokampus.fm/kampus.mp3",
-  "Radio Rodzina": "https://stream4.nadaje.com:8400/radirodzina",
-  "Polskie Radio": "http://mp3.polskieradio.pl:8900"
+  
+  "Radio Kampus": "https://stream.radiokampus.fm/kampus.mp3"
 
 };
 
