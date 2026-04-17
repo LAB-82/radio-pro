@@ -4,14 +4,15 @@
 <meta charset="UTF-8">
 <title>Muzyczne Radio PRO</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+<!-- Cyberpunk 2077 fonts: Rajdhani (game UI font) + OCR-A (terminal style) -->
+//fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700;800&family=Orbitron:wght@400;700&family=OCR-A&display=swap" rel="stylesheet">
 
 <style>
 body{
 margin:0;
 background:#000;
 color:#fff;
-font-family:'Orbitron',sans-serif;
+font-family:'Rajdhani', 'OCR-A', monospace;
 display:flex;
 flex-direction:column;
 align-items:center;
@@ -19,6 +20,10 @@ height:100vh;
 transition:0.4s;
 position: relative;
 overflow: hidden;
+font-weight: 500;
+letter-spacing: 1px;
+text-rendering: optimizeLegibility;
+-webkit-font-smoothing: antialiased;
 }
 
 body::before {
@@ -42,13 +47,12 @@ body::before {
 
 @keyframes static-noise {
   0% { transform: translate(0, 0); }
-  10% { transform: translate(-1px, 1px); }
-  20% { transform: translate(1px, -1px); }
-  30% { transform: translate(-1px, -2px); }
   100% { transform: translate(1px, 1px); }
 }
 
 #title{
+font-family: 'Rajdhani', 'OCR-A', monospace;
+font-weight: 800;
 font-size:88px;
 margin-top:50px;
 text-align:center;
@@ -57,17 +61,21 @@ text-shadow:0 0 5px #ff2a2a,0 0 15px #ff0000,0 0 30px #ff0000,0 0 60px #ff0000,
             0 0 10px rgba(255,255,255,0.2);
 animation: cyberpunk-title 4s ease-in-out infinite alternate;
 filter: drop-shadow(0 0 8px rgba(255,255,255,0.15));
+letter-spacing: 3px;
+text-transform: uppercase;
 }
 
 @keyframes cyberpunk-title {
   0% { 
-    text-shadow:0 0 5px #ff2a2a,0 0 15px #ff0000,0 0 30px #ff0000,0 0 60px #ff0000;
+    text-shadow:0 0 5px #ff2a2a,0 0 15px #ff0000,0 0 30px #ff0000;
     filter: drop-shadow(0 0 8px rgba(255,255,255,0.15));
+    transform: scale(1);
   }
   100% { 
     text-shadow:0 0 8px #ff2a2a,0 0 20px #ff0000,0 0 40px #ff0000,0 0 80px #ff0000,
                 0 0 15px rgba(255,255,255,0.3);
     filter: drop-shadow(0 0 12px rgba(255,255,255,0.25));
+    transform: scale(1.02);
   }
 }
 
@@ -81,12 +89,13 @@ overflow:hidden;
 box-shadow:0 0 20px rgba(255,42,42,0.4), inset 0 0 15px rgba(255,255,255,0.08);
 position: relative;
 z-index: 10;
+border: 2px solid rgba(255,42,42,0.6);
 }
 
 canvas{
 display:block;
 height:260px;
-border-radius:8px;
+border-radius:6px;
 filter: drop-shadow(0 0 12px rgba(255,0,0,0.5)) brightness(1.03);
 animation: canvas-flicker 3s ease-in-out infinite alternate;
 }
@@ -117,24 +126,46 @@ background:#111;
 border:2px solid #ff2a2a;
 box-shadow:0 0 12px #ff2a2a, 0 0 20px rgba(255,255,255,0.12), inset 0 0 8px rgba(255,255,255,0.06);
 transition: all 0.3s ease;
+font-family: 'Rajdhani', monospace;
+font-weight: 600;
+border-radius: 4px;
+position: relative;
+}
+
+.volumeWrapper::before {
+  content: 'VOL';
+  position: absolute;
+  font-size: 10px;
+  top: -18px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.8);
+  padding: 2px 8px;
+  border-radius: 3px;
+  letter-spacing: 1px;
 }
 
 button{
 width:160px;
 height:45px;
 background:#111;
-color:white;
+color:#fff;
 cursor:pointer;
-font-family:'Orbitron';
+font-family:'Rajdhani', 'OCR-A', monospace;
+font-weight: 700;
+font-size: 14px;
+letter-spacing: 1.5px;
 transition:0.2s;
 border:2px solid #ff2a2a;
 box-shadow:0 0 12px #ff2a2a, 0 0 20px rgba(255,255,255,0.15), inset 0 0 8px rgba(255,255,255,0.05);
 position: relative;
 overflow: hidden;
+text-transform: uppercase;
+border-radius: 4px;
 }
 
 button::before {
-  content: '';
+  content: attr(data-label);
   position: absolute;
   top: 0;
   left: -100%;
@@ -142,10 +173,18 @@ button::before {
   height: 100%;
   background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
   transition: left 0.5s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 button:hover::before {
   left: 100%;
+}
+
+button:hover {
+  box-shadow:0 0 25px #ff2a2a, 0 0 35px rgba(255,255,255,0.3);
+  transform: translateY(-2px);
 }
 
 #volume{
@@ -184,15 +223,19 @@ box-shadow:0 0 12px red,0 0 20px red, 0 0 6px rgba(255,255,255,0.3);
 cursor:pointer;
 }
 
-.playActive{ 
+.playActive { 
 color:#00ff00; 
 text-shadow:0 0 12px #00ff00, 0 0 20px rgba(255,255,255,0.25);
 box-shadow:0 0 20px #00ff00, 0 0 30px rgba(255,255,255,0.2);
+background: rgba(0,255,0,0.1);
+border-color: #00ff00;
 }
-.stopActive{ 
+.stopActive { 
 color:#ff4444; 
 text-shadow:0 0 12px red, 0 0 20px rgba(255,255,255,0.15);
 box-shadow:0 0 20px red, 0 0 30px rgba(255,255,255,0.12);
+background: rgba(255,68,68,0.1);
+border-color: #ff4444;
 }
 
 .muteActive{
@@ -200,14 +243,16 @@ color:#ffaa00;
 text-shadow:0 0 12px orange, 0 0 20px rgba(255,255,255,0.25);
 box-shadow:0 0 20px orange, 0 0 30px rgba(255,255,255,0.2);
 animation:pulseMute 0.8s infinite alternate;
+background: rgba(255,170,0,0.1);
+border-color: #ffaa00;
 }
 
 @keyframes pulseMute{
-from{ 
+from { 
 transform:scale(1); 
 box-shadow: 0 0 12px orange, 0 0 20px rgba(255,255,255,0.15); 
 }
-to{ 
+to { 
 transform:scale(1.08); 
 box-shadow: 0 0 25px orange, 0 0 35px rgba(255,255,255,0.3); 
 }
@@ -218,6 +263,9 @@ margin-top:10px;
 text-align:center;
 width:100%;
 z-index: 20;
+font-family: 'Rajdhani', monospace;
+font-weight: 600;
+letter-spacing: 1px;
 }
 
 #bottomLink a{
@@ -225,14 +273,25 @@ color:#ff2a2a;
 text-decoration:none;
 text-shadow:0 0 8px red, 0 0 15px rgba(255,255,255,0.2);
 font-size:20px;
+font-weight: 700;
+letter-spacing: 2px;
+text-transform: uppercase;
 transition: all 0.3s ease;
+position: relative;
 }
 
 #bottomLink a:hover {
   text-shadow: 0 0 20px #ff2a2a, 0 0 30px rgba(255,255,255,0.35);
+  animation: link-glitch 0.3s ease;
 }
 
-/* Vignette i Chromatic Aberration */
+@keyframes link-glitch {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(2px); }
+  75% { transform: translateX(-2px); }
+}
+
+/* Cyberpunk 2077 efekty */
 body::after {
   content: '';
   position: fixed;
@@ -240,13 +299,11 @@ body::after {
   left: 0;
   width: 100%;
   height: 100%;
-  background: 
-    radial-gradient(circle at center, transparent 35%, rgba(0,0,0,0.65) 85%, rgba(255,0,0,0.08) 100%);
+  background: radial-gradient(circle at center, transparent 35%, rgba(0,0,0,0.65) 85%, rgba(255,0,0,0.08) 100%);
   pointer-events: none;
   z-index: 2;
 }
 
-/* Chromatic aberration na krawędziach */
 .chrome-left::before,
 .chrome-right::after {
   content: '';
@@ -276,12 +333,7 @@ body::after {
   left: 0;
   width: 100%;
   height: 1px;
-  background: linear-gradient(90deg, 
-    transparent, 
-    rgba(255,255,255,0.12) 25%, 
-    rgba(255,42,42,0.2) 50%, 
-    rgba(255,255,255,0.12) 75%, 
-    transparent);
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), rgba(255,42,42,0.2), rgba(255,255,255,0.12), transparent);
   box-shadow: 0 0 6px rgba(255,255,255,0.35);
   animation: scan-move 0.15s linear infinite;
   pointer-events: none;
@@ -297,7 +349,7 @@ body::after {
 </head>
 
 <body class="chrome-left chrome-right">
-<!-- Dynamiczne scanlines -->
+<!-- Dynamiczne scanlines Cyberpunk 2077 -->
 <script>
 setInterval(() => {
   const scanline = document.createElement('div');
@@ -310,12 +362,12 @@ setInterval(() => {
 </script>
 
 <div id="title">Muzyczne Radio</div>
-<canvas id="proEqualizer"></canvas>
+anvas id="proEqualizer"></canvas>
 
 <div id="controls">
-<button id="playBtn" onclick="playRadio()">PLAY</button>
-<button id="stopBtn" onclick="stopRadio()">STOP</button>
-<button id="muteBtn" onclick="muteRadio()">MUTE 🔊</button>
+<button id="playBtn" data-label="PLAY" onclick="playRadio()">PLAY</button>
+<button id="stopBtn" data-label="STOP" onclick="stopRadio()">STOP</button>
+<button id="muteBtn" data-label="MUTE" onclick="muteRadio()">MUTE 🔊</button>
 
 <div class="volumeWrapper">
 <input id="volume" type="range" min="0" max="1" step="0.01" value="0.5">
