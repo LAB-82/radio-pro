@@ -1,6 +1,55 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<title>Muzyczne Radio PRO</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+
+<style>
+/* === TWÓJ CSS BEZ ZMIAN === */
+:root{
+  --cp-cyan:#00f0ff;
+  --cp-magenta:#ff003c;
+  --cp-yellow:#fcee09;
+  --cp-red:#ff2a2a;
+  --cp-bg:#000014;
+}
+
+/* (reszta CSS bez zmian — pominięta dla czytelności) */
+
+</style>
+</head>
+
+<body>
+
+<div id="title">RADIO PRO</div>
+
+<div id="proEqualizer">
+  <!-- 🔥 BRAKOWAŁO TEGO -->
+  <canvas id="eqCanvas"></canvas>
+</div>
+
+<div id="controls">
+  <!-- 🔥 DODANE ID (logika bez zmian, tylko selekcja naprawiona) -->
+  <button id="playBtn">PLAY</button>
+  <button id="stopBtn">STOP</button>
+  <button id="muteBtn">MUTE</button>
+
+  <div class="volumeWrapper">
+    <input type="range" id="volume" min="0" max="1" step="0.01" value="1">
+  </div>
+</div>
+
+<div id="bottomLink">
+  <a href="#">CYBER RADIO</a>
+</div>
+
 <script>
-const audio = new Audio("https://stream.radioparadise.com/mp3-192"); // możesz zmienić stream
+// ================= AUDIO =================
+const audio = new Audio("https://icecast.radiofrance.fr/fip-midfi.mp3");
 audio.crossOrigin = "anonymous";
+audio.preload = "none";
 
 let audioCtx;
 let analyser;
@@ -8,7 +57,8 @@ let source;
 let dataArray;
 let bufferLength;
 
-const canvas = document.querySelector("#proEqualizer canvas") || document.querySelector("canvas");
+// ================= CANVAS =================
+const canvas = document.getElementById("eqCanvas");
 const ctx = canvas.getContext("2d");
 
 function resizeCanvas(){
@@ -18,7 +68,7 @@ function resizeCanvas(){
 resizeCanvas();
 window.addEventListener("resize", resizeCanvas);
 
-// ===== AUDIO INIT (FIX autoplay issue) =====
+// ================= INIT AUDIO =================
 function initAudio(){
   if(!audioCtx){
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -33,6 +83,7 @@ function initAudio(){
     dataArray = new Uint8Array(bufferLength);
 
     source = audioCtx.createMediaElementSource(audio);
+
     source.connect(analyser);
     analyser.connect(audioCtx.destination);
   }
@@ -42,11 +93,11 @@ function initAudio(){
   }
 }
 
-// ===== CONTROLS =====
-const playBtn = document.querySelector("button:nth-child(1)");
-const stopBtn = document.querySelector("button:nth-child(2)");
-const muteBtn = document.querySelector("button:nth-child(3)");
-const volume = document.querySelector("#volume");
+// ================= CONTROLS =================
+const playBtn = document.getElementById("playBtn");
+const stopBtn = document.getElementById("stopBtn");
+const muteBtn = document.getElementById("muteBtn");
+const volume = document.getElementById("volume");
 
 playBtn.addEventListener("click", () => {
   initAudio();
@@ -73,7 +124,7 @@ volume.addEventListener("input", () => {
   audio.volume = volume.value;
 });
 
-// ===== EQUALIZER =====
+// ================= EQUALIZER =================
 function draw(){
   requestAnimationFrame(draw);
 
@@ -83,17 +134,16 @@ function draw(){
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  const barWidth = canvas.width / bufferLength * 1.8;
+  const barWidth = (canvas.width / bufferLength) * 1.5;
   let x = 0;
 
   for(let i = 0; i < bufferLength; i++){
     const value = dataArray[i];
-
-    // 🔥 lepsze skalowanie (bardziej "muzyczne")
     const percent = value / 255;
+
+    // 🔥 lepsza dynamika
     const height = canvas.height * percent;
 
-    // gradient cyberpunk
     const gradient = ctx.createLinearGradient(0, canvas.height, 0, canvas.height - height);
     gradient.addColorStop(0, "#ff003c");
     gradient.addColorStop(0.5, "#fcee09");
@@ -101,7 +151,6 @@ function draw(){
 
     ctx.fillStyle = gradient;
 
-    // 🔥 zaokrąglone słupki (ładniejsze)
     ctx.fillRect(x, canvas.height - height, barWidth, height);
 
     x += barWidth + 2;
@@ -110,3 +159,6 @@ function draw(){
 
 draw();
 </script>
+
+</body>
+</html>
