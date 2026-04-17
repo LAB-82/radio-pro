@@ -156,16 +156,25 @@ localStorage.setItem("radio_favs", JSON.stringify(favs));
 }
 
 /* =========================
-   TYLKO TE 2 LINKI ZMIENIONE
+   REAL AUDIO STREAMS (FIX)
 ========================= */
 const manualStreams = {
-"Radio Plus":"https://www.radio-polska.pl/radio-plus-legnica",
-"Muzyczne Radio":"https://www.muzyczneradio.pl/index.php/player/lo.html?type=lo"
+"Radio Plus":"http://stream.rcs.revma.com/ypqt40u0x1zuv", 
+"Muzyczne Radio":"http://stream.muzyczneradio.pl:8000/stream"
 };
 
-/* =========================
-   LOGO FIX
-========================= */
+/* blokada HTML linków */
+function isValidStream(url){
+return url && (
+url.includes(".mp3") ||
+url.includes("icecast") ||
+url.includes("shoutcast") ||
+url.includes(":8000") ||
+url.includes("/stream")
+);
+}
+
+/* LOGO */
 async function setLogo(name){
 try{
 const res = await fetch(
@@ -178,13 +187,10 @@ logo.src = data[0].favicon;
 return;
 }
 }catch(e){}
-
 logo.src = "";
 }
 
-/* =========================
-   STREAM RESOLVER
-========================= */
+/* STREAM RESOLVER */
 async function resolveStream(name){
 
 if(cache[name]){
@@ -205,7 +211,7 @@ const data = await res.json();
 
 const best = data.find(s =>
 s.url_resolved &&
-s.url_resolved.startsWith("http")
+isValidStream(s.url_resolved)
 );
 
 if(best){
@@ -219,9 +225,7 @@ return best.url_resolved;
 return null;
 }
 
-/* =========================
-   LOAD
-========================= */
+/* LOAD */
 async function load(i){
 
 current = i;
@@ -294,12 +298,6 @@ saveCache();
 }
 }
 }, 300000);
-
-/* CLEAR CACHE */
-function clearCache(){
-cache = {};
-localStorage.removeItem("radio_cache");
-}
 
 /* UI */
 stations.forEach((s,i)=>{
