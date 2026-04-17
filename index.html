@@ -16,15 +16,10 @@ align-items:center;
 height:100vh;
 transition:0.4s;
 }
-
-/* USUNIĘTO blok body.day – tryb dzień jest wyłączony */
-/*
 body.day{
 background:#eaeaea;
 color:#000;
 }
-*/
-
 #title{
 font-size:88px;
 margin-top:50px;
@@ -63,14 +58,10 @@ background:#111;
 border:2px solid #ff2a2a;
 box-shadow:0 0 10px #ff2a2a;
 }
-
-/* Żaden z tych styli nie jest teraz potrzebny, bo usunęliśmy .day */
-/*
 body.day .volumeWrapper{
 background:#d6d6d6;
 box-shadow:0 0 40px #ff2a2a,0 0 80px #ff0000;
 }
-*/
 button{
 width:160px;
 height:45px;
@@ -82,15 +73,11 @@ transition:0.2s;
 border:2px solid #ff2a2a;
 box-shadow:0 0 10px #ff2a2a;
 }
-
-/* usunięto wersję dla .day */
-/*
 body.day button{
 background:#d6d6d6;
 color:#000;
 box-shadow:0 0 40px #ff2a2a,0 0 80px #ff0000;
 }
-*/
 #volume{
 width:120px;
 height:10px;
@@ -108,3 +95,73 @@ border:1px solid #ff0000;
 #volume::-webkit-slider-thumb{
 -webkit-appearance:none;
 width:16px;
+height:16px;
+border-radius:4px;
+background:#ff0000;
+box-shadow:0 0 10px red,0 0 20px red;
+cursor:pointer;
+}
+#volume::-moz-range-thumb{
+width:16px;
+height:16px;
+border:none;
+border-radius:4px;
+background:#ff0000;
+box-shadow:0 0 10px red,0 0 20px red;
+cursor:pointer;
+}
+.playActive{ color:#00ff00; text-shadow:0 0 10px #00ff00; }
+.stopActive{ color:#ff4444; text-shadow:0 0 10px red; }
+.muteActive{
+color:#ffaa00;
+text-shadow:0 0 10px orange;
+animation:pulseMute 0.8s infinite alternate;
+}
+@keyframes pulseMute{
+from{ transform:scale(1); }
+to{ transform:scale(1.1); }
+}
+#modeBtn{
+font-size:22px;
+width:66px;
+height:49px;
+}
+body:not(.day) #modeBtn{
+color:#ffff00;
+text-shadow:0 0 8px #ffff00,0 0 16px #ffff66;
+background:#111;
+}
+body.day #modeBtn{
+color:#ffff00;
+text-shadow:0 0 8px #ffff00,0 0 16px #ffff66;
+background:#00ccff;
+box-shadow:0 0 12px #00ccff,0 0 24px #00aaff;
+}
+#bottomLink{
+margin-top:10px;
+text-align:center;
+width:100%;
+}
+#bottomLink a{
+color:#ff2a2a;
+text-decoration:none;
+text-shadow:0 0 6px red;
+font-size:20px;
+}
+</style>
+</head>
+<body>
+<div id="title">Muzyczne Radio</div>
+<canvas id="proEqualizer"></canvas>
+<div id="controls">
+<button id="playBtn" onclick="playRadio()">PLAY</button>
+<button id="stopBtn" onclick="stopRadio()">STOP</button>
+<button id="muteBtn" onclick="muteRadio()">MUTE 🔊</button>
+<div class="volumeWrapper">
+<input id="volume" type="range" min="0" max="1" step="0.01" value="0.5">
+</div>
+<button id="modeBtn" onclick="toggleMode()">🌙</button>
+</div>
+<div id="bottomLink">
+<a href="https://www.muzyczneradio.pl" target="_blank">www.muzyczneradio.pl</a>
+</div>
