@@ -1,98 +1,66 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="pl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Muzyczne Radio PRO</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Muzyczne Radio PRO</title>
 
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      margin: 0;
-      background: #000;
-      color: #fff;
-      font-family: 'Orbitron', sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-height: 100vh;
-      overflow-x: hidden;
-      position: relative;
-    }
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
 
-    /* 🔥 CYBERPUNK GRID + SCANLINE */
-    body::before {
-      content: "";
-      position: fixed;
-      width: 200%;
-      height: 200%;
-      background:
-        linear-gradient(
-          transparent 95%,
-          rgba(255, 0, 0, 0.08) 95%
-        ),
-        linear-gradient(
-          90deg,
-          transparent 95%,
-          rgba(255, 0, 0, 0.08) 95%
-        );
-      background-size: 40px 40px;
-      animation: gridMove 6s linear infinite;
-      z-index: -1;
-      opacity: 0.3;
-    }
+<style>
+body{
+margin:0;
+background:#000;
+color:#fff;
+font-family:'Orbitron',sans-serif;
+display:flex;
+flex-direction:column;
+align-items:center;
+height:100vh;
+overflow: hidden;
+transition:0.4s;
+position: relative;
+}
 
-    @keyframes gridMove {
-      0%   { transform: translate(0, 0); }
-      100% { transform: translate(-40px, -40px); }
-    }
+/* 🔥 CYBERPUNK GRID + SCANLINE */
+body::before {
+  content: "";
+  position: fixed;
+  width: 200%;
+  height: 200%;
+  background:
+    linear-gradient(transparent 95%, rgba(255, 0, 0, 0.08) 95%),
+    linear-gradient(90deg, transparent 95%, rgba(255, 0, 0, 0.08) 95%);
+  background-size: 40px 40px;
+  animation: gridMove 6s linear infinite;
+  z-index: -1;
+  opacity: 0.3;
+  pointer-events: none;
+}
 
-    /* 🔥 GLITCH TITLE */
-    #title {
-      font-size: 88px;
-      margin-top: 50px;
-      text-align: center;
-      color: #ff2a2a;
-      position: relative;
-      text-shadow: 0 0 5px red, 0 0 15px red, 0 0 30px red;
-      animation: glitch 3s ease infinite alternate;
-    }
+body.day::before {
+  background:
+    linear-gradient(transparent 95%, rgba(255, 0, 0, 0.05) 95%),
+    linear-gradient(90deg, transparent 95%, rgba(255, 0, 0, 0.05) 95%);
+  opacity: 0.2;
+}
 
-    #title::before,
-    #title::after {
-      content: attr(data-text);
-      position: absolute;
-      left: 0;
-      width: 100%;
-      overflow: hidden;
-      pointer-events: none;
-    }
+@keyframes gridMove {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(-40px, -40px); }
+}
 
-    #title::before {
-      color: #ff0000;
-      z-index: -1;
-      animation: glitchTop 3s infinite alternate;
-      opacity: 0.9;
-    }
-
-    #title::after {
-      color: #ff0000;
-      z-index: -2;
-      animation: glitchBottom 2.5s infinite alternate;
-      opacity: 0.6;
-    }
-
-    @keyframes glitch {
-      0%   { transform: translate(0); }
-      20%  { transform: translate(2px, -2px); }
-      40%  { transform: translate(-2px, 2px); }
-      60%  { transform: translate(2px, 2px); }
-      80%  { transform: translate(-2px, -2px); }
-      100% { transform: translate(0); }
-    }
-
-    @keyframes glitchTop {
-      0%   { clip-path: inset(0 0 80% 0); transform: translate(-3px, -3px); }
-      50%  { clip-path: inset(0 0 10% 0); transform: translate(3px, 0); }
-      100% { clip-path: inset(80% 0 
+/* 🔥 SCANLINES */
+body::after {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0) 0px,
+    rgba(0, 0, 0, 0) 2px,
+    rgba(255, 0, 0, 0.03) 3px,
+    rgba(0, 0, 0, 0) 4
