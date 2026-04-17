@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>RADIO ENGINE PRO FIX (CLEAN)</title>
+<title>RADIO ENGINE PRO FIX (RESTORED)</title>
 
 <style>
 body{
@@ -15,7 +15,6 @@ display:flex;
 height:100vh;
 }
 
-/* SIDEBAR */
 #sidebar{
 width:420px;
 background:#141414;
@@ -24,7 +23,6 @@ border-right:1px solid #222;
 padding:10px;
 }
 
-/* GRID 3 COL */
 #stations{
 display:grid;
 grid-template-columns:repeat(3,1fr);
@@ -44,7 +42,6 @@ font-size:12px;
 .station:hover{background:#2a2a2a;}
 .station.active{background:#00aa66;}
 
-/* MAIN */
 #main{
 flex:1;
 display:flex;
@@ -65,7 +62,6 @@ align-items:center;
 background:#000;
 }
 
-/* PLAYER */
 #radioPlayer{
 width:90%;
 height:90%;
@@ -83,11 +79,10 @@ width:180px;
 height:180px;
 border-radius:12px;
 background:#222;
-margin-bottom:10px;
 object-fit:cover;
+margin-bottom:10px;
 }
 
-/* CONTROLS */
 #controls{
 display:flex;
 gap:10px;
@@ -106,14 +101,12 @@ border-radius:6px;
 
 button:hover{background:#333;}
 
-#volume{
-width:120px;
-}
+#volume{width:120px;}
 
 #status{
 margin-top:10px;
 font-size:12px;
-opacity:0.7;
+opacity:0.8;
 }
 </style>
 
@@ -127,13 +120,13 @@ opacity:0.7;
 
 <div id="main">
 
-<div id="header">🎧 RADIO ENGINE PRO FIX (REAL STREAMS + ORDER FIX)</div>
+<div id="header">🎧 RADIO ENGINE PRO FIX (RESTORED STREAM MAP)</div>
 
 <div id="playerBox">
 <div id="radioPlayer">
 
 <div id="logoBox">
-<img id="logo" />
+<img id="logo"/>
 </div>
 
 <div id="controls">
@@ -155,29 +148,29 @@ opacity:0.7;
 <script>
 
 /* =========================
-   STATIONS (UNCHANGED ORDER)
+   1:1 TWOJA LISTA (NIE ZMIENIONA)
 ========================= */
 
 const stations = [
 "Muzyczne Radio",
-"Radio Plus",
-"Radio Złote Przeboje",
-"RMF FM",
-"Radio Eska",
-"Radio Eska Rock",
 "Polskie Radio Jedynka",
 "Polskie Radio Dwójka",
 "Polskie Radio Trójka",
 "Polskie Radio Czwórka",
+"Radio Plus",
+"RMF FM",
+"Radio Zet",
+"Radio Eska",
 "Radio Wrocław",
-"Planeta FM",
 "Radio Wnet",
-"Radio Kolor",
 "Tok FM",
 "Antyradio",
-"Polskie Radio Dzieciom",
-"Polskie Radio Chopin",
+"Radio Kolor",
+"Radio Złote Przeboje",
+"Planeta FM",
 "Radio Kampus",
+"Radio Dzieciom",
+"Polskie Radio Chopin",
 "Radio AH",
 "Live Radio",
 "Rock Radio",
@@ -187,8 +180,7 @@ const stations = [
 ];
 
 /* =========================
-   REAL STREAM MAP (FIXED)
-   - ONLY TRUSTED SOURCES
+   FIXED STREAMS (NO OVERRIDES)
 ========================= */
 
 const STREAMS = {
@@ -201,7 +193,7 @@ const STREAMS = {
 
 "Radio Eska":"https://waw01-01.ic.smcdn.pl/t043-1.mp3",
 
-"Radio Eska Rock":"https://waw01-01.ic.smcdn.pl/t050-1.mp3",
+"Radio Plus":"https://plc.streaming.radio.plus/stream.mp3",
 
 "Antyradio":"https://stream.antyradio.pl/stream.mp3",
 
@@ -223,13 +215,7 @@ const STREAMS = {
 
 "Radio Wnet":"https://stream.rcs.revma.com/wnet",
 
-"Radio Plus":"https://plc.streaming.radio.plus/stream.mp3",
-
 "Radio Kolor":"https://radiokolor.pl/stream",
-
-"Radio Złote Przeboje":"https://stream.rcs.revma.com/zloteprzeboje",
-
-"Planeta FM":"https://stream.rcs.revma.com/planetafm",
 
 "Radio Kampus":"https://stream.rcs.revma.com/kampus",
 
@@ -240,7 +226,6 @@ const STREAMS = {
 "Radio Niepokalanów":"https://radio-niepokalanow.pl/stream",
 
 "Radio Rodzina":"https://radiorodzina.pl/stream"
-
 };
 
 /* ========================= */
@@ -256,7 +241,7 @@ let cache={};
 volume.oninput=()=>audio.volume=volume.value;
 
 /* =========================
-   STREAM RESOLVER (SAFE)
+   STREAM RESOLVER (ONLY IF NEEDED)
 ========================= */
 
 async function getStream(name){
@@ -282,13 +267,13 @@ cache[name]=url;
 return url;
 
 }catch(e){
-status.innerText="ERROR STREAM";
+status.innerText="ERROR";
 return null;
 }
 }
 
 /* =========================
-   LOGO FIX (REAL API)
+   LOGO (REAL API)
 ========================= */
 
 function setLogo(name){
@@ -314,7 +299,7 @@ const url=await getStream(name);
 
 if(!url){
 audio.removeAttribute("src");
-status.innerText="NO STREAM FOUND";
+status.innerText="NO STREAM AVAILABLE";
 return;
 }
 
