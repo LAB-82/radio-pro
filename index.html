@@ -162,7 +162,7 @@ localStorage.setItem("radio_cache", JSON.stringify(cache));
 }
 
 function saveFavs(){
-localStorage.setItem("radio_favs", JSON.stringify(favs));
+localStorage.setItem("radio-favs", JSON.stringify(favs));
 }
 
 /* =========================
@@ -287,6 +287,11 @@ div.onclick=()=>load(i);
 
 document.getElementById("stations").appendChild(div);
 });
+
+// Automatyczne odtwarzanie domyślnej stacji po załadowaniu strony
+window.onload = () => {
+  load(0); // Załaduj pierwszą stację jako domyślną i odtwórz ją
+};
 
 </script>
 
