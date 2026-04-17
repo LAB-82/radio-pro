@@ -7,37 +7,37 @@
 
 <style>
 body{
-margin:0;
-font-family:Arial;
-background:#0b0b0b;
-color:#fff;
-display:flex;
-height:100vh;
+  margin:0;
+  font-family:Arial;
+  background:#0b0b0b;
+  color:#fff;
+  display:flex;
+  height:100vh;
 }
 
 #sidebar{
-width:420px;
-background:#141414;
-overflow:auto;
-border-right:1px solid #222;
-padding:10px;
+  width:420px;
+  background:#141414;
+  overflow:auto;
+  border-right:1px solid #222;
+  padding:10px;
 }
 
 #stations{
-display:grid;
-grid-template-columns:repeat(3,1fr);
-gap:10px;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
 }
 
 .station{
-background:#1a1a1a;
-padding:10px;
-cursor:pointer;
-border-radius:8px;
-text-align:center;
-font-size:12px;
-position:relative;
-transition:0.2s;
+  background:#1a1a1a;
+  padding:10px;
+  cursor:pointer;
+  border-radius:8px;
+  text-align:center;
+  font-size:12px;
+  position:relative;
+  transition:0.2s;
 }
 
 .station:hover{background:#2a2a2a;}
@@ -45,53 +45,53 @@ transition:0.2s;
 .station.live{background:#1f7a3a;}
 
 .star{
-position:absolute;
-top:4px;
-right:6px;
-font-size:12px;
-cursor:pointer;
-opacity:0.5;
+  position:absolute;
+  top:4px;
+  right:6px;
+  font-size:12px;
+  cursor:pointer;
+  opacity:0.5;
 }
 .star.fav{opacity:1;color:gold;}
 
 #main{
-flex:1;
-display:flex;
-flex-direction:column;
+  flex:1;
+  display:flex;
+  flex-direction:column;
 }
 
 #header{
-padding:12px;
-background:#1a1a1a;
-font-weight:bold;
+  padding:12px;
+  background:#1a1a1a;
+  font-weight:bold;
 }
 
 #player{
-flex:1;
-display:flex;
-justify-content:center;
-align-items:center;
-flex-direction:column;
-gap:10px;
+  flex:1;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
+  gap:10px;
 }
 
 audio{
-width:80%;
+  width:80%;
 }
 
 #logo{
-width:160px;
-height:120px;
-object-fit:contain;
-background:#111;
-padding:8px;
-border-radius:10px;
+  width:160px;
+  height:120px;
+  object-fit:contain;
+  background:#111;
+  padding:8px;
+  border-radius:10px;
 }
 
 #status{
-font-size:13px;
-opacity:0.8;
-white-space:pre-line;
+  font-size:13px;
+  opacity:0.8;
+  white-space:pre-line;
 }
 
 button{ display:none; }
@@ -102,40 +102,40 @@ button{ display:none; }
 <body>
 
 <div id="sidebar">
-<div id="stations"></div>
+  <div id="stations"></div>
 </div>
 
 <div id="main">
 
-<div id="header">🎧 RADIO ENGINE PRO 2026 (SELF HEALING)</div>
+  <div id="header">🎧 RADIO ENGINE PRO 2026 (SELF HEALING)</div>
 
-<div id="player">
+  <div id="player">
 
-<img id="logo"/>
+    <img id="logo"/>
 
-<audio id="audio" controls></audio>
+    <audio id="audio" controls></audio>
 
-<div id="status">READY</div>
+    <div id="status">READY</div>
 
-</div>
+  </div>
 
 </div>
 
 <script>
 
 const stations = [
-"Muzyczne Radio",
-"Radio Plus",
-"RMF FM",
-"Radio Zet",
-"Radio Wrocław",
-"Tok FM",
-"Radio Kolor",
-"Radio Złote Przeboje",
-"Planeta FM",
-"Radio Kampus",
-"Radio Rodzina",
-"Polskie Radio"
+  "Muzyczne Radio",
+  "Radio Plus",
+  "RMF FM",
+  "Radio Zet",
+  "Radio Wrocław",
+  "Tok FM",
+  "Radio Kolor",
+  "Radio Złote Przeboje",
+  "Planeta FM",
+  "Radio Kampus",
+  "Radio Rodzina",
+  "Polskie Radio"
 ];
 
 const audio = document.getElementById("audio");
@@ -148,131 +148,131 @@ let cache = JSON.parse(localStorage.getItem("radio_cache") || "{}");
 let favs = JSON.parse(localStorage.getItem("radio_favs") || "[]");
 
 function saveCache(){
-localStorage.setItem("radio_cache", JSON.stringify(cache));
+  localStorage.setItem("radio_cache", JSON.stringify(cache));
 }
 
 function saveFavs(){
-localStorage.setItem("radio_favs", JSON.stringify(favs));
+  localStorage.setItem("radio_favs", JSON.stringify(favs));
 }
 
-/* ✅ PRAWDZIWE STREAMY AUDIO (STABILNE) */
+/* ✅ STABILNE STRUMIENIE DLA KAŻDEJ STACJI */
 const manualStreams = {
 
-"Muzyczne Radio":"http://stream4.nadaje.com:11986/mr",
-"Radio Plus":"http://pldm.ml/radio?url=http://stream.radio.plus.pl:8000/plus",
-"RMF FM":"https://rs6-krk2.rmfstream.pl/rmf_fm",
-"Radio Zet":"https://zt03.cdn.eurozet.pl/zet-net.mp3",
-"Radio Wrocław":"https://stream4.nadaje.com:8176/prw",
-"Tok FM":"https://radiostream.pl/tuba9-1.mp3",
-"Radio Kolor":"https://stream.radiokolor.pl/kolor.mp3",
-"Radio Złote Przeboje":"https://zt02.cdn.eurozet.pl/zlote-przeboje.mp3",
-"Planeta FM":"https://zt03.cdn.eurozet.pl/planeta-fm.mp3",
-"Radio Kampus":"https://stream.radiokampus.fm/kampus.mp3",
-"Radio Rodzina":"http://stream4.nadaje.com:8400/radirodzina",
-"Polskie Radio":"https://stream.polskieradio.pl/pr1_mp3"
+  "Muzyczne Radio": "http://stream.rcs.revma.com/mnyz64f5072vv",          // 96 kbps, wybrany stream Muzyczne Radio [web:1]
+  "Radio Plus": "http://pla.cdn.eurozet.pl/pla-net.mp3",                // Eurozet Radio Plus/Planeta [web:19][web:21]
+  "RMF FM": "https://rs6-krk2.rmfstream.pl/rmf_fm",                     // RMF FM [web:19]
+  "Radio Zet": "https://zt03.cdn.eurozet.pl/zet-net.mp3",              // Radio Zet Eurozet [web:19]
+  "Radio Wrocław": "https://stream4.nadaje.com:8176/prw",              // Polskie Radio Wrocław [web:23]
+  "Tok FM": "https://radiostream.pl/tuba9-1.mp3",                       // Tok FM [web:19]
+  "Radio Kolor": "https://stream.rcs.revma.com/nrfscb49xd3vv",          // Radio Kolor MP3 stream [web:22]
+  "Radio Złote Przeboje": "https://zt02.cdn.eurozet.pl/zlote-przeboje.mp3",  // Złote Przeboje Eurozet [web:20]
+  "Planeta FM": "http://pla.cdn.eurozet.pl/pla-net.mp3",                // Planeta FM Eurozet [web:21]
+  "Radio Kampus": "https://stream.radiokampus.fm/kampus.mp3",           // Radio Kampus [web:6]
+  "Radio Rodzina": "https://stream4.nadaje.com:8400/radirodzina",       // Radio Rodzina [web:7]
+  "Polskie Radio": "http://mp3.polskieradio.pl:8900"                    // PR1 Jedynka MP3 [web:8]
 
 };
 
 /* ✅ LOGO FIX */
 function setLogo(name){
-logo.src = `https://www.radio-browser.info/backends/logos/${encodeURIComponent(name)}.png`;
-logo.onerror = () => {
-logo.src = "https://upload.wikimedia.org/wikipedia/commons/a/a3/Image-not-found.png";
-};
+  logo.src = `https://www.radio-browser.info/backends/logos/${encodeURIComponent(name)}.png`;
+  logo.onerror = () => {
+    logo.src = "https://upload.wikimedia.org/wikipedia/commons/a/a3/Image-not-found.png";
+  };
 }
 
 /* STREAM RESOLVER */
 async function resolveStream(name){
 
-if(manualStreams[name]){
-cache[name] = manualStreams[name];
-saveCache();
-return manualStreams[name];
-}
+  if(manualStreams[name]){
+    cache[name] = manualStreams[name];
+    saveCache();
+    return manualStreams[name];
+  }
 
-if(cache[name]){
-return cache[name];
-}
+  if(cache[name]){
+    return cache[name];
+  }
 
-return null;
+  return null;
 }
 
 /* LOAD */
 async function load(i){
 
-current = i;
-const name = stations[i];
+  current = i;
+  const name = stations[i];
 
-setLogo(name);
+  setLogo(name);
 
-status.innerText = "ŁADOWANIE: " + name;
+  status.innerText = "ŁADOWANIE: " + name;
 
-const url = await resolveStream(name);
+  const url = await resolveStream(name);
 
-if(!url){
-status.innerText = "❌ BRAK STREAMU: " + name;
-return;
-}
+  if(!url){
+    status.innerText = "❌ BRAK STREAMU: " + name;
+    return;
+  }
 
-audio.src = url;
-audio.volume = 0.85;
+  audio.src = url;
+  audio.volume = 0.85;
 
-audio.play()
-.then(()=>{
-status.innerText = "▶ GRA: " + name;
-markLive(i);
-})
-.catch(()=>{
-status.innerText = "⚠️ kliknij PLAY ręcznie";
-});
+  audio.play()
+    .then(()=>{
+      status.innerText = "▶ GRA: " + name;
+      markLive(i);
+    })
+    .catch(()=>{
+      status.innerText = "⚠️ kliknij PLAY ręcznie";
+    });
 }
 
 /* LIVE */
 function markLive(i){
-document.querySelectorAll(".station").forEach((el,idx)=>{
-el.classList.toggle("live", idx===i);
-});
+  document.querySelectorAll(".station").forEach((el,idx)=>{
+    el.classList.toggle("live", idx===i);
+  });
 }
 
 /* FAVORITES */
 function toggleFav(name, el){
-if(favs.includes(name)){
-favs = favs.filter(f=>f!==name);
-el.classList.remove("fav");
-}else{
-favs.push(name);
-el.classList.add("fav");
-}
-saveFavs();
+  if(favs.includes(name)){
+    favs = favs.filter(f=>f!==name);
+    el.classList.remove("fav");
+  }else{
+    favs.push(name);
+    el.classList.add("fav");
+  }
+  saveFavs();
 }
 
 /* AUTO CACHE CLEAN */
 setInterval(()=>{
-cache = {};
-localStorage.removeItem("radio_cache");
+  cache = {};
+  localStorage.removeItem("radio_cache");
 }, 600000);
 
 /* UI */
 stations.forEach((s,i)=>{
-const div=document.createElement("div");
-div.className="station";
-div.innerText=s;
+  const div=document.createElement("div");
+  div.className="station";
+  div.innerText=s;
 
-const star=document.createElement("div");
-star.className="star";
-star.innerText="★";
+  const star=document.createElement("div");
+  star.className="star";
+  star.innerText="★";
 
-if(favs.includes(s)) star.classList.add("fav");
+  if(favs.includes(s)) star.classList.add("fav");
 
-star.onclick=(e)=>{
-e.stopPropagation();
-toggleFav(s, star);
-};
+  star.onclick=(e)=>{
+    e.stopPropagation();
+    toggleFav(s, star);
+  };
 
-div.appendChild(star);
-div.onclick=()=>load(i);
+  div.appendChild(star);
+  div.onclick=()=>load(i);
 
-document.getElementById("stations").appendChild(div);
+  document.getElementById("stations").appendChild(div);
 });
 
 </script>
