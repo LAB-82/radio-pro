@@ -16,10 +16,15 @@ align-items:center;
 height:100vh;
 transition:0.4s;
 }
+
+/* USUNIĘTO blok body.day – tryb dzień jest wyłączony */
+/*
 body.day{
 background:#eaeaea;
 color:#000;
 }
+*/
+
 #title{
 font-size:88px;
 margin-top:50px;
@@ -58,10 +63,14 @@ background:#111;
 border:2px solid #ff2a2a;
 box-shadow:0 0 10px #ff2a2a;
 }
+
+/* Żaden z tych styli nie jest teraz potrzebny, bo usunęliśmy .day */
+/*
 body.day .volumeWrapper{
 background:#d6d6d6;
 box-shadow:0 0 40px #ff2a2a,0 0 80px #ff0000;
 }
+*/
 button{
 width:160px;
 height:45px;
@@ -73,11 +82,15 @@ transition:0.2s;
 border:2px solid #ff2a2a;
 box-shadow:0 0 10px #ff2a2a;
 }
+
+/* usunięto wersję dla .day */
+/*
 body.day button{
 background:#d6d6d6;
 color:#000;
 box-shadow:0 0 40px #ff2a2a,0 0 80px #ff0000;
 }
+*/
 #volume{
 width:120px;
 height:10px;
@@ -95,20 +108,3 @@ border:1px solid #ff0000;
 #volume::-webkit-slider-thumb{
 -webkit-appearance:none;
 width:16px;
-height:16px;
-border-radius:4px;
-background:#ff0000;
-box-shadow:0 0 10px red,0 0 20px red;
-cursor:pointer;
-}
-#volume::-moz-range-thumb{
-width:16px;
-height:16px;
-border:none;
-border-radius:4px;
-background:#ff0000;
-box-shadow:0 0 10px red,0 0 20px red;
-cursor:pointer;
-}
-.playActive{ color:#00ff00; text-shadow:0 0 10px #00ff00; }
-.stopActive{ c
