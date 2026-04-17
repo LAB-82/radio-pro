@@ -130,7 +130,8 @@ const stations = [
 "Radio Złote Przeboje",
 "Planeta FM",
 "Radio Kampus",
-"Radio Rodzina"
+"Radio Rodzina",
+"Radio Republika"
 ];
 
 const audio = document.getElementById("audio");
@@ -150,12 +151,34 @@ localStorage.setItem("radio_favs", JSON.stringify(favs));
 }
 
 /* =========================
-   STREAM RESOLVER
+   PEWNE STREAMY (Z TWOICH LINKÓW)
 ========================= */
+const manualStreams = {
+"Radio Plus":"https://www.radio-polska.pl/radio-plus-legnica",
+"RMF FM":"https://www.radio-polska.pl/rmf-fm",
+"Radio Zet":"https://www.radio-polska.pl/radio-zet",
+"Radio Wrocław":"https://www.radio-polska.pl/pr-radio-wroclaw-1023",
+"Tok FM":"https://www.radio-polska.pl/tok-fm",
+"Radio Kolor":"https://www.radio-polska.pl/radio-kolor-103-fm",
+"Radio Złote Przeboje":"https://www.radio-polska.pl/radio-zlote-przeboje",
+"Planeta FM":"https://www.radio-polska.pl/planeta-fm",
+"Radio Kampus":"https://www.radio-polska.pl/radio-kampus-971",
+"Radio Rodzina":"https://www.radio-polska.pl/katolickie-radio-rodzina",
+"Radio Republika":"https://www.radio-polska.pl/radio-republika"
+};
+
+/* STREAM RESOLVER */
 async function resolveStream(name){
 
 if(cache[name]){
 return cache[name];
+}
+
+/* manual override FIRST */
+if(manualStreams[name]){
+cache[name] = manualStreams[name];
+saveCache();
+return manualStreams[name];
 }
 
 try{
@@ -180,9 +203,7 @@ return best.url_resolved;
 return null;
 }
 
-/* =========================
-   LOAD + SELF HEALING
-========================= */
+/* LOAD */
 async function load(i){
 
 current = i;
@@ -209,18 +230,14 @@ status.innerText = "⚠️ kliknij PLAY ręcznie";
 });
 }
 
-/* =========================
-   LIVE MARKER
-========================= */
+/* LIVE MARKER */
 function markLive(i){
 document.querySelectorAll(".station").forEach((el,idx)=>{
 el.classList.toggle("live", idx===i);
 });
 }
 
-/* =========================
-   FAVORITES
-========================= */
+/* FAVORITES */
 function toggleFav(name, el){
 if(favs.includes(name)){
 favs = favs.filter(f=>f!==name);
@@ -232,18 +249,14 @@ el.classList.add("fav");
 saveFavs();
 }
 
-/* =========================
-   AUTO CACHE CLEANER
-========================= */
+/* AUTO CACHE CLEANER */
 setInterval(()=>{
 cache = {};
 localStorage.removeItem("radio_cache");
 console.log("🧹 auto cache cleaned");
-}, 600000); // 10 min
+}, 600000);
 
-/* =========================
-   SELF HEALING BACKGROUND CHECK
-========================= */
+/* SELF HEALING BACKGROUND CHECK */
 setInterval(async ()=>{
 for(let i=0;i<stations.length;i++){
 const name = stations[i];
@@ -260,20 +273,16 @@ saveCache();
 }catch(e){}
 }
 }
-}, 300000); // 5 min
+}, 300000);
 
-/* =========================
-   CLEAR CACHE
-========================= */
+/* CLEAR CACHE */
 function clearCache(){
 cache = {};
 localStorage.removeItem("radio_cache");
 status.innerText = "CACHE WYCZYSZCZONY";
 }
 
-/* =========================
-   UI
-========================= */
+/* UI */
 stations.forEach((s,i)=>{
 const div=document.createElement("div");
 div.className="station";
