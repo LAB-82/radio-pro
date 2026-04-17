@@ -75,7 +75,6 @@ flex-direction:column;
 gap:10px;
 }
 
-/* LOGO */
 #logo{
 width:180px;
 height:120px;
@@ -83,15 +82,6 @@ object-fit:contain;
 border-radius:10px;
 background:#111;
 padding:10px;
-}
-
-/* SEPARATOR */
-.separator{
-grid-column:1/-1;
-text-align:center;
-font-size:13px;
-opacity:0.6;
-padding:6px;
 }
 
 audio{
@@ -158,27 +148,13 @@ const stations = [
 "Radio Rodzina",
 "Radio Republika",
 
-"__SEPARATOR__",
-
 "technofm",
 "house-nation-uk",
 "your-trance-radio",
 "rewind-2000s",
 "res-fm2",
 "frisky-radio",
-"Radio Heaven",
-"metal-express",
-"metalfm",
-"classic-rock-station",
-"flow-103",
-"hip-hop-request",
-"electric-radio",
-"jazz-fm",
-"country-usa",
-"100hitz-rap",
-"radio-80-fm",
-"love-90s",
-"kusc-classical-915-fm-kdb"
+"Radio Heaven"
 ];
 
 const audio = document.getElementById("audio");
@@ -198,6 +174,17 @@ function saveFavs(){
 localStorage.setItem("radio_favs", JSON.stringify(favs));
 }
 
+/* 🔥 MANUAL STREAMS (RADIO-POLSKA FIX) */
+const manualStreams = {
+"technofm":"https://streams.radiobob.de/techno/mp3-192/stream.radiobob.de/",
+"house-nation-uk":"https://streaming.radionomy.com/HouseNationUK",
+"your-trance-radio":"https://play.trance.one/stream",
+"rewind-2000s":"https://streaming.radionomy.com/Rewind2000s",
+"res-fm2":"https://stream.resfm.pl/resfm2.mp3",
+"frisky-radio":"https://stream.friskyradio.com/frisky_mp3_high",
+"Radio Heaven":"https://stream.radioheaven.pl/stream"
+};
+
 /* LOGO */
 function setLogo(name){
 logo.src = `https://www.radio-browser.info/backends/logos/${encodeURIComponent(name)}.png`;
@@ -208,6 +195,13 @@ async function resolveStream(name){
 
 if(cache[name]){
 return cache[name];
+}
+
+/* 🔥 najpierw manual */
+if(manualStreams[name]){
+cache[name] = manualStreams[name];
+saveCache();
+return manualStreams[name];
 }
 
 try{
@@ -237,8 +231,6 @@ async function load(i){
 
 current = i;
 const name = stations[i];
-
-if(name==="__SEPARATOR__") return;
 
 setLogo(name);
 
@@ -293,8 +285,6 @@ console.log("🧹 auto cache cleaned");
 setInterval(async ()=>{
 for(let i=0;i<stations.length;i++){
 const name = stations[i];
-if(name==="__SEPARATOR__") continue;
-
 if(!cache[name]){
 try{
 const res = await fetch(
@@ -319,15 +309,6 @@ status.innerText = "CACHE WYCZYSZCZONY";
 
 /* UI */
 stations.forEach((s,i)=>{
-
-if(s==="__SEPARATOR__"){
-const sep=document.createElement("div");
-sep.className="separator";
-sep.innerText="Stacje zagraniczne";
-document.getElementById("stations").appendChild(sep);
-return;
-}
-
 const div=document.createElement("div");
 div.className="station";
 div.innerText=s;
