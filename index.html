@@ -156,70 +156,7 @@ localStorage.setItem("radio_favs", JSON.stringify(favs));
 }
 
 /* =========================
-   🔥 FIX STREAM RESOLVER (REAL AUDIO ONLY)
-========================= */
-async function resolveStream(name){
-
-if(cache[name]){
-return cache[name];
-}
-
-if(manualStreams[name]){
-cache[name] = manualStreams[name];
-saveCache();
-return manualStreams[name];
-}
-
-try{
-const res = await fetch(
-`https://de1.api.radio-browser.info/json/stations/search?name=${encodeURIComponent(name)}&limit=10`
-);
-const data = await res.json();
-
-/* 🔥 TYLKO PRAWDZIWE STREAMY AUDIO */
-const best = data.find(s =>
-s.url_resolved &&
-(
-s.url_resolved.endsWith(".mp3") ||
-s.url_resolved.endsWith(".aac") ||
-s.url_resolved.includes("stream") ||
-s.url_resolved.includes("radio")
-)
-);
-
-if(best){
-cache[name] = best.url_resolved;
-saveCache();
-return best.url_resolved;
-}
-
-}catch(e){}
-
-return null;
-}
-
-/* =========================
-   FIX LOGO (REAL IMAGE + FALLBACK)
-========================= */
-async function setLogo(name){
-try{
-const res = await fetch(
-`https://de1.api.radio-browser.info/json/stations/search?name=${encodeURIComponent(name)}&limit=1`
-);
-const data = await res.json();
-
-if(data[0]?.favicon && data[0].favicon.startsWith("http")){
-logo.src = data[0].favicon;
-return;
-}
-}catch(e){}
-
-/* fallback (zawsze coś pokaże) */
-logo.src = "https://upload.wikimedia.org/wikipedia/commons/3/3f/Logo_placeholder.png";
-}
-
-/* =========================
-   MANUAL STREAMS (NIE ZMIENIAM)
+   MANUAL STREAMS (TYLKO PRAWIDŁOWE AUDIO)
 ========================= */
 const manualStreams = {
 "Radio Plus":"https://www.radio-polska.pl/radio-plus-legnica",
@@ -235,6 +172,67 @@ const manualStreams = {
 "Polskie Radio":"http://e.radio-polska.pl/embed/radio-poland-411263",
 "Muzyczne Radio":"https://www.muzyczneradio.pl/index.php/player/lo.html?type=lo"
 };
+
+/* =========================
+   LOGO FIX (ZAWSZE FALLBACK OBRAZ)
+========================= */
+async function setLogo(name){
+try{
+const res = await fetch(
+`https://de1.api.radio-browser.info/json/stations/search?name=${encodeURIComponent(name)}&limit=1`
+);
+const data = await res.json();
+
+if(data[0]?.favicon && data[0].favicon.startsWith("http")){
+logo.src = data[0].favicon;
+return;
+}
+}catch(e){}
+
+logo.src = "https://via.placeholder.com/160x120?text=RADIO";
+}
+
+/* =========================
+   STREAM RESOLVER (BLOKADA HTML)
+========================= */
+async function resolveStream(name){
+
+if(cache[name]) return cache[name];
+
+if(manualStreams[name]){
+cache[name] = manualStreams[name];
+saveCache();
+return manualStreams[name];
+}
+
+try{
+const res = await fetch(
+`https://de1.api.radio-browser.info/json/stations/search?name=${encodeURIComponent(name)}&limit=10`
+);
+const data = await res.json();
+
+/* 🔥 KLUCZOWA POPRAWKA: tylko audio streamy */
+const best = data.find(s =>
+s.url_resolved &&
+(
+s.url_resolved.endsWith(".mp3") ||
+s.url_resolved.endsWith(".aac") ||
+s.url_resolved.includes("stream") ||
+s.url_resolved.includes(":")
+) &&
+!s.url_resolved.includes("radio-polska.pl")
+);
+
+if(best){
+cache[name] = best.url_resolved;
+saveCache();
+return best.url_resolved;
+}
+
+}catch(e){}
+
+return null;
+}
 
 /* LOAD */
 async function load(i){
@@ -256,22 +254,23 @@ return;
 audio.src = url;
 audio.volume = 0.85;
 
-audio.play()
-.then(()=>{
+/* stabilizacja autoplay */
+setTimeout(()=>{
+audio.play().catch(()=>{});
+}, 200);
+
 status.innerText = "▶ GRA: " + name;
 markLive(i);
-})
-.catch(()=>{
-status.innerText = "⚠️ kliknij PLAY ręcznie";
-});
 }
 
+/* LIVE */
 function markLive(i){
 document.querySelectorAll(".station").forEach((el,idx)=>{
 el.classList.toggle("live", idx===i);
 });
 }
 
+/* FAVORITES */
 function toggleFav(name, el){
 if(favs.includes(name)){
 favs = favs.filter(f=>f!==name);
@@ -283,15 +282,16 @@ el.classList.add("fav");
 saveFavs();
 }
 
+/* CACHE CLEAN */
 setInterval(()=>{
 cache = {};
 localStorage.removeItem("radio_cache");
 }, 600000);
 
+/* SELF HEALING (POPRAWIONE – NIE NADPISUJE MANUALI) */
 setInterval(async ()=>{
-for(let i=0;i<stations.length;i++){
-const name = stations[i];
-if(!cache[name]){
+for(let name of stations){
+if(!cache[name] && !manualStreams[name]){
 try{
 const res = await fetch(
 `https://de1.api.radio-browser.info/json/stations/search?name=${encodeURIComponent(name)}&limit=1`
@@ -306,11 +306,7 @@ saveCache();
 }
 }, 300000);
 
-function clearCache(){
-cache = {};
-localStorage.removeItem("radio_cache");
-}
-
+/* UI */
 stations.forEach((s,i)=>{
 const div=document.createElement("div");
 div.className="station";
