@@ -1,82 +1,148 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>RADIO ENGINE FIX</title>
+
+<style>
+body{
+margin:0;
+font-family:Arial;
+background:#0b0b0b;
+color:#fff;
+display:flex;
+height:100vh;
+}
+
+#sidebar{
+width:420px;
+background:#141414;
+overflow:auto;
+border-right:1px solid #222;
+padding:10px;
+}
+
+#stations{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:10px;
+}
+
+.station{
+background:#1a1a1a;
+padding:10px;
+cursor:pointer;
+border-radius:8px;
+text-align:center;
+font-size:12px;
+}
+
+.station:hover{background:#2a2a2a;}
+.station.active{background:#00aa66;}
+
+#main{
+flex:1;
+display:flex;
+flex-direction:column;
+}
+
+#header{
+padding:12px;
+background:#1a1a1a;
+font-weight:bold;
+}
+
+#playerBox{
+flex:1;
+display:flex;
+justify-content:center;
+align-items:center;
+background:#000;
+}
+
+#status{
+padding:10px;
+font-size:13px;
+opacity:0.8;
+}
+
+audio{
+width:90%;
+}
+</style>
+</head>
+
+<body>
+
+<div id="sidebar">
+<div id="stations"></div>
+</div>
+
+<div id="main">
+
+<div id="header">🎧 RADIO ENGINE FIX</div>
+
+<div id="playerBox">
+<div>
+<audio id="audio" controls></audio>
+<div id="status">READY</div>
+</div>
+</div>
+
+</div>
+
 <script>
 
 const stations = [
-"Muzyczne Radio",
-"Polskie Radio Jedynka",
-"Polskie Radio Dwójka",
-"Polskie Radio Trójka",
-"Polskie Radio Czwórka",
-"Radio Plus",
 "RMF FM",
 "Radio Zet",
 "Radio Eska",
-"Radio Wrocław",
-"Radio Wnet",
-"Tok FM",
 "Antyradio",
-"Radio Kolor",
-"Radio Złote Przeboje",
-"Planeta FM",
-"Radio Kampus",
-"Radio Dzieciom",
-"Polskie Radio Chopin",
-"Radio AH",
-"Rock Radio",
-"Radio Maryja",
-"Radio Niepokalanów",
-"Radio Rodzina"
+"Tok FM"
 ];
 
-/* 🔥 AUTO STREAM FINDER (ZAMIANA STREAMS) */
+const STREAMS = {
+"RMF FM":"https://rs6-krk2-cyfronet.rmfstream.pl/RMFFM48",
+"Radio Zet":"https://zt.cdn.eurozet.pl/ZET128.mp3",
+"Radio Eska":"https://waw.ic.smcdn.pl/t043-1.mp3",
+"Antyradio":"https://stream.antyradio.pl/stream.mp3",
+"Tok FM":"https://radiostream.pl/tuba10-1.mp3"
+};
 
-async function findStream(name){
-try{
-const res = await fetch(`https://de1.api.radio-browser.info/json/stations/search?name=${encodeURIComponent(name)}&limit=1`);
-const data = await res.json();
-return data?.[0]?.url_resolved || null;
-}catch(e){
-return null;
-}
-}
+const audio = document.getElementById("audio");
+const status = document.getElementById("status");
 
-/* AUDIO */
-const audio=document.getElementById("audio");
-const status=document.getElementById("status");
+function load(name){
+const url = STREAMS[name];
 
-let current=0;
-
-async function load(i){
-
-current=i;
-const name=stations[i];
-
-status.innerText="SEARCHING STREAM: "+name;
-
-const url = await findStream(name);
+status.innerText = "ŁADOWANIE: " + name;
 
 if(!url){
-status.innerText="NO STREAM FOUND: "+name;
+status.innerText = "BRAK STREAMU: " + name;
 return;
 }
 
-audio.src=url;
+audio.src = url;
 
 audio.play()
-.then(()=>status.innerText="PLAYING: "+name)
-.catch(err=>status.innerText="PLAY BLOCKED: "+err);
+.then(()=>status.innerText="GRA: "+name)
+.catch(err=>{
+status.innerText="BLOKADA ODTWARZANIA: kliknij PLAY ręcznie";
+console.log(err);
+});
 }
-
-function play(){load(current);}
-function stop(){audio.pause();audio.src="";status.innerText="STOPPED";}
-function mute(){audio.muted=!audio.muted;}
 
 /* UI */
 stations.forEach((s,i)=>{
 const div=document.createElement("div");
 div.className="station";
 div.innerText=s;
-div.onclick=()=>load(i);
+div.onclick=()=>load(s);
 document.getElementById("stations").appendChild(div);
 });
 
 </script>
+
+</body>
+</html>
