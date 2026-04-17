@@ -1,172 +1,349 @@
-<!DOCTYPE html>
+<!DOCTYPE html>  
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
 <title>Muzyczne Radio PRO</title>
+
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+
 <style>
-:root {
-  --red: #ff0000;
-  --red2: #ff3333;
-  --red3: #ff6666;
-  --text: #ff2a2a;
-  --muted: #ff2a2a;
-  --accent: #ff2a2a;
-  --line: rgba(255, 0, 0, 0.35);
+body{
+margin:0;
+background:#000;
+color:#fff;
+font-family:'Orbitron',sans-serif;
+display:flex;
+flex-direction:column;
+align-items:center;
+height:100vh;
+overflow:hidden;
 }
 
-/* 🌌 Czarny tło z czerwonymi neonymi */
-body {
-  margin: 0;
-  background: #000;
-  color: #fff;
-  font-family: 'Orbitron', sans-serif;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  height: 100vh;
-  position: relative;
-  overflow: hidden;
+/* 🔥 CYBERPUNK GRID */
+body::before{
+content:"";
+position:fixed;
+width:200%;
+height:200%;
+background:linear-gradient(transparent 95%, rgba(255,0,0,0.1) 95%),
+linear-gradient(90deg, transparent 95%, rgba(255,0,0,0.1) 95%);
+background-size:40px 40px;
+animation:gridMove 6s linear infinite;
+z-index:-1;
+opacity:0.3;
 }
 
-/* 🔌 Tytuł – bez zmian, tylko lekko wyróżniony */
-#title {
-  font-size: 88px;
-  margin-top: 50px;
-  text-align: center;
-  color: #ff2a2a;
-  text-shadow:
-    0 0 5px #ff2a2a,
-    0 0 15px #ff0000,
-    0 0 30px #ff0000,
-    0 0 60px #ff0000,
-    0 0 80px #ff0000;
+@keyframes gridMove{
+from{transform:translate(0,0);}
+to{transform:translate(-40px,-40px);}
 }
 
-/* 🔌 ProEqualizer – bez zmian */
-#proEqualizer {
-  display: block;
-  margin: 0 auto;
-  margin-top: 30px;
-  margin-bottom: 30px;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 0 10px rgba(255, 0, 0, 0.3);
+/* 🔥 GLITCH TITLE */
+#title{
+font-size:88px;
+margin-top:50px;
+text-align:center;
+color:#ff2a2a;
+position:relative;
+text-shadow:0 0 10px red,0 0 30px red;
+animation:glitch 2s infinite;
 }
 
-canvas {
-  display: block;
-  height: 260px;
-  border-radius: 8px;
+#title::before,
+#title::after{
+content:attr(data-text);
+position:absolute;
+left:0;
+width:100%;
+overflow:hidden;
 }
 
-/* 🔌 Kontrolki – bez zmian, ale styl przycisków z Cyberpunk 2077 */
-#controls {
-  display: flex;
-  gap: 8px;
-  margin-top: 20px;
-  margin-bottom: 20px;
-  align-items: center;
-  justify-content: space-between;
+#title::before{
+color:#00ffff;
+z-index:-1;
+animation:glitchTop 2s infinite;
 }
 
-/* 🌟 Cyberpunk 2077 – efekt hover na przyciskach */
-button {
-  width: 160px;
-  height: 45px;
-  background: #000;
-  color: #ff0000;
-  font-family: 'Orbitron';
-  cursor: pointer;
-  border: 2px solid #ff0000;
-  border-radius: 6px;
-  position: relative;
-  overflow: hidden;
-  box-shadow:
-    0 0 0 1px #ff0000 inset,
-    0 0 10px rgba(255, 0, 0, 0.4);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+#title::after{
+color:#ff00ff;
+z-index:-2;
+animation:glitchBottom 2s infinite;
 }
 
-button:hover {
-  box-shadow:
-    0 0 0 1px #ff0000 inset,
-    0 0 10px rgba(255, 0, 0, 0.6),
-    0 0 20px rgba(255, 0, 0, 0.3) inset;
-  transform: translateY(-1px) scale(1.015);
-  border-color: #ff3333;
+@keyframes glitch{
+0%{transform:skew(0deg);}
+20%{transform:skew(2deg);}
+40%{transform:skew(-2deg);}
+60%{transform:skew(1deg);}
+80%{transform:skew(-1deg);}
+100%{transform:skew(0deg);}
 }
 
-button:hover::before {
-  opacity: 0.8;
-  animation: glitchBorder 0.5s linear infinite alternate;
+@keyframes glitchTop{
+0%{clip-path:inset(0 0 80% 0);}
+50%{clip-path:inset(10% 0 60% 0);}
+100%{clip-path:inset(0 0 80% 0);}
 }
 
-button:active {
-  transform: translateY(1px) scale(0.98);
-  box-shadow:
-    0 0 0 1px #ff0000 inset,
-    0 0 6px rgba(255, 0, 0, 0.3);
+@keyframes glitchBottom{
+0%{clip-path:inset(80% 0 0 0);}
+50%{clip-path:inset(60% 0 10% 0);}
+100%{clip-path:inset(80% 0 0 0);}
 }
 
-/* Glitch na krawędziach przycisku tylko przy hover */
-button::before {
-  content: '';
-  position: absolute;
-  inset: -2px;
-  background: linear-gradient(
-    90deg,
-    rgba(255, 0, 0, 0.1),
-    rgba(255, 0, 0, 0.05),
-    rgba(255, 0, 0, 0.1)
-  );
-  background-size: 100px 10px;
-  mix-blend-mode: screen;
-  opacity: 0;
-  z-index: 0;
-  pointer-events: none;
-  transition: opacity 0.2s;
+/* CANVAS */
+#proEqualizer{
+display:block;
+margin-top:30px;
+margin-bottom:30px;
+border-radius:8px;
 }
 
-/* Animacja glitch tylko na hover */
-@keyframes glitchBorder {
-  0%   { background-position: 0 0; }
-  100% { background-position: 100px 0; }
+canvas{
+height:260px;
 }
 
-/* 🎛 Suwak głośności (bez zmian) */
-.volumeWrapper {
-  width: 160px;
-  height: 45px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #000;
-  border: 2px solid #ff2a2a;
-  box-shadow: 0 0 10px #ff2a2a;
+/* CONTROLS */
+#controls{
+display:flex;
+gap:8px;
+margin-top:20px;
+margin-bottom:20px;
 }
 
-#volume {
-  width: 120px;
-  height: 10px;
-  appearance: none;
-  border-radius: 10px;
-  outline: none;
-  background: #000;
-  border: 1px solid #ff2a2a;
-  box-shadow: 0 0 6px #ff2a2a;
+/* 🔥 CYBER BUTTONS */
+button{
+width:160px;
+height:45px;
+background:#050505;
+color:#fff;
+border:2px solid #ff0033;
+cursor:pointer;
+font-family:'Orbitron';
+position:relative;
+overflow:hidden;
+text-shadow:0 0 5px red;
+box-shadow:0 0 10px red, inset 0 0 5px red;
+transition:0.2s;
 }
 
-#volume::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 16px;
-  height: 16px;
-  border-radius: 4px;
-  background: #ff0000;
-  box-shadow: 0 0 10px #ff0000, 0 0 20px #ff0000;
-  cursor: pointer;
+button:hover{
+background:#110000;
+box-shadow:0 0 20px red,0 0 40px red;
 }
 
-/* ❌ Aktualizacja: nie zmiany w aktywach, mute, stop itp. */
-.playActive { color: #00ff00; text-shadow: 0 0 10px #00ff00; }
-.stopActive { color: 
+/* GLITCH ON HOVER */
+button:hover::before{
+content:"";
+position:absolute;
+left:0;
+top:0;
+width:100%;
+height:100%;
+background:rgba(255,0,0,0.2);
+animation:glitchBtn 0.3s infinite;
+}
+
+@keyframes glitchBtn{
+0%{transform:translate(0,0);}
+25%{transform:translate(2px,-2px);}
+50%{transform:translate(-2px,2px);}
+75%{transform:translate(1px,-1px);}
+100%{transform:translate(0,0);}
+}
+
+/* VOLUME */
+.volumeWrapper{
+width:160px;
+height:45px;
+display:flex;
+align-items:center;
+justify-content:center;
+background:#111;
+border:2px solid #ff0033;
+box-shadow:0 0 15px red;
+}
+
+#volume{
+width:120px;
+appearance:none;
+background:#000;
+border:1px solid red;
+}
+
+#volume::-webkit-slider-thumb{
+-webkit-appearance:none;
+width:16px;
+height:16px;
+background:red;
+box-shadow:0 0 10px red;
+}
+
+/* STATES */
+.playActive{ color:#00ff00; text-shadow:0 0 10px #00ff00; }
+.stopActive{ color:#ff4444; text-shadow:0 0 10px red; }
+
+.muteActive{
+color:#ffaa00;
+text-shadow:0 0 10px orange;
+animation:pulseMute 0.8s infinite alternate;
+}
+
+@keyframes pulseMute{
+from{ transform:scale(1); }
+to{ transform:scale(1.1); }
+}
+
+/* LINK */
+#bottomLink{
+margin-top:10px;
+}
+
+#bottomLink a{
+color:#ff2a2a;
+text-shadow:0 0 6px red;
+}
+</style>
+</head>
+
+<body>
+
+<div id="title" data-text="Muzyczne Radio">Muzyczne Radio</div>
+<canvas id="proEqualizer"></canvas>
+
+<div id="controls">
+<button id="playBtn" onclick="playRadio()">PLAY</button>
+<button id="stopBtn" onclick="stopRadio()">STOP</button>
+<button id="muteBtn" onclick="muteRadio()">MUTE 🔊</button>
+
+<div class="volumeWrapper">
+<input id="volume" type="range" min="0" max="1" step="0.01" value="0.5">
+</div>
+</div>
+
+<div id="bottomLink">
+<a href="https://www.muzyczneradio.pl" target="_blank">www.muzyczneradio.pl</a>
+</div>
+
+<audio id="audio" crossorigin="anonymous"></audio>
+
+<script>
+const STREAM_URL="https://stream.rcs.revma.com/gzwc1xcq042vv";
+
+const audio=document.getElementById("audio");
+const volume=document.getElementById("volume");
+
+const playBtn=document.getElementById("playBtn");
+const stopBtn=document.getElementById("stopBtn");
+const muteBtn=document.getElementById("muteBtn");
+
+const title=document.getElementById("title");
+const controls=document.getElementById("controls");
+
+const canvas=document.getElementById("proEqualizer");
+const ctx=canvas.getContext("2d");
+
+audio.volume=parseFloat(volume.value);
+
+let audioCtx, analyser, source, dataArray;
+let peaks=[];
+let animationStarted=false;
+
+function setupAudio(){
+if(audioCtx) return;
+
+audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+
+source=audioCtx.createMediaElementSource(audio);
+
+analyser=audioCtx.createAnalyser();
+analyser.fftSize=512;
+analyser.smoothingTimeConstant=0.5;
+
+source.connect(analyser);
+analyser.connect(audioCtx.destination);
+
+dataArray=new Uint8Array(analyser.frequencyBinCount);
+
+for(let i=0;i<300;i++) peaks[i]=0;
+}
+
+function playRadio(){
+setupAudio();
+
+if(audioCtx.state === "suspended"){
+audioCtx.resume();
+}
+
+audio.src=STREAM_URL;
+audio.play();
+
+playBtn.classList.add("playActive");
+stopBtn.classList.remove("stopActive");
+
+if(!animationStarted){
+animationStarted=true;
+draw();
+}
+}
+
+function stopRadio(){
+audio.pause();
+
+stopBtn.classList.add("stopActive");
+playBtn.classList.remove("playActive");
+
+setTimeout(()=>{
+stopBtn.classList.remove("stopActive");
+},1000);
+
+for(let i=0;i<peaks.length;i++){
+peaks[i]=0;
+}
+}
+
+function muteRadio(){
+audio.muted=!audio.muted;
+muteBtn.classList.toggle("muteActive");
+}
+
+volume.addEventListener("input",()=>{
+audio.volume=parseFloat(volume.value);
+});
+
+function resizeCanvas(){
+let width = title.offsetWidth;
+canvas.width = width;
+canvas.height = 260;
+canvas.style.width = width + "px";
+controls.style.width = width + "px";
+}
+
+window.addEventListener("load", resizeCanvas);
+window.addEventListener("resize", resizeCanvas);
+
+function draw(){
+requestAnimationFrame(draw);
+if(!analyser) return;
+analyser.getByteFrequencyData(dataArray);
+drawEQ();
+}
+
+function drawEQ(){
+ctx.clearRect(0,0,canvas.width,canvas.height);
+
+let bars = 100;
+let barWidth = canvas.width / bars;
+
+for(let i=0;i<bars;i++){
+let value = dataArray[i] || 0;
+let h = (value/255) * canvas.height;
+
+ctx.fillStyle="red";
+ctx.fillRect(i*barWidth, canvas.height-h, barWidth-1, h);
+}
+}
+</script>
+
+</body>
+</html>
