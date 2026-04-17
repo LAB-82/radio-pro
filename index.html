@@ -75,6 +75,7 @@ flex-direction:column;
 gap:10px;
 }
 
+/* 🔥 LOGO */
 #logo{
 width:180px;
 height:120px;
@@ -147,7 +148,6 @@ const stations = [
 "Radio Kampus",
 "Radio Rodzina",
 "Radio Republika",
-
 "technofm",
 "house-nation-uk",
 "your-trance-radio",
@@ -174,15 +174,15 @@ function saveFavs(){
 localStorage.setItem("radio_favs", JSON.stringify(favs));
 }
 
-/* 🔥 MANUAL STREAMS (RADIO-POLSKA FIX) */
+/* 🔥 MANUAL STREAMS (radio-polska) */
 const manualStreams = {
-"technofm":"https://streams.radiobob.de/techno/mp3-192/stream.radiobob.de/",
-"house-nation-uk":"https://streaming.radionomy.com/HouseNationUK",
-"your-trance-radio":"https://play.trance.one/stream",
-"rewind-2000s":"https://streaming.radionomy.com/Rewind2000s",
-"res-fm2":"https://stream.resfm.pl/resfm2.mp3",
-"frisky-radio":"https://stream.friskyradio.com/frisky_mp3_high",
-"Radio Heaven":"https://stream.radioheaven.pl/stream"
+"technofm":"https://stream.rcs.revma.com/technofm",
+"house-nation-uk":"https://stream.rcs.revma.com/housenation",
+"your-trance-radio":"https://stream.rcs.revma.com/trance",
+"rewind-2000s":"https://stream.rcs.revma.com/rewind2000s",
+"res-fm2":"https://stream.rcs.revma.com/resfm2",
+"frisky-radio":"https://stream.rcs.revma.com/frisky",
+"Radio Heaven":"https://stream.rcs.revma.com/radioheaven"
 };
 
 /* LOGO */
