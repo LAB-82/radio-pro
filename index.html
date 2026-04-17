@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>RADIO ENGINE PRO 2026 (CLEAN FINAL)</title>
+<title>RADIO ENGINE PRO 2026 FULL</title>
 
 <style>
 body{
@@ -103,7 +103,7 @@ button:hover{background:#333;}
 
 <div id="main">
 
-<div id="header">🎧 RADIO ENGINE PRO 2026 (CLEAN FINAL)</div>
+<div id="header">🎧 RADIO ENGINE PRO 2026 (FULL LIST)</div>
 
 <div id="player">
 <audio id="audio" controls></audio>
@@ -119,22 +119,27 @@ button:hover{background:#333;}
 
 const stations = [
 "Muzyczne Radio",
+"Polskie Radio Jedynka",
+"Polskie Radio Dwójka",
+"Polskie Radio Trójka",
+"Polskie Radio Czwórka",
 "Radio Plus",
 "RMF FM",
 "Radio Zet",
+"Radio Eska",
 "Radio Wrocław",
-"Radio Wnet",
 "Tok FM",
+"Antyradio",
 "Radio Kolor",
 "Radio Złote Przeboje",
 "Planeta FM",
 "Radio Kampus",
-"Radio Dzieciom",
-"Polskie Radio Chopin",
-"Radio Maryja",
-"Radio Niepokalanów",
 "Radio Rodzina"
 ];
+
+/* =========================
+   PRO ENGINE
+========================= */
 
 const audio = document.getElementById("audio");
 const status = document.getElementById("status");
@@ -152,10 +157,7 @@ function saveFavs(){
 localStorage.setItem("radio_favs", JSON.stringify(favs));
 }
 
-/* =========================
-   STREAM RESOLVER (UNCHANGED LOGIC)
-========================= */
-
+/* STREAM RESOLVER */
 async function resolveStream(name){
 
 if(cache[name]){
@@ -165,20 +167,9 @@ return cache[name];
 
 status.innerText = "🔎 SZUKAM: " + name;
 
-const manualFixes = {
-"Radio Wnet":"https://stream.rcs.revma.com/wnet",
-"Radio Kolor":"https://stream.rcs.revma.com/radiokolor",
-"Radio Złote Przeboje":"https://zt.cdn.eurozet.pl/ZLOTE128.mp3"
-};
-
-if(manualFixes[name]){
-cache[name] = manualFixes[name];
-return manualFixes[name];
-}
-
 try{
 const res = await fetch(
-`https://de1.api.radio-browser.info/json/stations/search?name=${encodeURIComponent(name)}&limit=5`
+`https://de1.api.radio-browser.info/json/stations/search?name=${encodeURIComponent(name)}&limit=8`
 );
 const data = await res.json();
 
@@ -189,6 +180,7 @@ s.url_resolved.startsWith("http")
 
 if(best){
 cache[name] = best.url_resolved;
+saveCache();
 return best.url_resolved;
 }
 
@@ -231,6 +223,7 @@ el.classList.remove("fav");
 favs.push(name);
 el.classList.add("fav");
 }
+saveFavs();
 }
 
 /* CLEAR CACHE */
