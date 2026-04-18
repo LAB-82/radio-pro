@@ -5,7 +5,6 @@
 <title>Muzyczne Radio PRO</title>
 <!-- Google Fonts - Rajdhani i Orbitron -->
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
-
 <style>
 @font-face {
   font-family: 'Cyberpunk';
@@ -21,7 +20,6 @@
   --cp-red:#ff2a2a;
   --cp-bg:#000014;
 }
-
 body{
   margin:0;
   background:var(--cp-bg);
@@ -40,21 +38,20 @@ body{
   min-height:100vh;
   padding-bottom: 40px;
 }
-
-#title{
-  font-family:'Orbitron', sans-serif;
-  font-weight: 900;
-  font-size:88px;
+#title{  /* <-- TO WSTAWIASZ OD LINIJKI 41 */
+  font-family:'Cyberpunk', 'Orbitron', sans-serif;
+  font-weight: 400;
+  font-size:100px;
   margin-top:50px;
   text-align:center;
-  color:var(--cp-cyan);
+  color:var(--cp-yellow);
+  letter-spacing: 0px;
+  position: relative;
+  display: inline-block;
   text-shadow:
-    0 0 5px var(--cp-cyan),
-    0 0 10px var(--cp-cyan),
-    0 0 20px var(--cp-cyan),
-    0 0 40px var(--cp-magenta),
-    0 0 80px var(--cp-magenta);
-  animation: flicker 3s infinite alternate;
+    3px 3px 0px var(--cp-cyan),
+    -3px -3px 0px var(--cp-magenta),
+    0 0 30px var(--cp-yellow);
 }
 
 @keyframes flicker {
