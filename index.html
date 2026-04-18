@@ -3,16 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <title>Muzyczne Radio PRO</title>
-<!-- Google Fonts - Rajdhani i Orbitron -->
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
 <style>
-@font-face {
-  font-family: 'Cyberpunk';
-  src: url('https://cdn.jsdelivr.net/gh/LAB-82/radio-pro@main/Cyberpunk.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
-}
 :root{
   --cp-cyan:#00f0ff;
   --cp-magenta:#ff003c;
@@ -20,6 +12,7 @@
   --cp-red:#ff2a2a;
   --cp-bg:#000014;
 }
+
 body{
   margin:0;
   background:var(--cp-bg);
@@ -38,89 +31,59 @@ body{
   min-height:100vh;
   padding-bottom: 40px;
 }
+
 #title{
-  font-family:'Cyberpunk', 'Orbitron', sans-serif;
-  font-weight: 400;
-  font-size:100px;
+  font-family:'Orbitron', sans-serif;
+  font-weight: 900;
+  font-size:88px;
   margin-top:50px;
   text-align:center;
-  color:var(--cp-yellow);
-  letter-spacing: 0px;
-  position: relative;
-  display: inline-block;
+  color:var(--cp-cyan);
   text-shadow:
-    3px 3px 0px var(--cp-cyan),
-    -3px -3px 0px var(--cp-magenta),
-    0 0 30px var(--cp-yellow);
-  animation: glitch 3s infinite;
+    0 0 5px var(--cp-cyan),
+    0 0 10px var(--cp-cyan),
+    0 0 20px var(--cp-cyan),
+    0 0 40px var(--cp-magenta),
+    0 0 80px var(--cp-magenta);
+  animation: flicker 3s infinite alternate;
 }
 
-@keyframes glitch{
-  0%, 90%, 100%{
+@keyframes flicker {
+  0%, 18%, 22%, 25%, 53%, 57%, 100% {
     text-shadow:
-      3px 3px 0px var(--cp-cyan),
-      -3px -3px 0px var(--cp-magenta),
-      0 0 30px var(--cp-yellow);
-    transform: skew(0deg);
+      0 0 5px var(--cp-cyan),
+      0 0 10px var(--cp-cyan),
+      0 0 20px var(--cp-cyan),
+      0 0 40px var(--cp-magenta),
+      0 0 80px var(--cp-magenta);
+    opacity: 1;
   }
-  91%{
-    text-shadow:
-      6px 0px 0px var(--cp-cyan),
-      -6px 0px 0px var(--cp-magenta),
-      0 0 30px var(--cp-red);
-    transform: skew(5deg);
-  }
-  93%{
-    text-shadow:
-      -4px 2px 0px var(--cp-cyan),
-      4px -2px 0px var(--cp-magenta),
-      0 0 30px var(--cp-yellow);
-    transform: skew(-3deg);
-  }
-  95%{
-    text-shadow:
-      3px 3px 0px var(--cp-cyan),
-      -3px -3px 0px var(--cp-magenta),
-      0 0 30px var(--cp-yellow);
-    transform: skew(0deg);
+  20%, 24%, 55% {
+    text-shadow: none;
+    opacity: 0.8;
   }
 }
-</style>
-</head>
 
-<body>
-  <div id="title">Muzyczne Radio</div>
-</body>
-</html>
 #proEqualizer{
   margin-top:30px;
-  width: 80%;
-  max-width: 600px;
-  height: 120px;
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 4px;
-  padding: 20px;
-  background: rgba(0, 240, 255, 0.05);
+  margin-bottom:30px;
+  width:600px;
+  height:260px;
+  position:relative;
+  background:
+    linear-gradient(135deg, transparent 8px, var(--cp-bg) 8px) top left,
+    linear-gradient(225deg, transparent 8px, var(--cp-bg) 8px) top right,
+    linear-gradient(315deg, transparent 8px, var(--cp-bg) 8px) bottom right,
+    linear-gradient(45deg, transparent 8px, var(--cp-bg) 8px) bottom left;
+  background-size: 51% 51%;
+  background-repeat: no-repeat;
   border: 2px solid var(--cp-cyan);
-  box-shadow: 
-    0 0 20px var(--cp-cyan),
-    inset 0 0 20px rgba(0, 240, 255, 0.1);
+  box-shadow:
+    0 0 10px var(--cp-cyan),
+    0 0 20px var(--cp-magenta),
+    inset 0 0 20px rgba(0,240,255,0.2);
 }
-#proEqualizer .bar:nth-child(1){ animation-delay: 0s; height: 20%; }
-#proEqualizer .bar:nth-child(2){ animation-delay: 0.1s; height: 60%; }
-#proEqualizer .bar:nth-child(3){ animation-delay: 0.3s; height: 40%; }
-#proEqualizer .bar:nth-child(4){ animation-delay: 0.2s; height: 80%; }
-#proEqualizer .bar:nth-child(5){ animation-delay: 0.4s; height: 30%; }
-#proEqualizer .bar:nth-child(6){ animation-delay: 0.1s; height: 90%; }
-#proEqualizer .bar:nth-child(7){ animation-delay: 0.5s; height: 50%; }
-#proEqualizer .bar:nth-child(8){ animation-delay: 0.3s; height: 70%; }
 
-@keyframes bounce{
-  0%, 100%{ transform: scaleY(0.3); }
-  50%{ transform: scaleY(1); }
-}
 canvas{
   width:100%;
   height:100%;
