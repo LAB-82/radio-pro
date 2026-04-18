@@ -11,7 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 // Podaj właściwy adres strony radia
-$url = 'https://twojadres.strony.radiosite.pl'; // zamień na faktyczny adres
+$url = 'https://www.muzyczneradio.pl/'; // zamień na faktyczny adres
 
 // Funkcja do pobrania zawartości strony
 function getPageContent($url) {
