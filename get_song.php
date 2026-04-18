@@ -1,19 +1,17 @@
 <?php
-// get_song.php
-
-// Ustaw nagłówki CORS, aby umożliwić dostęp z dowolnej domeny
+// Ustaw nagłówki CORS, jeśli potrzebujesz
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type");
 
-// Opcjonalnie obsłuż OPTIONS, jeśli jest to zapytanie preflight
+// Obsłuż OPTIONS
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
     exit;
 }
 
-// Adres strony radia, którą chcesz pobrać
-$url = 'https://www.muzyczneradio.pl/';
+// Adres strony radia
+$url = 'https://www.muzyczneradio.pl/'; // zamień na właściwy adres
 
 // Funkcja do pobrania zawartości strony
 function getPageContent($url) {
@@ -35,23 +33,20 @@ if ($html === false) {
     exit;
 }
 
-// Użyj DOMDocument i DOMXPath do wyodrębnienia informacji
-$doc = new DOMDocument();
-libxml_use_internal_errors(true);
-$doc->loadHTML($html);
-libxml_clear_errors();
+// Szukamy tekstu po "TERAZ GRAMY" lub podobnym wzorze
+// Założenie: informacja o utworze pojawia się w tekście, np. w formacie:
+// "TERAZ GRAMY: [nazwa utworu]" albo "Teraz gram [nazwa utworu]"
+preg_match('/TERAZ GRAMY[:\s]*([\w\s\-\&\']+)</i', $html, $matches);
 
-$xpath = new DOMXPath($doc);
+// Jeśli nie znajdzie, próbujemy inny wzór
+if (empty($matches)) {
+    preg_match('/Teraz gram\s*([\w\s\-\&\']+)</i', $html, $matches);
+}
 
-// Zmień poniższy selektor na odpowiedni do Twojej strony, np.:
-// $selector = "//div[@id='current-song']";
-$selector = "//div[@class='nazwa-klasy']"; // lub inny selektor
-
-$elements = $xpath->query($selector);
-
-if ($elements->length > 0) {
-    $songInfo = trim($elements->item(0)->textContent);
-    echo htmlspecialchars($songInfo);
+// Wyświetlamy wynik
+if (isset($matches[1])) {
+    $currentSong = trim($matches[1]);
+    echo htmlspecialchars($currentSong);
 } else {
     echo "Nie znaleziono informacji o utworze.";
 }
