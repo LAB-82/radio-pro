@@ -10,8 +10,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 
-// Adres strony radia
-$url = 'https://www.muzyczneradio.pl/'; // zamień na właściwy adres
+// Podaj właściwy adres strony radia
+$url = 'https://twojadres.strony.radiosite.pl'; // zamień na faktyczny adres
 
 // Funkcja do pobrania zawartości strony
 function getPageContent($url) {
@@ -33,21 +33,20 @@ if ($html === false) {
     exit;
 }
 
-// Szukamy tekstu po "TERAZ GRAMY" lub podobnym wzorze
-// Założenie: informacja o utworze pojawia się w tekście, np. w formacie:
-// "TERAZ GRAMY: [nazwa utworu]" albo "Teraz gram [nazwa utworu]"
-preg_match('/TERAZ GRAMY[:\s]*([\w\s\-\&\']+)</i', $html, $matches);
+// Wyświetlenie zawartości strony - do debugowania
+// echo htmlspecialchars($html);
 
-// Jeśli nie znajdzie, próbujemy inny wzór
-if (empty($matches)) {
-    preg_match('/Teraz gram\s*([\w\s\-\&\']+)</i', $html, $matches);
-}
+// Szukamy pasujących fragmentów tekstu
+// Przykład regex, który dopasuje wszystko od "TERAZ GRAMY" do końca linii lub do następnego znacznika
+preg_match_all('/(TERAZ GRAMY[:\s]*[^\n<]+)/i', $html, $matches);
 
-// Wyświetlamy wynik
-if (isset($matches[1])) {
-    $currentSong = trim($matches[1]);
-    echo htmlspecialchars($currentSong);
+// Sprawdzamy, co znaleźliśmy
+if (!empty($matches[0])) {
+    echo "Znalezione fragmenty:\n";
+    foreach ($matches[0] as $index => $match) {
+        echo ($index + 1) . ". " . htmlspecialchars($match) . "\n";
+    }
 } else {
-    echo "Nie znaleziono informacji o utworze.";
+    echo "Nie znaleziono żadnych pasujących fragmentów.";
 }
 ?>
