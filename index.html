@@ -3,16 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <title>Muzyczne Radio PRO</title>
-<!-- Google Fonts - Rajdhani i Orbitron -->
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
 <style>
-@font-face {
-  font-family: 'Cyberpunk';
-  src: url('https://cdn.jsdelivr.net/gh/LAB-82/radio-pro@main/Cyberpunk.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
-}
 :root{
   --cp-cyan:#00f0ff;
   --cp-magenta:#ff003c;
@@ -20,6 +12,7 @@
   --cp-red:#ff2a2a;
   --cp-bg:#000014;
 }
+
 body{
   margin:0;
   background:var(--cp-bg);
@@ -38,91 +31,57 @@ body{
   min-height:100vh;
   padding-bottom: 40px;
 }
+
 #title{
-  font-family:'Cyberpunk', 'Orbitron', sans-serif;
-  font-weight: 400;
-  font-size:100px;
+  font-family:'Orbitron', sans-serif;
+  font-weight: 900;
+  font-size:88px;
   margin-top:50px;
   text-align:center;
-  color:var(--cp-yellow);
-  letter-spacing: 0px;
-  position: relative;
-  display: inline-block;
+  color:var(--cp-cyan);
   text-shadow:
-    3px 0px var(--cp-cyan),
-    -3px -3px 0px var(--cp-magenta),
-    0 0 30px var(--cp-yellow);
-  animation: glitch 3s infinite;
+    0 0 5px var(--cp-cyan),
+    0 0 10px var(--cp-cyan),
+    0 0 20px var(--cp-cyan),
+    0 0 40px var(--cp-magenta),
+    0 0 80px var(--cp-magenta);
+  animation: flicker 3s infinite alternate;
 }
 
-@keyframes glitch{
-  0%, 90%, 100%{
+@keyframes flicker {
+  0%, 18%, 22%, 25%, 53%, 57%, 100% {
     text-shadow:
-      3px 0px var(--cp-cyan),
-      -3px -3px 0px var(--cp-magenta),
-      0 0 30px var(--cp-yellow);
-    transform: skew(0deg);
+      0 0 5px var(--cp-cyan),
+      0 0 10px var(--cp-cyan),
+      0 0 20px var(--cp-cyan),
+      0 0 40px var(--cp-magenta),
+      0 0 80px var(--cp-magenta);
+    opacity: 1;
   }
-  91%{
-    text-shadow:
-      6px 0px 0px var(--cp-cyan),
-      -6px 0px 0px var(--cp-magenta),
-      0 0 30px var(--cp-red);
-    transform: skew(5deg);
-  }
-  93%{
-    text-shadow:
-      -4px 2px 0px var(--cp-cyan),
-      4px -2px 0px var(--cp-magenta),
-      0 0 30px var(--cp-yellow);
-    transform: skew(-3deg);
-  }
-  95%{
-    text-shadow:
-      3px 3px 0px var(--cp-cyan),
-      -3px -3px 0px var(--cp-magenta),
-      0 0 30px var(--cp-yellow);
-    transform: skew(0deg);
+  20%, 24%, 55% {
+    text-shadow: none;
+    opacity: 0.8;
   }
 }
 
 #proEqualizer{
   margin-top:30px;
-  width: 80%;
-  max-width: 600px;
-  height: 120px;
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 4px;
-  padding: 20px;
-  background: rgba(0, 240, 255, 0.05);
+  margin-bottom:30px;
+  width:600px;
+  height:260px;
+  position:relative;
+  background:
+    linear-gradient(135deg, transparent 8px, var(--cp-bg) 8px) top left,
+    linear-gradient(225deg, transparent 8px, var(--cp-bg) 8px) top right,
+    linear-gradient(315deg, transparent 8px, var(--cp-bg) 8px) bottom right,
+    linear-gradient(45deg, transparent 8px, var(--cp-bg) 8px) bottom left;
+  background-size: 51% 51%;
+  background-repeat: no-repeat;
   border: 2px solid var(--cp-cyan);
-  box-shadow: 
-    0 0 20px var(--cp-cyan),
-    inset 0 0 20px rgba(0, 240, 255, 0.1);
-}
-
-#proEqualizer .bar{
-  width: 100%;
-  background: linear-gradient(0deg, var(--cp-magenta) 0%, var(--cp-yellow) 50%, var(--cp-cyan) 100%);
-  box-shadow: 0 0 10px var(--cp-cyan);
-  animation: bounce 1.2s ease-in-out infinite;
-  transform-origin: bottom;
-}
-
-#proEqualizer .bar:nth-child(1){ animation-delay: 0s; height: 20%; }
-#proEqualizer .bar:nth-child(2){ animation-delay: 0.1s; height: 60%; }
-#proEqualizer .bar:nth-child(3){ animation-delay: 0.3s; height: 40%; }
-#proEqualizer .bar:nth-child(4){ animation-delay: 0.2s; height: 80%; }
-#proEqualizer .bar:nth-child(5){ animation-delay: 0.4s; height: 30%; }
-#proEqualizer .bar:nth-child(6){ animation-delay: 0.1s; height: 90%; }
-#proEqualizer .bar:nth-child(7){ animation-delay: 0.5s; height: 50%; }
-#proEqualizer .bar:nth-child(8){ animation-delay: 0.3s; height: 70%; }
-
-@keyframes bounce{
-  0%, 100%{ transform: scaleY(0.3); }
-  50%{ transform: scaleY(1); }
+  box-shadow:
+    0 0 10px var(--cp-cyan),
+    0 0 20px var(--cp-magenta),
+    inset 0 0 20px rgba(0,240,255,0.2);
 }
 
 canvas{
@@ -172,30 +131,124 @@ button:hover{
   box-shadow: 0 0 15px var(--cp-cyan), 0 0 30px var(--cp-magenta);
   transform: translateY(-1px);
 }
+
+button:active{
+  transform: translateY(1px);
+  box-shadow: 0 0 5px var(--cp-cyan);
+}
+
+.volumeWrapper{
+  width:160px;
+  height:45px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:
+    linear-gradient(135deg, transparent 8px, #0a0a1a 8px) top left,
+    linear-gradient(225deg, transparent 8px, #0a0a1a 8px) top right,
+    linear-gradient(315deg, transparent 8px, #0a0a1a 8px) bottom right,
+    linear-gradient(45deg, transparent 8px, #0a0a1a 8px) bottom left;
+  background-size: 51% 51%;
+  background-repeat: no-repeat;
+  border: 2px solid var(--cp-cyan);
+  box-shadow: 0 0 8px var(--cp-cyan), inset 0 0 8px rgba(0,240,255,0.3);
+  position: relative;
+  box-sizing: border-box;
+}
+
+#volume{
+  width:120px;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  background: #0a0a1a;
+  border: 1px solid var(--cp-cyan);
+  outline: none;
+  margin: 0;
+}
+
+#volume::-webkit-slider-thumb{
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  background: var(--cp-yellow);
+  cursor: pointer;
+  border: 2px solid var(--cp-cyan);
+  box-shadow: 0 0 8px var(--cp-yellow), 0 0 15px var(--cp-cyan);
+  border-radius: 2px;
+  margin-top: -7px;
+}
+
+#volume::-moz-range-thumb{
+  width: 16px;
+  height: 16px;
+  background: var(--cp-yellow);
+  cursor: pointer;
+  border: 2px solid var(--cp-cyan);
+  box-shadow: 0 0 8px var(--cp-yellow), 0 0 15px var(--cp-cyan);
+  border-radius: 2px;
+}
+
+#volume::-webkit-slider-runnable-track{
+  background: linear-gradient(90deg, var(--cp-magenta), var(--cp-cyan));
+  height: 4px;
+}
+
+#volume::-moz-range-track{
+  background: linear-gradient(90deg, var(--cp-magenta), var(--cp-cyan));
+  height: 4px;
+}
+
+#volume.center::-webkit-slider-thumb{
+  background: var(--cp-yellow);
+  box-shadow: 0 0 8px var(--cp-yellow), 0 0 15px var(--cp-cyan);
+}
+#volume.center::-moz-range-thumb{
+  background: var(--cp-yellow);
+  box-shadow: 0 0 8px var(--cp-yellow), 0 0 15px var(--cp-cyan);
+}
+#volume.changed::-webkit-slider-thumb{
+  background: var(--cp-red);
+  box-shadow: 0 0 8px var(--cp-red), 0 0 15px var(--cp-magenta);
+}
+#volume.changed::-moz-range-thumb{
+  background: var(--cp-red);
+  box-shadow: 0 0 8px var(--cp-red), 0 0 15px var(--cp-magenta);
+}
+
+#bottomLink{
+  margin-top:20px;
+}
+
+#bottomLink a{
+  color:var(--cp-cyan);
+  text-decoration:none;
+  font-family:'Orbitron', sans-serif;
+  text-shadow: 0 0 5px var(--cp-cyan);
+  transition: 0.2s;
+}
+
+#bottomLink a:hover{
+  color:var(--cp-yellow);
+  text-shadow: 0 0 10px var(--cp-yellow), 0 0 20px var(--cp-magenta);
+}
 </style>
 </head>
 
 <body>
-  <div id="title">Muzyczne Radio</div>
-  
-  <div id="proEqualizer">
-    <div class="bar"></div>
-    <div class="bar"></div>
-    <div class="bar"></div>
-    <div class="bar"></div>
-    <div class="bar"></div>
-    <div class="bar"></div>
-    <div class="bar"></div>
-    <div class="bar"></div>
-  </div>
 
-  <div id="controls">
+<div id="title">Muzyczne Radio</div>
+
+<div id="proEqualizer">
+  <canvas id="eqCanvas"></canvas>
+</div>
+
+<div id="controls">
   <button>PLAY</button>
   <button>STOP</button>
   <button>MUTE</button>
-</div>
-</body>
-</html>
+
   <div class="volumeWrapper">
     <input type="range" id="volume" min="0" max="1" step="0.01" value="0.5" class="center">
   </div>
