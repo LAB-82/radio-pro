@@ -1,4 +1,5 @@
 <?php
+header("Content-Type: application/json; charset=UTF-8");
 
 $url = "https://stream.rcs.revma.com/gzwc1xcq042vv";
 
@@ -13,10 +14,10 @@ $context = stream_context_create($opts);
 $stream = fopen($url, 'r', false, $context);
 
 if (!$stream) {
-    die("Brak połączenia");
+    echo json_encode(["error" => "connection_failed"]);
+    exit;
 }
 
-// znajdź metaint
 $metaInt = null;
 foreach ($http_response_header as $h) {
     if (stripos($h, 'icy-metaint') !== false) {
@@ -25,24 +26,20 @@ foreach ($http_response_header as $h) {
 }
 
 if (!$metaInt) {
-    die("Brak metadata");
+    echo json_encode(["error" => "no_metadata"]);
+    exit;
 }
 
-// pomiń audio
 fread($stream, $metaInt);
-
-// długość metadata
 $len = ord(fread($stream, 1)) * 16;
-
 $meta = fread($stream, $len);
 
-// wyciągnij tytuł
 if (preg_match("/StreamTitle='([^']*)'/", $meta, $m)) {
     echo json_encode([
-        "now_playing" => $m[1]
+        "title" => $m[1]
     ]);
 } else {
-    echo json_encode(["error" => "no_data"]);
+    echo json_encode(["title" => "Brak danych"]);
 }
 
 fclose($stream);
