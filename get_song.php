@@ -1,38 +1,79 @@
 <?php
-// Ustaw nagłówki CORS
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
-header("Access-Control-Allow-Headers: Content-Type");
+header("Content-Type: application/json; charset=UTF-8");
 
-// Obsłuż OPTIONS
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    http_response_code(200);
-    exit;
-}
-
-// Adres strony
+// ===== URL =====
 $url = 'https://www.muzyczneradio.pl/';
 
-// Funkcja do pobrania zawartości
-function getPageContent($url) {
-    $options = [
-        "http" => [
-            "header" => "User-Agent: Mozilla/5.0\r\n"
-        ]
-    ];
-    $context = stream_context_create($options);
-    $content = @file_get_contents($url, false, $context);
-    return $content;
+// ===== CURL =====
+function fetch($url){
+    $ch = curl_init();
+
+    curl_setopt_array($ch, [
+        CURLOPT_URL => $url,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_TIMEOUT => 10,
+        CURLOPT_USERAGENT => "Mozilla/5.0",
+        CURLOPT_ENCODING => ""
+    ]);
+
+    $html = curl_exec($ch);
+    curl_close($ch);
+
+    return $html;
 }
 
-$html = getPageContent($url);
+$html = fetch($url);
 
-if ($html === false) {
-    echo "Nie można pobrać strony.";
+if(!$html){
+    echo json_encode(["error" => "fetch_failed"]);
     exit;
 }
 
-// Wyświetlamy zawartość
-echo "<h2>Zawartość strony (debug)</h2>";
-echo "<pre>" . htmlspecialchars($html) . "</pre>";
-?>
+// ===== PARSER =====
+libxml_use_internal_errors(true);
+$dom = new DOMDocument();
+$dom->loadHTML($html);
+
+$xpath = new DOMXPath($dom);
+
+// ===== PRÓBA 1 (najczęstsza struktura) =====
+$query = "//div[contains(@class,'teraz') or contains(@class,'now-playing')]";
+$nodes = $xpath->query($query);
+
+$track = null;
+
+foreach($nodes as $node){
+    $text = trim($node->textContent);
+
+    if(strlen($text) > 5 && strpos($text, '-') !== false){
+        $track = $text;
+        break;
+    }
+}
+
+// ===== PRÓBA 2 (fallback – szukanie tekstu globalnie) =====
+if(!$track){
+    if(preg_match('/([A-Z0-9 .&]+)\s-\s([A-Z0-9 .&]+)/i', $html, $m)){
+        $track = $m[0];
+    }
+}
+
+// ===== BRAK DANYCH =====
+if(!$track){
+    echo json_encode(["error" => "no_track_found"]);
+    exit;
+}
+
+// ===== ROZDZIELENIE =====
+$parts = explode('-', $track, 2);
+
+$artist = trim($parts[0]);
+$title  = isset($parts[1]) ? trim($parts[1]) : "";
+
+// ===== OUTPUT =====
+echo json_encode([
+    "artist" => $artist,
+    "title" => $title,
+    "full" => $artist . " - " . $title
+], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
