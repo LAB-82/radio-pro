@@ -280,23 +280,75 @@ window.addEventListener("resize", resize);
 function init(){
   if(!ctx){
     ctx = new (window.AudioContext || window.webkitAudioContext)();
-
     analyser = ctx.createAnalyser();
-    analyser.fftSize = 256;
-
-    // stabilne, naturalne audio
-    analyser.smoothingTimeConstant = 0.82;
-
+    analyser.fftSize = 2048; // więcej detali
+    analyser.smoothingTimeConstant = 0.7; // mniej mulisto
+    analyser.minDecibels = -90;
+    analyser.maxDecibels = -10;
     bufferLen = analyser.frequencyBinCount;
     data = new Uint8Array(bufferLen);
-
     src = ctx.createMediaElementSource(audio);
     src.connect(analyser);
     analyser.connect(ctx.destination);
   }
+  if(ctx.state === "suspended") ctx.resume();
+}
 
-  if(ctx.state === "suspended"){
-    ctx.resume();
+// ================= EQ PRO =================
+let lastValues, peaks, peakTimers;
+
+function draw(){
+  requestAnimationFrame(draw);
+  if(!analyser) return;
+
+  analyser.getByteFrequencyData(data);
+  c.clearRect(0,0,canvas.width,canvas.height);
+
+  const bars = 64;
+  const barW = canvas.width / bars;
+
+  if(!lastValues) lastValues = new Array(bars).fill(0);
+  if(!peaks) peaks = new Array(bars).fill(0);
+  if(!peakTimers) peakTimers = new Array(bars).fill(0);
+
+  for(let i = 0; i < bars; i++){
+    // Skala logarytmiczna
+    const percent = i / bars;
+    const index = Math.floor(Math.pow(percent, 2.2) * bufferLen * 0.8); // *0.8 bo góra to szum
+    let v = data[index];
+
+    // Attack/Decay
+    if(v > lastValues[i]) {
+      lastValues[i] = v * 0.75 + lastValues[i] * 0.25;
+    } else {
+      lastValues[i] = v * 0.2 + lastValues[i] * 0.8;
+    }
+
+    const h = Math.min(canvas.height, (lastValues[i] / 255) * canvas.height * 0.95);
+
+    // Gradient cyberpunk
+    const grad = c.createLinearGradient(0, canvas.height, 0, canvas.height - h);
+    grad.addColorStop(0, '#ff003c');
+    grad.addColorStop(0.5, '#fcee09');
+    grad.addColorStop(1, '#00f0ff');
+    c.fillStyle = grad;
+
+    // Glow
+    c.shadowBlur = 20;
+    c.shadowColor = '#00f0ff';
+    c.fillRect(i * barW, canvas.height - h, barW - 2, h);
+    c.shadowBlur = 0;
+
+    // Peak hold
+    if(h > peaks[i]) {
+      peaks[i] = h;
+      peakTimers[i] = 0;
+    } else {
+      peakTimers[i]++;
+      if(peakTimers[i] > 40) peaks[i] *= 0.97;
+    }
+    c.fillStyle = '#fcee09';
+    c.fillRect(i * barW, canvas.height - peaks[i] - 3, barW - 2, 3);
   }
 }
 
