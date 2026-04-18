@@ -1,80 +1,48 @@
 <?php
-header("Content-Type: application/json; charset=UTF-8");
 
-$url = 'https://www.muzyczneradio.pl/';
+$url = "https://stream.rcs.revma.com/gzwc1xcq042vv";
 
-function fetch($url) {
-    $ch = curl_init();
+$opts = [
+    "http" => [
+        "method" => "GET",
+        "header" => "Icy-MetaData: 1\r\n"
+    ]
+];
 
-    curl_setopt_array($ch, [
-        CURLOPT_URL            => $url,
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_FOLLOWLOCATION => true,
-        CURLOPT_TIMEOUT        => 10,
-        CURLOPT_USERAGENT      => "Mozilla/5.0",
-        CURLOPT_ENCODING       => "",
-        CURLOPT_SSL_VERIFYPEER => false,
-        CURLOPT_SSL_VERIFYHOST => false
+$context = stream_context_create($opts);
+$stream = fopen($url, 'r', false, $context);
+
+if (!$stream) {
+    die("Brak połączenia");
+}
+
+// znajdź metaint
+$metaInt = null;
+foreach ($http_response_header as $h) {
+    if (stripos($h, 'icy-metaint') !== false) {
+        $metaInt = (int) explode(":", $h)[1];
+    }
+}
+
+if (!$metaInt) {
+    die("Brak metadata");
+}
+
+// pomiń audio
+fread($stream, $metaInt);
+
+// długość metadata
+$len = ord(fread($stream, 1)) * 16;
+
+$meta = fread($stream, $len);
+
+// wyciągnij tytuł
+if (preg_match("/StreamTitle='([^']*)'/", $meta, $m)) {
+    echo json_encode([
+        "now_playing" => $m[1]
     ]);
-
-    $html = curl_exec($ch);
-    $http = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
-
-    if($html === false || $http !== 200){
-        return null;
-    }
-
-    return $html;
+} else {
+    echo json_encode(["error" => "no_data"]);
 }
 
-$html = fetch($url);
-
-if(!$html){
-    echo json_encode(["error" => "fetch_failed"]);
-    exit;
-}
-
-libxml_use_internal_errors(true);
-$dom = new DOMDocument();
-@$dom->loadHTML($html);
-
-$xpath = new DOMXPath($dom);
-
-$track = null;
-
-// Próba 1 – konkretny XPath
-$query = "//*[contains(@class,'now') or contains(@class,'playing') or contains(@class,'teraz') or contains(@class,'now-playing')]";
-$nodes = $xpath->query($query);
-
-foreach($nodes as $node){
-    $text = trim($node->textContent);
-    if(strlen($text) > 5 && strpos($text, '-') !== false){
-        $track = $text;
-        break;
-    }
-}
-
-// Próba 2 – fallback regex
-if(!$track){
-    if(preg_match('/[A-Z0-9ĘÓĄŚŻŹĆŃąśłęźćń .&]+\\s?-\\s?[A-Z0-9ĘÓĄŚŻŹĆŃąśłęźćń .&]+/iu', $html, $m)){
-        $track = $m[0];
-    }
-}
-
-if(!$track){
-    echo json_encode(["error" => "no_track_found"]);
-    exit;
-}
-
-// Rozdzielenie
-$parts = explode('-', $track, 2);
-$artist = trim($parts[0]);
-$title  = isset($parts[1]) ? trim($parts[1]) : "";
-
-// Output
-echo json_encode([
-    "artist" => $artist,
-    "title"  => $title,
-    "full"   => $artist . " - " . $title
-], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+fclose($stream);
