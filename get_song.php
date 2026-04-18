@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 // Adres strony radia, którą chcesz pobrać
-$url = 'https://przykladowastrona.radiosite.pl';
+$url = 'https://www.muzyczneradio.pl/';
 
 // Funkcja do pobrania zawartości strony
 function getPageContent($url) {
