@@ -281,7 +281,7 @@ function init(){
   if(!ctx){
     ctx = new (window.AudioContext || window.webkitAudioContext)();
     analyser = ctx.createAnalyser();
-    analyser.fftSize = 2048; // więcej detali
+    analyser.fftSize = 1024; // więcej detali
     analyser.smoothingTimeConstant = 0.7; // mniej mulisto
     analyser.minDecibels = -90;
     analyser.maxDecibels = -10;
@@ -304,7 +304,7 @@ function draw(){
   analyser.getByteFrequencyData(data);
   c.clearRect(0,0,canvas.width,canvas.height);
 
-  const bars = 64;
+  const bars = 32;
   const barW = canvas.width / bars;
 
   if(!lastValues) lastValues = new Array(bars).fill(0);
