@@ -1,6 +1,17 @@
 <?php
 // get_song.php
 
+// Ustaw nagłówki CORS, aby umożliwić dostęp z dowolnej domeny
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type");
+
+// Opcjonalnie obsłuż OPTIONS, jeśli jest to zapytanie preflight
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit;
+}
+
 // Adres strony radia, którą chcesz pobrać
 $url = 'https://przykladowastrona.radiosite.pl';
 
