@@ -1,5 +1,5 @@
 <?php
-// Ustaw nagłówki CORS, jeśli potrzebujesz
+// Ustaw nagłówki CORS
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type");
@@ -10,10 +10,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 
-// Podaj właściwy adres strony radia
-$url = 'https://www.muzyczneradio.pl/'; // zamień na faktyczny adres
+// Adres strony
+$url = 'https://www.muzyczneradio.pl/';
 
-// Funkcja do pobrania zawartości strony
+// Funkcja do pobrania zawartości
 function getPageContent($url) {
     $options = [
         "http" => [
@@ -25,7 +25,6 @@ function getPageContent($url) {
     return $content;
 }
 
-// Pobierz zawartość strony
 $html = getPageContent($url);
 
 if ($html === false) {
@@ -33,20 +32,7 @@ if ($html === false) {
     exit;
 }
 
-// Wyświetlenie zawartości strony - do debugowania
-// echo htmlspecialchars($html);
-
-// Szukamy pasujących fragmentów tekstu
-// Przykład regex, który dopasuje wszystko od "TERAZ GRAMY" do końca linii lub do następnego znacznika
-preg_match_all('/(TERAZ GRAMY[:\s]*[^\n<]+)/i', $html, $matches);
-
-// Sprawdzamy, co znaleźliśmy
-if (!empty($matches[0])) {
-    echo "Znalezione fragmenty:\n";
-    foreach ($matches[0] as $index => $match) {
-        echo ($index + 1) . ". " . htmlspecialchars($match) . "\n";
-    }
-} else {
-    echo "Nie znaleziono żadnych pasujących fragmentów.";
-}
+// Wyświetlamy zawartość
+echo "<h2>Zawartość strony (debug)</h2>";
+echo "<pre>" . htmlspecialchars($html) . "</pre>";
 ?>
